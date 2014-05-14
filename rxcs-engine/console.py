@@ -29,13 +29,14 @@ def pack(inxPack):
 
     Function prints header of the signal pack processed by RxCS frames + index
     of the current signal pack. |br|
+
     The function takes care of the proper coloring of the console output. |br|
 
     >>> console.pack(1)
 
     gives an output:
 
-    :bash:`>>> SIGNAL PACK #1:`.
+    :bash:`>>> SIGNAL PACK #1:`
 
     Args:
         inxPack (int): Index of the current signal pack
@@ -69,11 +70,11 @@ def progress(strStage, strModule):
 
     The function takes care of the proper coloring of the console output. |br|
 
-    >>> console.progress('Generator', 'Random multitone')
+    >>> console.progress('Signal generator', 'Random multitone')
 
     gives an output:
 
-    :bash:`|    >> Signal generator: Random multitone`.
+    :bash:`|    >> Signal generator: Random multitone`
 
 
     Args:
@@ -102,11 +103,12 @@ def module_progress(strInfo):
 
     The function takes care of the proper coloring of the console output. |br|
 
-    The output looks as follows: (strInfo = 'The module X is starting')
+    >>> console.progress('The module X is starting')
 
-        > The module X is starting...
+    gives an output:
 
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+    :bash:`|        > The module X is starting...`
+
 
     Args:
         strInfo (string): progress info to be printed
