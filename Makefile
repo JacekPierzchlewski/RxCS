@@ -46,7 +46,7 @@ pep8:
 	@echo      '"'RXCS'"' system - pep8 checker
 	@echo
 	@echo ================================================
-	@make --quiet -C rxcs pep8
+	@make --quiet -C rxcs-engine pep8
 	@make --quiet -C examples pep8
 
 # #############################################################################
