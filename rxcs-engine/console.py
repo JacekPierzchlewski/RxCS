@@ -1,15 +1,17 @@
 """
+
 Module contains console printing functions for the RXCS. |br|
 All of the console print in RxCS should be done using functions
 from this module.
 
-This module is a part of the RxCS toolbox.
+*Author*:
+    Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
-.. module:: console.py
+*Version*:
+    0.1 | 14-MAY-2014 : * Initial version.
 
-   :platform: Linux, Mac
-
-.. moduleauthor:: Jacek Pierzchlewski, Aalborg University, DK, <jap@es.aau.dk>
+*License*:
+    BSD 2-Clause
 
 """
 from __future__ import division
