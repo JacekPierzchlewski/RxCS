@@ -3,22 +3,22 @@
 #
 #	targets:
 #
-#		a.  pep8 : analyze the pep8-compatibility of the code 
+#		a.  pep8 : analyze the pep8-compatibility of the code
 #
-#		b.  htmldoc : generate the documentation in html 
+#		b.  htmldoc : generate the documentation in html
 #
 #		c.  clean : clean the code (remove temporary files)
 #
 #
 # Author:
-# 	Jacek Pierzchlewski, Aalborg University, Denmark 
+# 	Jacek Pierzchlewski, Aalborg University, Denmark
 # 	email: j a p (at) es _dot_ aau _dot_ dk
 #
 # Version:
 #
 #	0.1 | 13-MAY-2014: * Initial version
 #
-# License: 
+# License:
 #
 #	BSD 2-Clause
 
@@ -56,6 +56,6 @@ pep8:
 # #############################################################################
 clean:
 	@echo -n '"'RxCS'"' system - removing .pyc files
-	@make --quiet -C rxcs clean
+	@make --quiet -C rxcs-engine clean
 	@make --quiet -C examples clean
 	@echo done!
