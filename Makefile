@@ -1,5 +1,5 @@
 #
-# This is the main Makefile of the RxCS system.
+# This is the main Makefile of the RxCS toolbox.
 #
 #	targets:
 #
