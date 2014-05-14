@@ -50,7 +50,7 @@ PLEASE NOTE: To preserve code simplicity RxCS toolbox do not use objects (classe
 
 
 .. automodule:: console
-   :members: pack, progress, module_progress. module_progress_done, warning, info, bullet_info, note, param, bullet_param
+   :members: pack, progress, module_progress, module_progress_done, warning, info, bullet_info, note, param, bullet_param
 
 .. |br| raw:: html
 
