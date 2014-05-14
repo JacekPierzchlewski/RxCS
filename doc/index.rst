@@ -9,8 +9,10 @@ Welcome to RxCS's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
+  introduction
+  modules
 
 
 Indices and tables
