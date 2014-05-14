@@ -1,5 +1,4 @@
 """
-
 Module contains console printing functions for the RXCS. |br|
 All of the console print in RxCS should be done using functions
 from this module.
@@ -25,22 +24,25 @@ import time
 # =====================================================================
 def pack(inxPack):
     """
+    .. role:: bash(code)
+      :language: bash
+
     Function prints header of the signal pack processed by RxCS frames + index
     of the current signal pack. |br|
     The function takes care of the proper coloring of the console output. |br|
 
-    The output looks as follows: (inxPack == 1)
+    >>> console.pack(1)
 
-    >>> SIGNAL PACK #1:
+    gives an output:
 
-
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+    :bash:`>>> SIGNAL PACK #1:`.
 
     Args:
         inxPack (int): Index of the current signal pack
 
     Returns:
         nothing
+
     """
 
     strPackNumber = '#%d' % (inxPack)
@@ -58,19 +60,21 @@ def pack(inxPack):
 # =====================================================================
 def progress(strStage, strModule):
     """
-    Function prints progress of the RxCS frames.|br|
+    .. role:: bash(code)
+      :language: bash
+
+    Function prints progress of the RxCS frames. |br|
     It prints the progress sign ('>>') + the current stage (signal generation,
     sampler, reconstruction, etc...) + name of the current module. |br|
 
     The function takes care of the proper coloring of the console output. |br|
 
-    The output looks as follows: (strStage = 'Signal generator',
-                                  strModule = 'Random multitone')
+    >>> console.progress('Generator', 'Random multitone')
 
-        >> Signal generator: Random multitone
+    gives an output:
 
+    :bash:`|    >> Signal generator: Random multitone`.
 
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
 
     Args:
         strStage (string): name of the stage
