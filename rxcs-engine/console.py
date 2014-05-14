@@ -1,36 +1,16 @@
-###########################################################################
-# "IRfDUCS" PROJECT 2013 - 2014.
-#
-# RxCS toolbox, module: console.py
-#
-# Module contains console printing functions for the RXCS
-#
-#
-#
-# Copyright (c) 2013-2014  Jacek Pierzchlewski, (AAU SIP)
-#                          AALBORG UNIVERSITY, Denmark
-#                          Signal and Information Processing Section (AAU SIP)
-#                          Email:    jap@es.aau.dk (Jacek)
-#
-#                          Comments and bug reports are very welcome!
-#
-# Licensing: This software is released under the terms of the FreeBSD license.
-#
-###########################################################################
-
 """
-Control module of the RxCS Work Frame type 1. |br|
-This module controls run of the Work Frame 1.
+Module contains console printing functions for the RXCS. All of the console
+print in RxCS should be done using function from this module.
 
-Functions from this module which may be run by the user:
+This module is a part of the "IRfDUCS" PROJECT 2013 - 2016,
 
 .. module:: console.py
 
    :platform: Linux, Mac
 
-.. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
-"""
+.. moduleauthor:: Jacek Pierzchlewski, Aalborg University, DK, <jap@es.aau.dk>
 
+"""
 import sys
 import numpy as np
 import time
@@ -54,12 +34,13 @@ def pack(inxPack):
 # =====================================================================
 # Print the sys progress sign (>>) + current stage + name of the current module
 # =====================================================================
-def progress(strProg,strName):
+def progress(strProg, strName):
 
     sys.stdout.write(_colors('PROGRESS') + '    >> ' + _colors('ENDC'))
     sys.stdout.write(strProg + ': ' + strName + ' \n')
 
     return
+
 
 # =====================================================================
 # Print the module progress sign (>) + start the timer
@@ -108,7 +89,7 @@ def warning(strWarn):
 # =====================================================================
 # Print a bullet + information description + ':' + information
 # =====================================================================
-def bullet_info(strDesc,strInfo):
+def bullet_info(strDesc, strInfo):
 
     # Write the tabulator with a bullet
     sys.stdout.write('\n' + _colors('BULLET') + '        * ' + _colors('ENDC'))
@@ -140,6 +121,7 @@ def info(strInfo):
 
     return
 
+
 # =====================================================================
 # Print a note (an information without coloring)
 # =====================================================================
@@ -158,13 +140,13 @@ def note(strNote):
 # =====================================================================
 # Print a bullet + name of the parameter + the parameter
 # =====================================================================
-def bullet_param(strName,iVal,strForm,strUnit):
+def bullet_param(strName, iVal, strForm, strUnit):
 
     # Write the tabulator with a bullet
     sys.stdout.write('\n' + _colors('BULLET') + '        * ' + _colors('ENDC'))
 
     # Run the engine of parameter print
-    _param(strName,iVal,strForm,strUnit)
+    _param(strName, iVal, strForm, strUnit)
 
     return
 
@@ -172,13 +154,13 @@ def bullet_param(strName,iVal,strForm,strUnit):
 # =====================================================================
 # Print name of the parameter + the parameter
 # =====================================================================
-def param(strName,iVal,strForm,strUnit):
+def param(strName, iVal, strForm, strUnit):
 
     # Write the tabulator
     sys.stdout.write('          ')
 
     # Run the engine of parameter print
-    _param(strName,iVal,strForm,strUnit)
+    _param(strName, iVal, strForm, strUnit)
 
     return
 
@@ -220,7 +202,7 @@ def _colors(strKey):
 # =====================================================================
 # The engine of paramer print
 # =====================================================================
-def _param(strName,iVal,strForm,strUnit):
+def _param(strName, iVal, strForm, strUnit):
 
     # The name of the function (for error purposes)
     strFunc = 'rxcs.console._param'
@@ -244,7 +226,7 @@ def _param(strName,iVal,strForm,strUnit):
         (iCoef, strUnitRecalc) = _val2unit(iVal)
 
     elif strForm[0] == 's':  # <- the parameter contains seconds
-        _param_time_write(iVal,strForm)
+        _param_time_write(iVal, strForm)
         return
 
     else:  # <- there is a correct unit already given
@@ -262,7 +244,7 @@ def _param(strName,iVal,strForm,strUnit):
     if iCoef == 1:  # <- there is no need to recalculate the value
 
         # Put the number as it is, but pay attention if it is float or int
-        if isinstance(iVal,int):
+        if isinstance(iVal, int):
             strVal = ('%d') % (iVal_recal)
         else:
             strVal = ('%.3f') % (iVal_recal)
@@ -313,7 +295,7 @@ def _param(strName,iVal,strForm,strUnit):
             # Print out the 2nd representation
             sys.stdout.write('(')
             sys.stdout.write(_colors('INFO') + strVal2 + _colors('ENDC'))
-            sys.stdout.write(')'  + ' ')
+            sys.stdout.write(')' + ' ')
 
     # ----------------------------------------------------------------
 
@@ -334,7 +316,7 @@ def _param(strName,iVal,strForm,strUnit):
 # =====================================================================
 # The engine of time paramer print
 # =====================================================================
-def _param_time_write(iVal,strForm):
+def _param_time_write(iVal, strForm):
 
     # The name of the function (for error purposes)
     strFunc = 'rxcs.console._param_time_write'
@@ -372,6 +354,7 @@ def _param_time_write(iVal,strForm):
     sys.stdout.write('\n')
 
     return
+
 
 # =====================================================================
 # Recalculate unit string to unit coefficient
@@ -502,4 +485,3 @@ def _val2unit(iVal):
     # ----------------------------------------------------------------
 
     return (iCoef, strUnit)
-
