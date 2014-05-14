@@ -1,8 +1,9 @@
 """
-Module contains console printing functions for the RXCS. All of the console
-print in RxCS should be done using function from this module.
+Module contains console printing functions for the RXCS. |br|
+All of the console print in RxCS should be done using functions
+from this module.
 
-This module is a part of the "IRfDUCS" PROJECT 2013 - 2016,
+This module is a part of the RxCS toolbox.
 
 .. module:: console.py
 
@@ -11,6 +12,7 @@ This module is a part of the "IRfDUCS" PROJECT 2013 - 2016,
 .. moduleauthor:: Jacek Pierzchlewski, Aalborg University, DK, <jap@es.aau.dk>
 
 """
+from __future__ import division
 import sys
 import numpy as np
 import time
@@ -20,6 +22,24 @@ import time
 # Print signal pack header
 # =====================================================================
 def pack(inxPack):
+    """
+    Function prints header of the signal pack processed by RxCS frames + index
+    of the current signal pack. |br|
+    The function takes care of the proper coloring of the console output. |br|
+
+    The output looks as follows: (inxPack == 1)
+
+    >>> SIGNAL PACK #1:
+
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    Args:
+        inxPack (int): Index of the current signal pack
+
+    Returns:
+        nothing
+    """
 
     strPackNumber = '#%d' % (inxPack)
     sys.stdout.write('\n')
@@ -32,12 +52,34 @@ def pack(inxPack):
 
 
 # =====================================================================
-# Print the sys progress sign (>>) + current stage + name of the current module
+# Print the sys progress sign + current stage + name of the current module
 # =====================================================================
-def progress(strProg, strName):
+def progress(strStage, strModule):
+    """
+    Function prints progress of the RxCS frames.|br|
+    It prints the progress sign ('>>') + the current stage (signal generation,
+    sampler, reconstruction, etc...) + name of the current module. |br|
+
+    The function takes care of the proper coloring of the console output. |br|
+
+    The output looks as follows: (strStage = 'Signal generator',
+                                  strModule = 'Random multitone')
+
+        >> Signal generator: Random multitone
+
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    Args:
+        strStage (string): name of the stage
+        strModule (string): name of the module
+
+    Returns:
+        nothing
+    """
 
     sys.stdout.write(_colors('PROGRESS') + '    >> ' + _colors('ENDC'))
-    sys.stdout.write(strProg + ': ' + strName + ' \n')
+    sys.stdout.write(strStage + ': ' + strModule + ' \n')
 
     return
 
@@ -46,6 +88,26 @@ def progress(strProg, strName):
 # Print the module progress sign (>) + start the timer
 # =====================================================================
 def module_progress(strInfo):
+    """
+    Function prints an info about a module progress.
+    The info is preceded by a tabulator and a module progress sign ('>'). |br|
+
+    Additionally, the function starts a time counter. |br|
+
+    The function takes care of the proper coloring of the console output. |br|
+
+    The output looks as follows: (strInfo = 'The module X is starting')
+
+        > The module X is starting...
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    Args:
+        strInfo (string): progress info to be printed
+
+    Returns:
+        tStart (float): time stamp of the start
+    """
 
     sys.stdout.write(_colors('PROGRESS') + '\n        > ' + _colors('ENDC'))
     sys.stdout.write(strInfo + '...')
@@ -60,6 +122,27 @@ def module_progress(strInfo):
 # Finish the module progress print + print the tme of execution
 # =====================================================================
 def module_progress_done(tStart):
+    """
+    Function adds 'done' to a console message previously printed by a
+    'module_progress' function. |br|
+
+    Additionally, the function print an info about an execution time of a
+    module, based on the time stamp of the start of the module.  |br|
+
+    The function takes care of the proper coloring of the console output. |br|
+
+    The output looks as follows (first part printed by a 'module_progress'):
+
+        > The module X is starting...done in Y.YY seconds
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    Args:
+        tStart (float): time stamp of the start
+
+    Returns:
+        nothing
+    """
 
     # Measure the time
     tTime = time.time() - tStart
@@ -74,6 +157,24 @@ def module_progress_done(tStart):
 # Print a warning
 # =====================================================================
 def warning(strWarn):
+    """
+    Function prints a warning preceded by a proper tabulator. |br|
+
+    The function takes care of the proper coloring of the console output. |br|
+
+    The output looks as follows: (strWarn = 'Mind the gap!')
+
+              Mind the gap!
+
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    Args:
+        strWarn (string): warning to be printed
+
+    Returns:
+        nothing
+    """
 
     # Add a tabulator to the warning message
     strWarn = ('          %s') % (strWarn)
@@ -87,9 +188,63 @@ def warning(strWarn):
 
 
 # =====================================================================
+# Print information
+# =====================================================================
+def info(strInfo):
+    """
+    Function prints an info preceded by a proper tabulator. |br|
+
+    The function takes care of the proper coloring of the console output. |br|
+
+    The output looks as follows: (strInfo = 'This station has a ticket office')
+
+              This station has a ticket office
+
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    Args:
+        strInfo (string): info to be printed
+
+    Returns:
+        nothing
+    """
+
+    # Add a tabulator to the info message
+    strInfo = ('          %s') % (strInfo)
+
+    # Write the info
+    sys.stdout.write(_colors('INFO'))
+    sys.stdout.write(strInfo)
+    sys.stdout.write(_colors('ENDC') + '\n')
+
+    return
+
+
+# =====================================================================
 # Print a bullet + information description + ':' + information
 # =====================================================================
 def bullet_info(strDesc, strInfo):
+    """
+    Function prints an info preceded by a proper tabulator, an info
+    bullet '*' and a description of the info. |br|
+
+    The function takes care of the proper coloring of the console output. |br|
+
+    The output looks as follows: (strDesc = 'Ticket office'
+                                  strInfo = 'present on this station')
+
+            * Ticket office: present on this station
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    Args:
+        strDesc (string): description of the info
+        strInfo (string): info to be printed
+
+    Returns:
+        nothing
+    """
 
     # Write the tabulator with a bullet
     sys.stdout.write('\n' + _colors('BULLET') + '        * ' + _colors('ENDC'))
@@ -98,7 +253,7 @@ def bullet_info(strDesc, strInfo):
     sys.stdout.write(strDesc + ': ')
 
     # Write the info
-    sys.stdout.write(_colors('INFO'))
+    sys.stdout.write(_colors('BULLET_INFO'))
     sys.stdout.write(strInfo)
     sys.stdout.write(_colors('ENDC'))
     sys.stdout.write('\n')
@@ -107,25 +262,27 @@ def bullet_info(strDesc, strInfo):
 
 
 # =====================================================================
-# Print information
-# =====================================================================
-def info(strInfo):
-
-    # Add a tabulator to the info message
-    strInfo = ('          %s') % (strInfo)
-
-    # Write the info
-    sys.stdout.write(_colors('OK'))
-    sys.stdout.write(strInfo)
-    sys.stdout.write(_colors('ENDC') + '\n')
-
-    return
-
-
-# =====================================================================
 # Print a note (an information without coloring)
 # =====================================================================
 def note(strNote):
+    """
+    Function prints a note preceded by a proper tabulator. |br|
+
+    There is no coloring of the output. |br|
+
+    The output looks as follows: (strNote = 'This station has a ticket office')
+
+              This station has a ticket office
+
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    Args:
+        strInfo (string): info to be printed
+
+    Returns:
+        nothing
+    """
 
     # Add a tabulator to the info message
     strNote = ('          %s') % (strNote)
@@ -138,9 +295,113 @@ def note(strNote):
 
 
 # =====================================================================
+# Print name of the parameter + the parameter
+# =====================================================================
+def param(strName, iVal, strForm, strUnit):
+    """
+    Function prints a parameter and a parameter unit.
+    The parameter is preceeded by a tabulator and a parameter name. |br|
+
+    The parameter value is recalculated to a requested order of magnitude,
+    or the function may decide itself about the order of magnitude. The
+    formatting string (3rd parameter) controls the order of magnitude of
+    a printed value. If it contains the '-' character, the function will
+    decide about an order of magnitude. If it contains a magnitude unit
+    symbol, the function recalculates the value to the given order of
+    magnitude. |br|
+
+    The formatting string (3rd parameter) must contain one or two
+    characters. If there are two characters, the value is printed in two
+    orders of magnitude, second is in the parantheses. |br|
+
+    Available symbols of orders of magnitude:
+
+        (femto):  'f'
+        (pico):   'p'
+        (nano):   'n'
+        (micro):  'u'
+        (mili):   'm'
+        (none):   ' '
+        (kilo):   'k'
+        (Mega):   'M'
+        (Giga):   'G'
+        (Tera):   'T'
+
+        (second)  's'
+        (hour):   'h'
+    |br|
+
+    If the first character in the formatting string is 's', then the
+    parameter is treated as time expressed in seconds. In this case
+    the second character may either not exists in the string, or be equal
+    to 'h'. In the latter case the time will be also expressed in hours. |br|
+
+    The last argument is a unit name which will be printed after the values
+    of the paramter. If the first character in the formatting string is
+    's', then the last argument shuld be empty. |br|
+
+    The function takes care of the proper coloring of the console output. |br|
+
+    Usage examples:
+
+    >>> rxcs.console.param('Size of a hard drive',500*1e9,'G ','bytes')
+
+          Size of a hard drive: 500.000 G (500000000000) [bytes]
+
+    >>> rxcs.console.param('Dist. from Aalborg to Auckland',10889,'k ','miles')
+
+          Dist. from Aalborg to Auckland: 10.889 k (10889) [miles]
+
+    >>> rxcs, console.param('The number of people in DK',5627235,'k-','souls')
+
+          The number of people in DK: 5627.235 k (5.627 M) [souls]
+
+    >>> rxcs.console.param('> Life of Brian < running time',93*60,'sh','')
+
+          >Life of Brian< running time: 5580.0 [seconds] (1.55 [hours])
+
+    >>> rxcs.console.param('Honda Civic Type R 0-60',6.6,'s','')
+
+          Honda Civic Type R 0-60: 6.6 [seconds]
+
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    Args:
+        strName (string): name of the parameter
+        iVal (float): value
+        strForm (string): format string
+        strUnit (string): unit
+
+    Returns:
+        nothing
+    """
+
+    # Write the tabulator
+    sys.stdout.write('          ')
+
+    # Run the engine of parameter print
+    _param(strName, iVal, strForm, strUnit)
+
+    return
+
+
+# =====================================================================
 # Print a bullet + name of the parameter + the parameter
 # =====================================================================
 def bullet_param(strName, iVal, strForm, strUnit):
+    """
+    Function prints a parameter preceded by a proper tabulator, a bullet
+    and a parameter name. |br|
+
+    The function is identical to the previous 'param' function, the only
+    difference is a bullet added before the parameter name. Please refer
+    to the 'param' function for description of the function and its input
+    parameters. |br|
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    """
 
     # Write the tabulator with a bullet
     sys.stdout.write('\n' + _colors('BULLET') + '        * ' + _colors('ENDC'))
@@ -152,57 +413,19 @@ def bullet_param(strName, iVal, strForm, strUnit):
 
 
 # =====================================================================
-# Print name of the parameter + the parameter
-# =====================================================================
-def param(strName, iVal, strForm, strUnit):
-
-    # Write the tabulator
-    sys.stdout.write('          ')
-
-    # Run the engine of parameter print
-    _param(strName, iVal, strForm, strUnit)
-
-    return
-
-
-# =====================================================================#
-# Colors dictionary
-# =====================================================================
-def _colors(strKey):
-
-    # Define colors
-    dColors = {}
-    dColors['PURPLE'] = '\033[95m'
-    dColors['BLUE'] = '\033[94m'
-    dColors['GREEN'] = '\033[92m'
-    dColors['YELLOW'] = '\033[93m'
-    dColors['RED'] = '\033[91m'
-    dColors['BLACK'] = '\033[30m'
-    dColors['DARK_MAGENTA'] = '\033[35m'
-    dColors['AUQA'] = '\033[96m'
-    dColors['BLUE_BG'] = '\033[44m'
-    dColors['DARK_BLUE'] = '\033[34m'
-    dColors['DARK_GREEN'] = '\033[32m'
-    dColors['GREY30'] = '\033[30m'
-    dColors['GREY70'] = '\033[97m'
-    dColors['ENDC'] = '\033[0m'
-
-    # Define colors for communication
-    dColors['PROGRESS'] = dColors['DARK_MAGENTA']
-    dColors['OK'] = dColors['DARK_GREEN']
-    dColors['ERROR'] = dColors['RED']
-    dColors['INFO'] = dColors['BLUE']
-    dColors['BULLET'] = dColors['DARK_MAGENTA']
-    dColors['WARN'] = dColors['RED']
-
-    # Return the correct color
-    return dColors[strKey]
-
-
-# =====================================================================
-# The engine of paramer print
+# The engine of parameter print
 # =====================================================================
 def _param(strName, iVal, strForm, strUnit):
+    """
+    It is an engine of the formated parameter printing. |br|
+
+    The input to the fuctcion is identical to the previous 'param' function.
+    Please refer to the 'param' function for description of the function and
+    its input parameters. |br|
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    """
 
     # The name of the function (for error purposes)
     strFunc = 'rxcs.console._param'
@@ -317,6 +540,18 @@ def _param(strName, iVal, strForm, strUnit):
 # The engine of time paramer print
 # =====================================================================
 def _param_time_write(iVal, strForm):
+    """
+    It is an engine of the formated time parameter printing. |br|
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    Args:
+        iVal (float): value
+        strForm (string): format string
+
+    Returns:
+        nothing
+    """
 
     # The name of the function (for error purposes)
     strFunc = 'rxcs.console._param_time_write'
@@ -324,7 +559,7 @@ def _param_time_write(iVal, strForm):
     # ----------------------------------------------------------------
 
     # Create a string with seconds
-    strSeconds = ('%d [seconds]') % (iVal)
+    strSeconds = ('%.1f [seconds]') % (iVal)
 
     # Print the seconds
     sys.stdout.write(_colors('INFO') + strSeconds + _colors('ENDC') + ' ')
@@ -357,9 +592,35 @@ def _param_time_write(iVal, strForm):
 
 
 # =====================================================================
-# Recalculate unit string to unit coefficient
+# Recalculate a unit symbol to a unit coefficient
 # =====================================================================
 def _unit2coef(strUnit):
+
+    """
+    Function returns a unit coefficient based on a unit symbol.
+    Available unit names, symbols and coefficients:
+
+        (femto):  'f' = 1e-15
+        (pico):   'p' = 1e-12
+        (nano):   'n' = 1e-9
+        (micro):  'u' = 1e-6
+        (mili):   'm' = 1e-3
+        (none):   ' ' = 1
+        (kilo):   'k' = 1e3
+        (Mega):   'M' = 1e6
+        (Giga):   'G' = 1e9
+        (Tera):   'T' = 1e12
+
+        (hour):   'h' = 3600
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    Args:
+        strUnit (string): key of the unit
+
+    Returns:
+        iCoef (int): unit coefficient
+    """
 
     # The name of the function (for error purposes)
     strFunc = 'rxcs.console._unit2coef'
@@ -370,7 +631,7 @@ def _unit2coef(strUnit):
     if strUnit == 'f':
         iCoef = 1e-15
 
-    # piko
+    # pico
     elif strUnit == 'p':
         iCoef = 1e-12
 
@@ -394,19 +655,19 @@ def _unit2coef(strUnit):
     elif strUnit == 'k':
         iCoef = 1e3
 
-    # mega
+    # Mega
     elif strUnit == 'M':
         iCoef = 1e6
 
-    # giga
+    # Giga
     elif strUnit == 'G':
         iCoef = 1e9
 
-    # tera
+    # Tera
     elif strUnit == 'T':
         iCoef = 1e12
 
-    # hours
+    # hour
     elif strUnit == 'h':
         iCoef = 3600
 
@@ -414,7 +675,7 @@ def _unit2coef(strUnit):
     # Unknown unit
     else:
         strErr = strFunc + ' : '
-        strErr = strErr + ('> %s <  is an unknown parameter unit') % (strUnit)
+        strErr = strErr + ('> %s <  is an unknown unit symbol') % (strUnit)
         raise Exception(strErr)
 
     # ----------------------------------------------------------------
@@ -423,16 +684,29 @@ def _unit2coef(strUnit):
 
 
 # =====================================================================
-# Recalculate value to unit (string) and unit coefficient
+# Recalculate a value to a unit symbol and a unit coefficient
 # =====================================================================
 def _val2unit(iVal):
+    """
+    Function returns the unit coefficient and a unit symbol.
+
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    Args:
+        iVal (float): value
+
+    Returns:
+        iCoef (int): unit coefficient
+        strUnit (string): unit symbol
+    """
 
     # femto
     if iVal < 1e-12:
         iCoef = 1e-15
         strUnit = 'f'
 
-    # piko
+    # pico
     elif iVal < 1e-9:
         iCoef = 1e-12
         strUnit = 'p'
@@ -462,22 +736,22 @@ def _val2unit(iVal):
         iCoef = 1e3
         strUnit = 'k'
 
-    # mega
+    # Mega
     elif iVal < 1e9:
         iCoef = 1e6
         strUnit = 'M'
 
-    # giga
+    # Giga
     elif iVal < 1e12:
         iCoef = 1e9
         strUnit = 'G'
 
-    # infinite
+    # Infinite
     elif np.isinf(iVal):
         iCoef = np.inf
         strUnit = ''
 
-    # tera
+    # Tera
     else:
         iCoef = 1e12
         strUnit = 'T'
@@ -485,3 +759,74 @@ def _val2unit(iVal):
     # ----------------------------------------------------------------
 
     return (iCoef, strUnit)
+
+
+# =====================================================================#
+# Colors dictionary
+# =====================================================================
+def _colors(strKey):
+    """
+    Function gives access to the RxCS console colors dictionary. The
+    Function returns a proper console color formating string (ANSI colors)
+    based on the key given to the function. |br|
+
+    Available keys:
+
+        'PURPLE'
+        'BLUE'
+        'GREEN'
+        'YELLOW'
+        'RED'
+        'BLACK'
+        'DARK_MAGENTA'
+        'AQUA'
+        'BLUE_BG'
+        'DARK_BLUE'
+        'DARK_GREEN'
+        'GREY30'
+        'GREY70'
+
+        'PROGRESS'          -> color for progress signs ('>>>', '>>', '>')
+        'INFO'              -> color for info messages
+        'BULLET_INFO'       -> color for bullet info messages
+        'BULLET'            -> color for bullets ('*')
+        'WARN'              -> color for warning messages
+        'ENDC'              -> console formatting string which switches of
+                               the coloring
+
+    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+
+    Args:
+        strKey (string): key of the color
+
+    Returns:
+        strColor (string): console color formating string
+    """
+
+    # Define colors
+    dColors = {}
+    dColors['PURPLE'] = '\033[95m'
+    dColors['BLUE'] = '\033[94m'
+    dColors['GREEN'] = '\033[92m'
+    dColors['YELLOW'] = '\033[93m'
+    dColors['RED'] = '\033[91m'
+    dColors['BLACK'] = '\033[30m'
+    dColors['DARK_MAGENTA'] = '\033[35m'
+    dColors['AUQA'] = '\033[96m'
+    dColors['BLUE_BG'] = '\033[44m'
+    dColors['DARK_BLUE'] = '\033[34m'
+    dColors['DARK_GREEN'] = '\033[32m'
+    dColors['GREY30'] = '\033[30m'
+    dColors['GREY70'] = '\033[97m'
+
+    # Define colors for communication
+    dColors['PROGRESS'] = dColors['DARK_MAGENTA']
+    dColors['INFO'] = dColors['DARK_GREEN']
+    dColors['BULLET_INFO'] = dColors['BLUE']
+    dColors['BULLET'] = dColors['DARK_MAGENTA']
+    dColors['WARN'] = dColors['RED']
+    dColors['ENDC'] = '\033[0m'
+
+    # Return the correct color
+    strColor = dColors[strKey]
+    return strColor
