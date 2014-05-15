@@ -67,7 +67,7 @@ import rxcs
 # =====================================================================
 # Main function of the test
 # =====================================================================
-def sigRandMult_test():
+def _sigRandMult_test():
 
     # Print out the header of the signal generator test
     print('')
@@ -1397,5 +1397,5 @@ def _isequal(iX, iY, iMargin):
 # Trigger when start as a script
 # =====================================================================
 if __name__ == '__main__':
-    sigRandMult_test()
+    _sigRandMult_test()
 
