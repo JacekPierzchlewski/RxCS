@@ -46,7 +46,7 @@ pep8:
 	@echo      '"'RXCS'"' system - pep8 checker
 	@echo
 	@echo ================================================
-	@make --quiet -C rxcs-engine pep8
+	@make --quiet -C rxcs pep8
 	@make --quiet -C examples pep8
 
 # #############################################################################
@@ -56,6 +56,6 @@ pep8:
 # #############################################################################
 clean:
 	@echo -n '"'RxCS'"' system - removing .pyc files
-	@make --quiet -C rxcs-engine clean
+	@make --quiet -C rxcs clean
 	@make --quiet -C examples clean
 	@echo done!
