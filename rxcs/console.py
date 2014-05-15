@@ -811,6 +811,7 @@ def _colors(strKey):
     dColors['BULLET'] = dColors['DARK_MAGENTA']
     dColors['WARN'] = dColors['RED']
     dColors['PARAM'] = dColors['BLUE']
+    dColors['OK'] = dColors['DARK_GREEN']
     dColors['ENDC'] = '\033[0m'
 
 
