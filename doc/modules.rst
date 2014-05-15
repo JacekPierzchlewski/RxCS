@@ -45,7 +45,7 @@ PLEASE NOTE: To preserve code simplicity RxCS toolbox do not use objects (classe
 6. API modules - auxiliary modules:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-5.1 rxcs-engine.console:
+5.1 rxcs.console:
 ------------------------
 
 

@@ -18,12 +18,12 @@ import sys, os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../'))
-sys.path.insert(0, os.path.abspath('../rxcs-engine/'))
-sys.path.insert(0, os.path.abspath('../rxcs-engine/sig'))
-sys.path.insert(0, os.path.abspath('../rxcs-engine/acq'))
-sys.path.insert(0, os.path.abspath('../rxcs-engine/cs'))
-sys.path.insert(0, os.path.abspath('../rxcs-engine/ana'))
-sys.path.insert(0, os.path.abspath('../rxcs-engine/work_frame1'))
+sys.path.insert(0, os.path.abspath('../rxcs/'))
+sys.path.insert(0, os.path.abspath('../rxcs/sig'))
+sys.path.insert(0, os.path.abspath('../rxcs/acq'))
+sys.path.insert(0, os.path.abspath('../rxcs/cs'))
+sys.path.insert(0, os.path.abspath('../rxcs/ana'))
+sys.path.insert(0, os.path.abspath('../rxcs/work_frame1'))
 
 
 # -- General configuration -----------------------------------------------------
