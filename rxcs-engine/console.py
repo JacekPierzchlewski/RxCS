@@ -7,7 +7,8 @@ from this module.
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    0.1 | 14-MAY-2014 : * Initial version.
+    0.1 | 14-MAY-2014 : * Initial version. |br|
+    0.2 | 15-MAY-2014 : * Docstrings added.
 
 *License*:
     BSD 2-Clause
@@ -27,8 +28,7 @@ def pack(inxPack):
     .. role:: bash(code)
       :language: bash
 
-    Function prints header of the signal pack processed by RxCS frames + index
-    of the current signal pack. |br|
+    Function prints header of the signal pack processed by RxCS frames. |br|
 
     The function takes care of the proper coloring of the console output. |br|
 
@@ -78,7 +78,7 @@ def progress(strStage, strModule):
 
 
     Args:
-        strStage (string): name of the stage
+        strStage (string): name of the stage |br|
         strModule (string): name of the module
 
     Returns:
@@ -103,7 +103,7 @@ def module_progress(strInfo):
 
     The function takes care of the proper coloring of the console output. |br|
 
-    >>> console.progress('The module X is starting')
+    >>> console.module_progress('The module X is starting')
 
     gives an output:
 
@@ -139,11 +139,13 @@ def module_progress_done(tStart):
 
     The function takes care of the proper coloring of the console output. |br|
 
-    The output looks as follows (first part printed by a 'module_progress'):
+    >>> tStart = console.module_progress('The module X is starting')
+    >>> time.sleep(1)
+    >>> console.module_progress_done(tStart)
 
-        > The module X is starting...done in Y.YY seconds
+    gives an output:
 
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+    :bash:`|        > The module X is starting...done in 1.00 seconds`
 
     Args:
         tStart (float): time stamp of the start
@@ -170,12 +172,9 @@ def warning(strWarn):
 
     The function takes care of the proper coloring of the console output. |br|
 
-    The output looks as follows: (strWarn = 'Mind the gap!')
+    >>> console.warning('Mind the gap!')
 
-              Mind the gap!
-
-
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+    :bash:`|          Mind the gap!`
 
     Args:
         strWarn (string): warning to be printed
@@ -204,12 +203,9 @@ def info(strInfo):
 
     The function takes care of the proper coloring of the console output. |br|
 
-    The output looks as follows: (strInfo = 'This station has a ticket office')
+    >>> console.info('Very important info')
 
-              This station has a ticket office
-
-
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+    :bash:`|          Very important info`
 
     Args:
         strInfo (string): info to be printed
@@ -239,15 +235,14 @@ def bullet_info(strDesc, strInfo):
 
     The function takes care of the proper coloring of the console output. |br|
 
-    The output looks as follows: (strDesc = 'Ticket office'
-                                  strInfo = 'present on this station')
+    >>> console.bullet_info('Please remeber', 'mind the gap!')
 
-            * Ticket office: present on this station
+    gives an output
 
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+    :bash:`|          * Please remeber: mind the gap!`
 
     Args:
-        strDesc (string): description of the info
+        strDesc (string): description of the info |br|
         strInfo (string): info to be printed
 
     Returns:
@@ -278,12 +273,9 @@ def note(strNote):
 
     There is no coloring of the output. |br|
 
-    The output looks as follows: (strNote = 'This station has a ticket office')
+    >>> console.note('mind the gap!')
 
-              This station has a ticket office
-
-
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
+    :bash:`|          mind the gap!`
 
     Args:
         strInfo (string): info to be printed
@@ -324,19 +316,19 @@ def param(strName, iVal, strForm, strUnit):
 
     Available symbols of orders of magnitude:
 
-        (femto):  'f'
-        (pico):   'p'
-        (nano):   'n'
-        (micro):  'u'
-        (mili):   'm'
-        (none):   ' '
-        (kilo):   'k'
-        (Mega):   'M'
-        (Giga):   'G'
-        (Tera):   'T'
+        (femto):  'f'  |br|
+        (pico):   'p'  |br|
+        (nano):   'n'  |br|
+        (micro):  'u'  |br|
+        (mili):   'm'  |br|
+        (none):   ' '  |br|
+        (kilo):   'k'  |br|
+        (Mega):   'M'  |br|
+        (Giga):   'G'  |br|
+        (Tera):   'T'  |br|
 
-        (second)  's'
-        (hour):   'h'
+        (second)  's'  |br|
+        (hour):   'h'  |br|
     |br|
 
     If the first character in the formatting string is 's', then the
@@ -354,32 +346,30 @@ def param(strName, iVal, strForm, strUnit):
 
     >>> rxcs.console.param('Size of a hard drive',500*1e9,'G ','bytes')
 
-          Size of a hard drive: 500.000 G (500000000000) [bytes]
+    :bash:`|          Size of a hard drive: 500.000 G (500000000000) [bytes]`
 
     >>> rxcs.console.param('Dist. from Aalborg to Auckland',10889,'k ','miles')
 
-          Dist. from Aalborg to Auckland: 10.889 k (10889) [miles]
+    :bash:`|          Dist. from Aalborg to Auckland: 10.889 k (10889) [miles]`
 
     >>> rxcs, console.param('The number of people in DK',5627235,'k-','souls')
 
-          The number of people in DK: 5627.235 k (5.627 M) [souls]
+    :bash:`|          The number of people in DK: 5627.235 k (5.627 M) [souls]`
 
-    >>> rxcs.console.param('> Life of Brian < running time',93*60,'sh','')
+    >>> rxcs.console.param('>Jaws< running time',124*60,'sh','')
 
-          >Life of Brian< running time: 5580.0 [seconds] (1.55 [hours])
+    :bash:`|          >Jaws< running time: 7440.0 [seconds] (2.07 [hours])`
 
     >>> rxcs.console.param('Honda Civic Type R 0-60',6.6,'s','')
 
-          Honda Civic Type R 0-60: 6.6 [seconds]
+    :bash:`|          Honda Civic Type R 0-60: 6.6 [seconds]`
 
-
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
 
     Args:
-        strName (string): name of the parameter
-        iVal (float): value
-        strForm (string): format string
-        strUnit (string): unit
+        strName (string): name of the parameter |br|
+        iVal (float): value |br|
+        strForm (string): format string |br|
+        strUnit (string): unit |br|
 
     Returns:
         nothing
@@ -407,8 +397,6 @@ def bullet_param(strName, iVal, strForm, strUnit):
     to the 'param' function for description of the function and its input
     parameters. |br|
 
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
-
     """
 
     # Write the tabulator with a bullet
@@ -430,8 +418,6 @@ def _param(strName, iVal, strForm, strUnit):
     The input to the fuctcion is identical to the previous 'param' function.
     Please refer to the 'param' function for description of the function and
     its input parameters. |br|
-
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
 
     """
 
@@ -551,8 +537,6 @@ def _param_time_write(iVal, strForm):
     """
     It is an engine of the formated time parameter printing. |br|
 
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
-
     Args:
         iVal (float): value
         strForm (string): format string
@@ -620,8 +604,6 @@ def _unit2coef(strUnit):
         (Tera):   'T' = 1e12
 
         (hour):   'h' = 3600
-
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
 
     Args:
         strUnit (string): key of the unit
@@ -697,9 +679,6 @@ def _unit2coef(strUnit):
 def _val2unit(iVal):
     """
     Function returns the unit coefficient and a unit symbol.
-
-
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
 
     Args:
         iVal (float): value
@@ -801,8 +780,6 @@ def _colors(strKey):
         'WARN'              -> color for warning messages
         'ENDC'              -> console formatting string which switches of
                                the coloring
-
-    .. moduleauthor:: Jacek Pierzchlewski <jap@es.aau.dk>
 
     Args:
         strKey (string): key of the color
