@@ -9,8 +9,8 @@ from this module.
 *Version*:
     0.1  | 14-MAY-2014 : * Initial version. |br|
     0.2  | 15-MAY-2014 : * Docstrings added.
-    0.21 | 15-MAY-2014 : * New colors ('PARAM' and 'OK') added to the
-                           colors dictionary
+    0.21 | 15-MAY-2014 : * New colors ('PARAM' + 'OK') added to the dictionary
+
 
 *License*:
     BSD 2-Clause
