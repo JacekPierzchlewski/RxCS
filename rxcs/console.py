@@ -778,6 +778,8 @@ def _colors(strKey):
         'BULLET_INFO'       -> color for bullet info messages
         'BULLET'            -> color for bullets ('*')
         'WARN'              -> color for warning messages
+        'PARAM'             -> color for parameters printing
+        'OK'                -> color for good messages
         'ENDC'              -> console formatting string which switches of
                                the coloring
 
