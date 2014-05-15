@@ -29,6 +29,7 @@ PLEASE NOTE: To preserve code simplicity RxCS toolbox do not use objects (classe
 -------------------------
 
 .. automodule:: sigRandMult
+   :members: main
 
 
 2. API modules - signal acquisition:
