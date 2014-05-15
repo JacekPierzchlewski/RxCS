@@ -48,15 +48,19 @@ PLEASE NOTE: To preserve code simplicity RxCS toolbox do not use objects (classe
 6.1 rxcs.console:
 ------------------------
 
-6.1 rxcs.console:
-------------------------
-
-
 .. automodule:: console
    :members: pack, progress, module_progress, module_progress_done, warning, info, bullet_info, note, param, bullet_param
+
+
+
+7. Test scripts (rxcs/test):
+~~~~~~~~~~~~~~~~
+
+7.1 :sigRandMult_test:
+------------------------
+
+.. automodule:: sigRandMult_test
 
 .. |br| raw:: html
 
    <br />
-
-
