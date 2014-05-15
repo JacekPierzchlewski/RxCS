@@ -25,6 +25,11 @@ PLEASE NOTE: To preserve code simplicity RxCS toolbox do not use objects (classe
 1. API modules - signal generators:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+6.1 rxcs.sig.sigRandMult:
+-------------------------
+
+.. automodule:: sigRandMult
+
 
 2. API modules - signal acquisition:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
