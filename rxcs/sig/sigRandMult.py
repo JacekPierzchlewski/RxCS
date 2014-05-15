@@ -1,79 +1,26 @@
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#% sigRandMult: THE "AnSpar" PACKAGE - MULTITONE SIGNAL GENERATOR
-#%                                     File version 1.0r1 (28th March 2011)
-#%
-#% Function generates multitone signal.
-#% "1 tone" is a cosine function.
-#% ------------------------------------------------------------------------
-#% Input:
-#%       1. sSigConf: Signal generator configuration structure
-#%       2. sVerbConf: Verbose configuraion strucuture
-#%
-#% --------------------------------
-#% Configuration fields needed:
-#% sSigConf:
-#%               .strType:   "RandMult"
-#%               .randmult:  <- this module configuration substructure.
-#%
-#% sSigConf.randmult:
-#%
-#%               .fSmpRepFrq: signal representation sampling frequency
-#%               .tSigTime:   signal time due
-#%               .iSNR:       signal to noise ratio
-#%
-#%               .fSpecMax:   maximum frequency in the signal spectrum
-#%               .fSpecRes:   resolution frequency in the signal spectrum
-#%
-#%               .vFrqs:      given frequencies vector
-#%               .vAmps:      amplitudes for given frequencies
-#%               .vPhs:       phases for given frequencies
-#%
-#%               .nTones:    Number of additional random tones in the signal
-#%                           (not described in the vFrqs/vAmps/vPhs vectors)
-#%
-#%               .iMinAmp:   Minimum aplitude for tones with random value
-#%               .iStpAmp:   Resolution of the random amplitude value
-#%               .iMaxAmp:   Maximum aplitude for tones with random value
-#%
-#%               .iMinPhs:   Minimum phase for tones with random value
-#%               .iStpPhs:   Resolution of the random phase value
-#%               .iMaxPhs:   Maximum phase for tones with random value
-#%
-#% --------------------------------
-#% Struture returned by the generator:
-#% .sSig:
-#%               .vSig:      vector with the signal
-#%               .vSigNN:    vector with the original, non noisy signal
-#%               .vTSig:     time vector for the signal
-#%
-#%               .fRS:       signal representation sampling frequency
-#%               .tST:       signal time
-#%               .nSmp:      the number of smaples in the signal
-#%               .iSNR:      signal to noise ratio
-#%
-#%               .vFrqs:     vector with frequencies of tones
-#%               .vAmps:     vector with amplitudes of tones
-#%               .vPhs:      vector with phases of tones
-#%               .vAmPh:     complex vector with amplitudes/phases of tones
-#%               .fNq:       the signal Nyquist frequency
-#%
-#% ------------------------------------------------------------------------
-#% Copyright (c) 2010 - 2011 Jacek Pierzchlewski, (AAU TPS)
-#%                           AALBORG UNIVERSITY, Denmark
-#%                           Technology Platforms Section (AAU TPS)
-#%                           Email:    jap@es.aau.dk (Jacek)
-#%
-#%                           Comments and bug reports are very welcome!
-#%
-#% Licensing: This software is published under the terms of the:
-#%            GNU GENERAL PUBLIC LICENSE, Version 3, 29th June 2007
-#%
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+"""
+This a Random Multitone Signal Generator Module. |br|
+
+It is able to generate *N* multitone random signals according to settings
+given by a user.
+
+
+*Author*:
+    Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
+
+*Version*:
+    0.1  | 15-MAY-2014 : * Initial version. |br|
+
+*License*:
+    BSD 2-Clause
+"""
+
 from __future__ import division
 import numpy as np
 import sys
 import rxcs
 from sys import stdout
+
 
 def main(dSigConf):
 
