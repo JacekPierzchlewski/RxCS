@@ -356,9 +356,9 @@ def param(strName, iVal, strForm, strUnit):
 
     :bash:`|          The number of people in DK: 5627.235 k (5.627 M) [souls]`
 
-    >>> rxcs.console.param('>Jaws< running time',124*60,'sh','')
+    >>> rxcs.console.param('>E.T.< running time',115*60,'sh','')
 
-    :bash:`|          >Jaws< running time: 7440.0 [seconds] (2.07 [hours])`
+    :bash:`|          >E.T< running time: 6900.0 [seconds] (1.92 [hours])`
 
     >>> rxcs.console.param('Honda Civic Type R 0-60',6.6,'s','')
 
@@ -473,12 +473,12 @@ def _param(strName, iVal, strForm, strUnit):
         strVal = ('%.3f %s') % (iVal_recal, strUnitRecalc)
 
     # Write the value
-    sys.stdout.write(_colors('INFO') + strVal + _colors('ENDC') + ' ')
+    sys.stdout.write(_colors('PARAM') + strVal + _colors('ENDC') + ' ')
 
     # ----------------------------------------------------------------
     # 2nd representation:
 
-    # If the string is has 2 characters, print also the recalculated number
+    # If the string has 2 characters, print also the recalculated number
     # (the 2nd representation)
     if lForm == 2:
 
@@ -511,7 +511,7 @@ def _param(strName, iVal, strForm, strUnit):
 
             # Print out the 2nd representation
             sys.stdout.write('(')
-            sys.stdout.write(_colors('INFO') + strVal2 + _colors('ENDC'))
+            sys.stdout.write(_colors('PARAM') + strVal2 + _colors('ENDC'))
             sys.stdout.write(')' + ' ')
 
     # ----------------------------------------------------------------
@@ -519,7 +519,7 @@ def _param(strName, iVal, strForm, strUnit):
     # Print the unit, if it is not empty
     lUnit = len(strUnit)
     if lUnit > 0:
-        sys.stdout.write(_colors('INFO'))
+        sys.stdout.write(_colors('PARAM'))
         sys.stdout.write('[' + strUnit + ']')
         sys.stdout.write(_colors('ENDC'))
 
@@ -554,7 +554,7 @@ def _param_time_write(iVal, strForm):
     strSeconds = ('%.1f [seconds]') % (iVal)
 
     # Print the seconds
-    sys.stdout.write(_colors('INFO') + strSeconds + _colors('ENDC') + ' ')
+    sys.stdout.write(_colors('PARAM') + strSeconds + _colors('ENDC') + ' ')
 
     # Get the length of the format string
     lForm = len(strForm)
@@ -574,7 +574,7 @@ def _param_time_write(iVal, strForm):
 
         # Print the hours
         sys.stdout.write('(')
-        sys.stdout.write(_colors('INFO') + strHours + _colors('ENDC'))
+        sys.stdout.write(_colors('PARAM') + strHours + _colors('ENDC'))
         sys.stdout.write(')')
 
     # ----------------------------------------------------------------
@@ -810,7 +810,9 @@ def _colors(strKey):
     dColors['BULLET_INFO'] = dColors['BLUE']
     dColors['BULLET'] = dColors['DARK_MAGENTA']
     dColors['WARN'] = dColors['RED']
+    dColors['PARAM'] = dColors['BLUE']
     dColors['ENDC'] = '\033[0m'
+
 
     # Return the correct color
     strColor = dColors[strKey]
