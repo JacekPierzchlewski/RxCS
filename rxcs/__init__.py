@@ -12,7 +12,7 @@ import cs
 import ana
 
 # Import main frame1
-from work_frame1 import work_frame1
+import work_frame1
 
 # Import console printing function
 import console
