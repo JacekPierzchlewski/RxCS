@@ -344,23 +344,23 @@ def param(strName, iVal, strForm, strUnit):
 
     Usage examples:
 
-    >>> rxcs.console.param('Size of a hard drive',500*1e9,'G ','bytes')
+    >>> console.param('Size of a hard drive',500*1e9,'G ','bytes')
 
     :bash:`|          Size of a hard drive: 500.000 G (500000000000) [bytes]`
 
-    >>> rxcs.console.param('Dist. from Aalborg to Auckland',10889,'k ','miles')
+    >>> console.param('Dist. from Aalborg to Auckland',10889,'k ','miles')
 
     :bash:`|          Dist. from Aalborg to Auckland: 10.889 k (10889) [miles]`
 
-    >>> rxcs, console.param('The number of people in DK',5627235,'k-','souls')
+    >>> console.param('The number of people in DK',5627235,'k-','souls')
 
     :bash:`|          The number of people in DK: 5627.235 k (5.627 M) [souls]`
 
-    >>> rxcs.console.param('>E.T.< running time',115*60,'sh','')
+    >>> console.param('>E.T.< running time',115*60,'sh','')
 
     :bash:`|          >E.T< running time: 6900.0 [seconds] (1.92 [hours])`
 
-    >>> rxcs.console.param('Honda Civic Type R 0-60',6.6,'s','')
+    >>> console.param('Honda Civic Type R 0-60',6.6,'s','')
 
     :bash:`|          Honda Civic Type R 0-60: 6.6 [seconds]`
 
