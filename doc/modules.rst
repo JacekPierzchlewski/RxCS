@@ -51,8 +51,6 @@ PLEASE NOTE: To preserve code simplicity RxCS toolbox do not use objects (classe
 .. automodule:: console
    :members: pack, progress, module_progress, module_progress_done, warning, info, bullet_info, note, param, bullet_param
 
-
-
 7. Test scripts (rxcs/test):
 ~~~~~~~~~~~~~~~~
 
@@ -60,6 +58,7 @@ PLEASE NOTE: To preserve code simplicity RxCS toolbox do not use objects (classe
 ------------------------
 
 .. automodule:: sigRandMult_test
+
 
 .. |br| raw:: html
 
