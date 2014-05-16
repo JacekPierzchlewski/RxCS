@@ -1,4 +1,4 @@
-RXCS toolbox: root directory
+RXCS toolbox, root directory
 
 contents:
 
@@ -8,7 +8,7 @@ contents:
 
     3. rxcs\        - directory with all the RxCS modules
 
-    4. test\        - directory with test functions for modules from toolbox
+    4. test\        - directory with test functions for toolbox modules
 
     5. CONTENTS.txt - the current file
 
