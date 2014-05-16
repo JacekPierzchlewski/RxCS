@@ -60,7 +60,7 @@ PLEASE NOTE: To preserve code simplicity RxCS toolbox do not use objects (classe
 7. Test scripts (rxcs/test):
 ~~~~~~~~~~~~~~~~
 
-7.1 :sigRandMult_test:
+7.1 sigRandMult_test:
 ------------------------
 
 .. automodule:: sigRandMult_test
