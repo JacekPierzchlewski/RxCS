@@ -1,4 +1,4 @@
-RXCS toolbox, directory with all the RxCS modules
+RXCS toolbox, rxcs\ - directory with all the RxCS modules
 
 contents:
 
