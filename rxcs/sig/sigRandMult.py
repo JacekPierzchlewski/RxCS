@@ -1,15 +1,17 @@
 """
-This a Random Multitone Signal Generator Module. |br|
+This a Random Multitone Signal Generator module. |br|
 
 It is able to generate *N* multitone random signals according to settings
-given by a user.
-
+given by a user. |br|
+An input dictionary, which is a sole argument to the *main*
+function contains all the settings given to the generator.
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
     0.1  | 15-MAY-2014 : * Initial version. |br|
+    0.2  | 16-MAY-2014 : * Docstrings added. |br|
 
 *License*:
     BSD 2-Clause
@@ -23,6 +25,102 @@ from sys import stdout
 
 
 def main(dSigConf):
+    """
+    This the main function of the generator and the only one which should be
+    accessed by a user. |br|
+
+    An input dictionary, which is a sole argument to the function
+    function contains all the settings given to the generator. |br|
+
+    The function returns a dictionary with generated signals and their
+    parameters. |br|
+
+    Please go to the *examples* directory for examples on how to use the
+    generator. |br|
+
+    Fields in the configuration dictionary:
+
+    - a. **bMute** (*int*): mute the console output from the generator
+
+    - b. **tS** (*float*): time of a signals
+
+    - c. **fR** (*float*): signals representation frequency
+
+    - d. **iSNR** (*float*): level of noise in signals [dB] (SNR)
+
+    - e. **iP** (*float*): requested power of signals
+
+    - f. **fMax** (*float*): maximum frequency present in signals
+
+    - g. **fRes** (*float*): tones frequency resolution
+
+    - h. **vFrqs** (*numpy vector*): vector with requested frequencies of tones
+
+    - i. **vAmps** (*numpy vector*): vector with requested amplitudes of tones
+
+    - j. **vPhs** (*numpy vector*): vector with requested phases of tones
+
+    - k. **iMinAmp** (*float*): min amplitude of a tone present in a signal
+
+    - l. **iGraAmp** (*float*): gradation of a random amplitude of a tone
+
+    - m. **iMaxAmp** (*float*): max amplitude of a tone present in a signal
+
+    - n. **iMinPhs** (*float*): min allowed phase of a tone present in a signal
+
+    - o. **iGraPhs** (*float*): gradation of a random phase of a tone
+
+    - p. **iMaxPhs** (*float*): max allowed phase of a tone present in a signal
+
+    - q. **nSigPack** (*int*): the number of signals to be generated
+
+
+    Fields in the output dictionary:
+
+    - a. **mSig** (*int*): Matrix with output signals
+
+    - b. **mSigNN** (*float*): Matrix with nonnoisy output signals
+
+    - c. **nSigs** (*float*): The number of generated signals
+
+    - d. **fR** (*float*): Signal representation sampling frequency
+
+    - e. **tS** (*float*): The time of the signals [s]
+
+    - f. **nSmp** (*float*): The number of samples in the signals
+
+    - g. **vTSig** (*float*): The time vector for the generated signals
+
+    - h. **iSNR** (*numpy vector*): Signal 2 noise ratio
+
+    - i. **iP** (*numpy vector*): Requested power of the signals
+
+    - j. **vP** (*numpy vector*): Power of the signals
+
+    - k. **vPNN** (*float*): Power of the non noisy signals
+
+    - l. **vPCoef** (*float*): Power adjustment coefficients
+
+    - m. **mFrqs** (*float*): Frequencies of tones in the signals
+
+    - n. **mAmps** (*float*): Amplitudes of tones in the signals
+
+    - o. **mPhs** (*float*): Phases of tones in the signals
+
+    - p. **mAmPh** (*float*): Amp/Phases tones complex vector
+
+    - q. **fFFTR** (*int*): Signal FFT frequency resolution
+
+
+    Args:
+        dSigConf (dictionary): dictionary with configuration for
+        the generator
+
+    Returns:
+        dSig (dictionary): dictionary with generated signals and their
+        parameters
+
+    """
 
     # The name of the function (for error purposes)
     strFunc = 'sigRandMult.main'
@@ -45,7 +143,7 @@ def main(dSigConf):
     # -----------------------------------------------------------------
     # Signal time parameters:
 
-    # The time of the signal [s]
+    # The time of a signal [s]
     # If not given, it is an error
     strErr = ('The time of the signal [s] (tS) ')
     strErr = strErr + ('is not given in the configuration!')
