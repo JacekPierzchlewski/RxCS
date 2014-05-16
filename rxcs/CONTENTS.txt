@@ -1,0 +1,21 @@
+RXCS toolbox, directory with all the RxCS modules
+
+contents:
+
+    1. acq\           - directory with acquisition systems modules
+
+    2. ana\           - directory with system analysis modules
+
+    3. cs\            - directory with compressed sensing modules
+
+    4. sig\           - directory with signal generators modules
+
+    5. work_frame1\   - directory with work frame 1 modules
+
+    6. CONTENTS.txt   - the current file
+
+    7. Makefile       - local Makefile
+
+    8. __init__.py    - module initialization file
+
+    9. console.py     - RxCS console printing module
