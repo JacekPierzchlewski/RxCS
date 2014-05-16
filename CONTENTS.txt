@@ -1,0 +1,11 @@
+RXCS toolbox: root directory
+
+contents:
+
+    1. doc\         - directory with RxCS documentation
+
+    2. examples\    - directory with RxCS examples
+
+    3. rxcs\        - directory with all the RxCS modules
+
+    4. test\        - directory with test functions for modules from toolbox
