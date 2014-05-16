@@ -1,0 +1,9 @@
+RXCS toolbox, cs\ - directory with compressed sensing modules
+
+contents:
+
+    1. CONTENTS.txt   - the current file
+
+    2. Makefile       - local Makefile
+
+    3. __init__.py    - module initialization file
