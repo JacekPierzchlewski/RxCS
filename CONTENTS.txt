@@ -9,3 +9,9 @@ contents:
     3. rxcs\        - directory with all the RxCS modules
 
     4. test\        - directory with test functions for modules from toolbox
+
+    5. CONTENTS.txt - the current file
+
+    6. LICENSE.txt  - license of the toolbox (2-clause BSD)
+
+    7. Makefile     - main Makefile of the RxCS toolbox
