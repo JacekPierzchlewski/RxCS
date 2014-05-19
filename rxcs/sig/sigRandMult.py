@@ -652,84 +652,13 @@ def main(dSigConf):
     # Generate the signals by IFFT
     # =================================================================
 
-    # Adjust the amplitudes value to the number of points
-    mAmpsAdj = mAmps * nSmp/2
-
-    # Change phases into radians
-    mPhsRad = mPhs*np.pi/180
-
-    # Generate a one complex matrix for all the signals and its conjugated copy
-    mAmPh = mAmpsAdj*np.cos(mPhsRad) + 1j*mAmpsAdj*np.sin(mPhsRad)
-    mAmPh_conj = np.conjugate(mAmPh)
-
-    #----------------------------------------------------------------------
-    # Put the complex matrix with amplitudes and phases of tones into
-    # one matrix dedicated for IFFT
-
-    # Recalculate the matrix with indices of frequencies in the spectrum
-    # to real frequencies
-    mFrqs = mFrqsInx*fRes
-
-    # Recalculate the matrix with indices of frequencies in the spectrum
-    # to indices of frequencies in the IFFT transform
-    mIFFTFrqsInx = np.around(mFrqs/fFFTR).astype(int)
-
-    # Allocate the vector for the ifft coefficients for all the signals
-    # (one signal in one row)
-    mIFFT = np.zeros((nSigs, nSmp)) + 1j*np.zeros((nSigs, nSmp))
-
-    # Put the complex vector with tones values into the IFFT matrix
-    for inxSig in np.arange(nSigs):
-
-        # IFFT indices of tones for the current signal
-        vInx = mIFFTFrqsInx[inxSig,:]
-
-        # Put the tones for the current signal
-        mIFFT[inxSig, vInx]  = mAmPh[inxSig,:]
-
-        # IFFT indices of conjugate tones for the current signal
-        vInxConj = (nSmp - mIFFTFrqsInx[inxSig,:]).astype(int)
-
-        # Put the conjugate tones for the current signal
-        mIFFT[inxSig, vInxConj] = mAmPh_conj[inxSig,:]
-
-    #----------------------------------------------------------------------
-    # Generate the signals (perform the IFFT)
-    mSig = np.fft.ifftn(mIFFT,axes=[1]).real
 
     # =================================================================
     # Adjust the signal power
-    # =================================================================
-
-    # Measure the power of the signals
-    vP = (np.sum(mSig*mSig,axis=1) / nSmp).reshape(nSigs,1)
-
-    # Adjust the signal power, if needed
-    if not np.isnan(iP) or np.isinf(iP):
-
-        # Compute power adjustments coefficients for the noise signals
-        vPCoef = np.sqrt(iP/vP)
-
-        # Adjust the signal power
-        mPCoef = np.tile(vPCoef,(1,nSmp))
-        mSig = mSig * mPCoef
-
-        # Adjust the reported amplitudes of tones
-        (_,nAmps) = mAmps.shape
-        mPCoef = np.tile(vPCoef,(1,nAmps))
-        mAmps = mAmps * mPCoef
-        mAmPh = mAmPh * mPCoef
-
-        # Measure the power of the adjusted signals
-        vP = np.sum(mSig*mSig,axis=1) / nSmp
-
-    else:
-        # Power adjustment coefficients are 1 (no adjustment)
-        vPCoef = np.ones((nSigs,1))
+    (mSig, vP, vPCoef, mAmps, mAmPh) = _adjPower(mSig, iP, mAmps, mAmPh)
 
     # =================================================================
     # Add the AWGN noise to the signals
-    # =================================================================
 
     # Backup the non noisy signals
     mSigNN = mSig.copy()      # Matrix with signals
@@ -737,28 +666,7 @@ def main(dSigConf):
 
     # Add the noise, if needed
     if not (np.isnan(iSNR) or np.isinf(iSNR)):
-
-        # Generate the noise
-        mNoise = np.random.randn(nSigs, nSmp)
-
-        # Measure the current powers of the noise signals
-        vNoisePReal = (np.sum(mNoise*mNoise,axis=1) / nSmp).reshape(nSigs,1)
-
-        # Compute the requested noise power for every signal
-        vNoiseP = (vP/(10**(iSNR/10))).reshape(nSigs,1)
-
-        # Compute power adjustments coefficients for the noise signals
-        vPNoiseCoef = np.sqrt(vNoiseP/vNoisePReal)
-
-        # Adjust the noise power
-        mPNoiseCoef = np.tile(vPNoiseCoef,(1,nSmp))
-        mNoise = mPNoiseCoef * mNoise
-
-        # Add the noise to the signals
-        mSig = mSig + mNoise
-
-        # Measure the power of the signals
-        vP = np.sum(mSig*mSig,axis=1) / nSmp
+        (mSig, vP) = _addNoise(mSig, vP, iSNR)
 
     # =================================================================
     # Generate the output dictionary
@@ -812,3 +720,123 @@ def main(dSigConf):
 
     return dSig
 
+
+# =================================================================
+# Generate the signals by IFFT
+# =================================================================
+def _genSigs():
+
+    # Adjust the amplitudes value to the number of points
+    mAmpsAdj = mAmps * nSmp/2
+
+    # Change phases into radians
+    mPhsRad = mPhs*np.pi/180
+
+    # Generate a one complex matrix for all the signals and its conjugated copy
+    mAmPh = mAmpsAdj*np.cos(mPhsRad) + 1j*mAmpsAdj*np.sin(mPhsRad)
+    mAmPh_conj = np.conjugate(mAmPh)
+
+    #----------------------------------------------------------------------
+    # Put the complex matrix with amplitudes and phases of tones into
+    # one matrix dedicated for IFFT
+
+    # Recalculate the matrix with indices of frequencies in the spectrum
+    # to real frequencies
+    mFrqs = mFrqsInx*fRes
+
+    # Recalculate the matrix with indices of frequencies in the spectrum
+    # to indices of frequencies in the IFFT transform
+    mIFFTFrqsInx = np.around(mFrqs/fFFTR).astype(int)
+
+    # Allocate the vector for the ifft coefficients for all the signals
+    # (one signal in one row)
+    mIFFT = np.zeros((nSigs, nSmp)) + 1j*np.zeros((nSigs, nSmp))
+
+    # Put the complex vector with tones values into the IFFT matrix
+    for inxSig in np.arange(nSigs):
+
+        # IFFT indices of tones for the current signal
+        vInx = mIFFTFrqsInx[inxSig,:]
+
+        # Put the tones for the current signal
+        mIFFT[inxSig, vInx]  = mAmPh[inxSig,:]
+
+        # IFFT indices of conjugate tones for the current signal
+        vInxConj = (nSmp - mIFFTFrqsInx[inxSig,:]).astype(int)
+
+        # Put the conjugate tones for the current signal
+        mIFFT[inxSig, vInxConj] = mAmPh_conj[inxSig,:]
+
+    #----------------------------------------------------------------------
+    # Generate the signals (perform the IFFT)
+    mSig = np.fft.ifftn(mIFFT,axes=[1]).real
+
+
+# =================================================================
+# Add the AWGN noise to the signals
+# =================================================================
+def _addNoise(mSig, vP, iSNR):
+
+    # Get the number of signals and the size of signals (the number of samples)
+    (nSigs, nSmp) = mSig.shape
+
+    # Generate the noise
+    mNoise = np.random.randn(nSigs, nSmp)
+
+    # Measure the current powers of the noise signals
+    vNoisePReal = (np.sum(mNoise*mNoise,axis=1) / nSmp).reshape(nSigs,1)
+
+    # Compute the requested noise power for every signal
+    vNoiseP = (vP/(10**(iSNR/10))).reshape(nSigs,1)
+
+    # Compute power adjustments coefficients for the noise signals
+    vPNoiseCoef = np.sqrt(vNoiseP/vNoisePReal)
+
+    # Adjust the noise power
+    mPNoiseCoef = np.tile(vPNoiseCoef,(1,nSmp))
+    mNoise = mPNoiseCoef * mNoise
+
+    # Add the noise to the signals
+    mSig = mSig + mNoise
+
+    # Measure the power of the signals
+    vP = np.sum(mSig*mSig,axis=1) / nSmp
+
+    return (mSig, vP)
+
+
+# =================================================================
+# Adjust the signal power
+# =================================================================
+def _adjPower(mSig, iP, mAmps, mAmPh):
+
+    # Get the number of signals and the size of signals (the number of samples)
+    (nSigs, nSmp) = mSig.shape
+
+    # Measure the power of the signals
+    vP = (np.sum(mSig*mSig,axis=1) / nSmp).reshape(nSigs,1)
+
+    # Adjust the signal power, if needed
+    if not np.isnan(iP) or np.isinf(iP):
+
+        # Compute power adjustments coefficients for the noise signals
+        vPCoef = np.sqrt(iP/vP)
+
+        # Adjust the signal power
+        mPCoef = np.tile(vPCoef,(1,nSmp))
+        mSig = mSig * mPCoef
+
+        # Adjust the reported amplitudes of tones
+        (_,nAmps) = mAmps.shape
+        mPCoef = np.tile(vPCoef,(1,nAmps))
+        mAmps = mAmps * mPCoef
+        mAmPh = mAmPh * mPCoef
+
+        # Measure the power of the adjusted signals
+        vP = np.sum(mSig*mSig,axis=1) / nSmp
+
+    else:
+        # Power adjustment coefficients are equal to 1 (no adjustment)
+        vPCoef = np.ones((nSigs,1))
+
+    return (mSig, vP, vPCoef, mAmps, mAmPh)
