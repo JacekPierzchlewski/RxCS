@@ -117,7 +117,7 @@ def main(dSigConf):
 
 
     Args:
-        dSigConf (dictionary): dictionary with configuration for the generator        dSigConf (dictionary): dictionary with configuration for the generator
+        dSigConf (dictionary): dictionary with configuration for the generator
 
     Returns:
         dSig (dictionary): dictionary with generated signals and their
@@ -204,7 +204,7 @@ def main(dSigConf):
     (mSig, vP, vPCoef, mAmps, mAmPh) = _adjPower(mSig, iP, mAmps, mAmPh)
 
     # Add the AWGN noise to the signals
-    (vPNN, mSigNN, mSig, vP) = _addNoise(mSig, vP, iSNR)
+    (mSigNN, vPNN, mSig, vP) = _addNoise(mSig, vP, iSNR)
 
     # =================================================================
     # Generate the output dictionary
@@ -937,7 +937,6 @@ def _drawAmps(vAmps, nTones, nSigs, iMinAmp, iGraAmp, iMaxAmp):
 
     """
 
-
     # Add unknown amplitudes of the additional tones to the vAmps vector
     vAmps = np.concatenate((vAmps, np.nan*np.zeros(nTones)))
 
@@ -1098,6 +1097,7 @@ def _genSigs(mFrqsInx, mAmps, mPhs, nSigs, tS, fR, fRes):
 # =================================================================
 # Adjust the signal power
 # =================================================================
+def _adjPower(mSig, iP, mAmps, mAmPh):
     """
     This function adjustes powers of the generated signals.
     If the requested power of the signals is equal to NaN or inf, then
@@ -1116,8 +1116,6 @@ def _genSigs(mFrqsInx, mAmps, mPhs, nSigs, tS, fR, fRes):
         mAmps (matrix):  matrix with adjusted amplitudes of tones
         mAmPh (matrix):  complex matrix with adjusted amplitudes/phases
     """
-
-def _adjPower(mSig, iP, mAmps, mAmPh):
 
     # Get the number of signals and the size of signals (the number of samples)
     (nSigs, nSmp) = mSig.shape
