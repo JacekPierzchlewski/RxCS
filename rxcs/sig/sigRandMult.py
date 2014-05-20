@@ -502,7 +502,7 @@ def _checkConf(dSigConf):
     if nFG > 0:
 
         # Create the vector with given and specified frequencies (not np.nan)
-        vFrqs_ = vFrqs[np.isnan(vFrqs) == False]
+        vFrqs_ = vFrqs[np.isnan(vFrqs) == 0]
 
         # 1. resolution:
         if np.abs(np.sum(np.round(vFrqs_/fRes) - (vFrqs_/fRes))) > 1e-15:
@@ -800,7 +800,7 @@ def _drawFreq(vFrqs, nTones, fMax, nSigs, fRes):
 
     # Create a vector with GIVEN (not nan) indices of frequencies in the
     # vFrqs vector
-    vFrqsInx_ = (vFrqsInx[np.isnan(vFrqsInx) == False]).astype(int)
+    vFrqsInx_ = (vFrqsInx[np.isnan(vFrqsInx) == 0]).astype(int)
 
     #----------------------------------------------------------------------
     # Create the vector with indices of avaialble frequencies in the spectrum
@@ -810,7 +810,7 @@ def _drawFreq(vFrqs, nTones, fMax, nSigs, fRes):
 
     # Boolean vector which indicates if the frequency is free
     vFreqIsFree = np.ones(nSpectTones).astype(bool)
-    vFreqIsFree[vFrqsInx_ - 1] = False
+    vFreqIsFree[vFrqsInx_ - 1] = 0
 
     # Create the vector with indices of available frequencies
     vAvailFreqsInx = vSpecInx[vFreqIsFree]

@@ -3,6 +3,7 @@ import rxcs
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def _sig_RMSG_ex1():
 
     # -----------------------------------------------------------------
@@ -32,7 +33,7 @@ def _sig_RMSG_ex1():
     dSigConf['vFrqs'] = np.array([2e3, 3e3, 4e3])
 
     # Vector with given amplitudes
-    dSigConf['vAmps'] = np.array([1, 2, 3 ])
+    dSigConf['vAmps'] = np.array([1, 2, 3])
 
     # Vector with given phases
     dSigConf['vPhs'] = np.array([np.nan, np.nan, np.nan])
@@ -65,7 +66,7 @@ def _sig_RMSG_ex1():
 
     # Get the generated signal
     mSig = dSig['mSig']
-    vSig = mSig[0,:]
+    vSig = mSig[0, :]
 
     # Analyze the spectrum of the signal
     vFFT = np.fft.fft(vSig)
@@ -87,7 +88,7 @@ def _sig_RMSG_ex1():
     hSubPlot1.grid(True)
     hSubPlot1.set_title('Spectrum of a random multitone signal')
     hSubPlot1.set_xlabel('Frequency [Hz]')
-    (markerline, stemlines, baseline) = hSubPlot1.stem(vF,vFFTa,
+    (markerline, stemlines, baseline) = hSubPlot1.stem(vF, vFFTa,
                                                        linefmt='b-',
                                                        markerfmt='bo',
                                                        basefmt='r-')

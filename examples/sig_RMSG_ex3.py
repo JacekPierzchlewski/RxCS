@@ -4,6 +4,7 @@ import numpy as np
 from scipy import signal
 import matplotlib.pyplot as plt
 
+
 def _sig_RMSG_ex3():
 
     # -----------------------------------------------------------------
@@ -40,8 +41,7 @@ def _sig_RMSG_ex3():
                                   23e6,
                                   24e6,
                                   25e6,
-                                  26e6,
-                                  ])
+                                  26e6])
 
     # Vector with given amplitudes
     dSigConf['vAmps'] = np.array([1,
@@ -54,8 +54,7 @@ def _sig_RMSG_ex3():
                                   np.nan,
                                   np.nan,
                                   np.nan,
-                                  np.nan,
-                                  ])
+                                  np.nan])
 
     # Vector with given phases
     dSigConf['vPhs'] = np.nan*np.zeros(11)
@@ -93,10 +92,10 @@ def _sig_RMSG_ex3():
 
     # Get the generated signals
     mSig = dSig['mSig']
-    vSig1 = mSig[0,:]
-    vSig2 = mSig[1,:]
-    vSig3 = mSig[2,:]
-    vSig4 = mSig[3,:]
+    vSig1 = mSig[0, :]
+    vSig2 = mSig[1, :]
+    vSig3 = mSig[2, :]
+    vSig4 = mSig[3, :]
 
     # Get the signals representation sampling frequency
     fR = dSig['fR']

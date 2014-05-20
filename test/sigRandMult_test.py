@@ -175,7 +175,7 @@ def _TestCase1(iTolerance):
     dSigConf['vFrqs'] = np.array([2e3, np.nan, 4e3])
 
     # Vector with given amplitudes
-    dSigConf['vAmps'] = np.array([np.nan, 1, np.nan ])
+    dSigConf['vAmps'] = np.array([np.nan, 1, np.nan])
 
     # Vector with given phases
     dSigConf['vPhs'] = np.array([np.nan, np.nan, 90])
@@ -274,10 +274,10 @@ def _TestCase2(iTolerance):
     # - - - - - - - - - - - - - - - -
 
     # Vector with given frequencies
-    dSigConf['vFrqs'] = np.array([1e3 ])
+    dSigConf['vFrqs'] = np.array([1e3])
 
     # Vector with given amplitudes
-    dSigConf['vAmps'] = np.array([0.5 ])
+    dSigConf['vAmps'] = np.array([0.5])
 
     # Vector with given phases
     dSigConf['vPhs'] = np.array([180])
@@ -379,10 +379,10 @@ def _TestCase3(iTolerance):
     dSigConf['vFrqs'] = np.array([1e3, np.nan, np.nan])
 
     # Vector with given amplitudes
-    dSigConf['vAmps'] = np.array([0.5,   1,     10 ])
+    dSigConf['vAmps'] = np.array([0.5, 1, 10])
 
     # Vector with given phases
-    dSigConf['vPhs'] = np.array([78, np.nan, np.nan ])
+    dSigConf['vPhs'] = np.array([78, np.nan, np.nan])
 
     # - - - - - - - - - - - - - - - -
 
@@ -484,7 +484,7 @@ def _TestCase4(iTolerance):
     dSigConf['vAmps'] = np.array([1.0, 1, 10, 20])
 
     # Vector with given phases
-    dSigConf['vPhs'] = np.array([78, 10, -50, -40 ])
+    dSigConf['vPhs'] = np.array([78, 10, -50, -40])
 
     # - - - - - - - - - - - - - - - -
 
@@ -527,6 +527,7 @@ def _TestCase4(iTolerance):
     # -----------------------------------------------------------------
 
     return
+
 
 # =====================================================================
 # Test case 5
@@ -579,13 +580,13 @@ def _TestCase5(iTolerance):
     # - - - - - - - - - - - - - - - -
 
     # Vector with given frequencies
-    dSigConf['vFrqs'] = np.array([ ])
+    dSigConf['vFrqs'] = np.array([])
 
     # Vector with given amplitudes
-    dSigConf['vAmps'] = np.array([ ])
+    dSigConf['vAmps'] = np.array([])
 
     # Vector with given phases
-    dSigConf['vPhs'] = np.array([ ])
+    dSigConf['vPhs'] = np.array([])
 
     # The number of additional tones
     dSigConf['nTones'] = 10
@@ -626,6 +627,7 @@ def _TestCase5(iTolerance):
     # -----------------------------------------------------------------
 
     return
+
 
 # =====================================================================
 # ENGINE OF THE TEST: Check the generated signals
@@ -676,6 +678,7 @@ def _checkSignals(dSigConf, dSig, iTolerance):
 
     return
 
+
 # =====================================================================
 # This function tests the number of generated signals
 # =====================================================================
@@ -719,6 +722,7 @@ def _checkNoOfSignals(dSigConf, dSig):
         raise Exception('the number of signals: error!!!')
 
     return
+
 
 # =====================================================================
 # This function tests the number of generated samples
@@ -795,7 +799,6 @@ def _checkNoOfTones(dSigConf, dSig):
         Nothing
     """
 
-
     # Reset the ok flag
     bOk = 1
 
@@ -863,19 +866,19 @@ def _checkFrequencies(dSigConf, dSig):
     mFrqsRep = dSig['mFrqs']
 
     # Compute the real frequencies of tones in the spectrum
-    mFrqsReal = _computeFreqs(dSig['mSigNN'],dSig['fFFTR'],nTonesCorr)
+    mFrqsReal = _computeFreqs(dSig['mSigNN'], dSig['fFFTR'], nTonesCorr)
 
     # Check if reported frequencies agree with real frequencies in the spectrum
     for inxSig in np.arange(nSigsCorr):  # Loop over all signals
 
         # Take the vector with reported frequencies of the current signal
         # and sort it
-        vFrqsRep = mFrqsRep[inxSig,:]
+        vFrqsRep = mFrqsRep[inxSig, :]
         vFrqsRep = np.sort(vFrqsRep)
 
         # Take the vector with real frequencies of the current signal
         # and sort it
-        vFrqsReal = mFrqsReal[inxSig,:]
+        vFrqsReal = mFrqsReal[inxSig, :]
         vFrqsReal = np.sort(vFrqsReal)
 
         # Compare the vectors
@@ -890,7 +893,7 @@ def _checkFrequencies(dSigConf, dSig):
     vFrqs = dSigConf['vFrqs']
 
     # Take only the specified frequencies
-    vFrqs = vFrqs[np.isnan(vFrqs) == False]
+    vFrqs = vFrqs[np.isnan(vFrqs) == 0]
 
     # Count the number of specified requested frequencies
     nReqFrqs = vFrqs.size
@@ -898,7 +901,7 @@ def _checkFrequencies(dSigConf, dSig):
 
         # Take the vector with real frequencies of the current signal
         # and sort it
-        vFrqsReal = mFrqsReal[inxSig,:]
+        vFrqsReal = mFrqsReal[inxSig, :]
 
         # Check if all the requested frequencies are in the spectrum
         for inxFrq in np.arange(nReqFrqs):
@@ -960,7 +963,7 @@ def _checkAmplitudes(dSigConf, dSig, iTolerance):
 
     # Compute the real amplitudes of tones in the spectrum
     (mFrqsReal, mAmpsReal) = _computeAmps(dSig['mSigNN'],
-                                          dSig['fFFTR'],nTonesCorr)
+                                          dSig['fFFTR'], nTonesCorr)
 
     # Get the reported frequencies of tones in the spectrum
     mFrqsRep = dSig['mFrqs']
@@ -1006,12 +1009,12 @@ def _checkAmplitudes(dSigConf, dSig, iTolerance):
 
             # Check if the reported frequency is equal to the real
             if not _isequal(vFrqsReal[inxTon], vFrqsRep[inxTon],
-                           iTolerance*vFrqsRep[inxTon]):
+                            iTolerance*vFrqsRep[inxTon]):
                 bOk = 0
 
             # Check if the reported amplitude is equal to the real
             if not _isequal(vAmpsReal[inxTon], vAmpsRep[inxTon],
-                           iTolerance*vAmpsReal[inxTon]):
+                            iTolerance*vAmpsReal[inxTon]):
                 bOk = 0
         # - - - - - - - - - - - - - - - - -
 
@@ -1066,22 +1069,23 @@ def _checkAmplitudes(dSigConf, dSig, iTolerance):
 
             # Check if the reported frequency is equal to the requested
             if not np.isnan(iF):
-                if not _isequal(iF,iFRep,iTolerance*iF):
+                if not _isequal(iF, iFRep, iTolerance*iF):
                     bOk = 0
 
             # Check if the requested amplitude was given explicitely
             if not np.isnan(iA):
 
                 # Check if the reported amplitude is equal to the requested
-                if not _isequal(iA,iARep,iTolerance*iA):
+                if not _isequal(iA, iARep, iTolerance*iA):
                     bOk = 0
 
             # Check if the requested amplitude was given explicitely
-            else:  #<- was not given explicitly
+            else:  # <- was not given explicitly
 
                 # Check if the random amplitude was drawn correctly
-                if iA > iMaxAmp*(1+iTolerance) or iA < iMinAmp*(1-iTolerance):
-                    bOk = 0
+                if iA > iMaxAmp * (1 + iTolerance) or \
+                   iA < iMinAmp * (1 - iTolerance):
+                        bOk = 0
 
     # - - - - - - - - - - - - - - - - -
 
@@ -1094,6 +1098,7 @@ def _checkAmplitudes(dSigConf, dSig, iTolerance):
     # -----------------------------------------------------------------
 
     return
+
 
 # =====================================================================
 # This function tests phases of tones in the spectrum
@@ -1136,7 +1141,7 @@ def _checkPhases(dSigConf, dSig, iTolerance):
 
     # Compute the real phases of tones in the spectrum
     (mFrqsReal, mPhsReal) = _computePhs(dSig['mSigNN'],
-                                        dSig['fFFTR'],nTonesCorr)
+                                        dSig['fFFTR'], nTonesCorr)
 
     # Get the reported frequencies of tones in the spectrum
     mFrqsRep = dSig['mFrqs']
@@ -1260,28 +1265,29 @@ def _checkPhases(dSigConf, dSig, iTolerance):
 
             # Check if the reported frequency is equal to the requested
             if not np.isnan(iF):
-                if not _isequal(iF,iFRep,iTolerance*iF):
+                if not _isequal(iF, iFRep, iTolerance * iF):
                     bOk = 0
 
             # Check if the requested phase was given explicitly
             if not np.isnan(iPhs):
 
                 # Check if the reported phase is equal to the requested
-                if not _isequal(iPhs,iPhsRep,iTolerance*iPhs):
+                if not _isequal(iPhs, iPhsRep, iTolerance * iPhs):
 
                     # Check the case where one value is =~ -180, other =~ +180
                     if _isequal(iPhs, -180, iTolerance*iPhs):
                         iPhs = iPhs + 360
-                    if _isequal(iPhsRep, -180, iTolerance*iPhsRep):
+                    if _isequal(iPhsRep, -180, iTolerance * iPhsRep):
                         iPhsRep = iPhsRep + 360
-                    if not _isequal(iPhs, iPhsRep, iTolerance*iPhsRep):
+                    if not _isequal(iPhs, iPhsRep, iTolerance * iPhsRep):
                         bOk = 0
 
             # Check if the requested phase was given explicitely
-            else:  #<- was not given explicitly
+            else:  # <- was not given explicitly
 
                 # Check if the random phase was drawn correctly
-                if (iPhs > iMaxPhs*(1+iTolerance)) or (iPhs < iMinPhs*(1-iTolerance)):
+                if (iPhs > iMaxPhs * (1 + iTolerance)) or \
+                   (iPhs < iMinPhs * (1 - iTolerance)):
                         bOk = 0
 
     # - - - - - - - - - - - - - - - - -
@@ -1385,7 +1391,7 @@ def _checkPower(dSigConf, dSig, iTolerance):
     mSig = dSig['mSig']
 
     # Compute the real power of noisy signals
-    vP = np.sum(mSig * mSig,axis=1) / nSmpCorr
+    vP = np.sum(mSig * mSig, axis=1) / nSmpCorr
 
     # Get the reported power of noisy signals
     vPRep = dSig['vP']
@@ -1469,7 +1475,7 @@ def _checkNoise(dSigConf, dSig, iTolerance):
         vPnCorr = vPNN / (10**(iSNR/10))
 
         # Compute the real power of noises
-        vPn = np.sum(mNoise * mNoise,axis=1) / nSmpCorr
+        vPn = np.sum(mNoise * mNoise, axis=1) / nSmpCorr
 
         # Compare the real power of noise with the requested power of noise
         for inxSig in np.arange(nSigsCorr):       # Loop over all noise signals
@@ -1481,7 +1487,7 @@ def _checkNoise(dSigConf, dSig, iTolerance):
             iPnCorr = vPnCorr[inxSig]
 
             # Compare the real power of noise with the requested power of noise
-            if not _isequal(iPn, iPnCorr, iPnCorr*iTolerance):
+            if not _isequal(iPn, iPnCorr, iPnCorr * iTolerance):
                 bOk = 0
 
         # Report
@@ -1521,11 +1527,11 @@ def _computeTones(mSig):
 
     # Compute the amplitudes of tones
     mFFTA = np.abs(mFFT)
-    mFFTA[mFFTA<1e-4] = 0     # Clear the matrix
+    mFFTA[mFFTA < 1e-4] = 0     # Clear the matrix
 
     # Compute the number of tones
-    mFFTA[mFFTA>=1e-4] = 1
-    vNTones = np.sum((mFFTA),1)
+    mFFTA[mFFTA >= 1e-4] = 1
+    vNTones = np.sum((mFFTA), 1)
     vNTones = (vNTones / 2).astype(int)
 
     # Return the vector with the number of tones
@@ -1562,7 +1568,7 @@ def _computeFreqs(mSig, fFFTR, nTones):
     (_, nIFFT) = mFFT.shape
 
     # Take only half of the IFFT spectrum
-    mFFT = mFFT[:, np.arange(nIFFT/2).astype(int) ]
+    mFFT = mFFT[:, np.arange(nIFFT / 2).astype(int)]
 
     # Get the number elements in the half of the IFFT spectrum
     (_, nIFFT) = mFFT.shape
@@ -1572,17 +1578,17 @@ def _computeFreqs(mSig, fFFTR, nTones):
 
     # Compute the amplitudes of tones
     mFFTA = np.abs(mFFT)
-    mFFTA[mFFTA<1e-4] = 0     # Clear the matrix
+    mFFTA[mFFTA < 1e-4] = 0     # Clear the matrix
 
     # Denote the present tones with 1
-    mFFTA[mFFTA>=1e-4] = 1
+    mFFTA[mFFTA >= 1e-4] = 1
 
     # Allocate the matrix for frequencies of tones
     mFrqsReal = np.zeros((nSigs, nTones))
 
     # Compute the real frequencies
     for inxSig in np.arange(nSigs):
-        mFrqsReal[inxSig,:] = vFrqs[ mFFTA[inxSig,:]==1]
+        mFrqsReal[inxSig, :] = vFrqs[mFFTA[inxSig, :] == 1]
 
     # Return the matrix with frequencies
     return mFrqsReal
@@ -1619,7 +1625,7 @@ def _computeAmps(mSig, fFFTR, nTones):
     mFFT = np.fft.fftn(mSig, axes=[1])*2/nIFFT
 
     # Take only half of the IFFT spectrum
-    mFFT = mFFT[:, np.arange(nIFFT/2).astype(int) ]
+    mFFT = mFFT[:, np.arange(nIFFT / 2).astype(int)]
 
     # Get the number elements in the half of the IFFT spectrum
     (_, nIFFT) = mFFT.shape
@@ -1629,11 +1635,11 @@ def _computeAmps(mSig, fFFTR, nTones):
 
     # Compute the amplitudes of tones
     mFFTA = np.abs(mFFT)
-    mFFTA[mFFTA<1e-4] = 0     # Clear the matrix
+    mFFTA[mFFTA < 1e-4] = 0     # Clear the matrix
 
     # Denote the present tones with 1
     mFFTA_ = mFFTA.copy()
-    mFFTA_[mFFTA>1e-4] = 1
+    mFFTA_[mFFTA > 1e-4] = 1
 
     # Allocate the matrix for frequencies of tones
     mFrqsReal = np.zeros((nSigs, nTones))
@@ -1645,10 +1651,10 @@ def _computeAmps(mSig, fFFTR, nTones):
     for inxSig in np.arange(nSigs):
 
         # Take only these tones, which have an amplitude higher than 1e-4
-        mFrqsReal[inxSig,:] = vFrqs[ mFFTA_[inxSig,:]==1]
+        mFrqsReal[inxSig, :] = vFrqs[mFFTA_[inxSig, :] == 1]
 
         # Get amplitudes of the frequencies
-        mAmpsReal[inxSig,:] = mFFTA[inxSig,mFFTA_[inxSig,:]==1]
+        mAmpsReal[inxSig, :] = mFFTA[inxSig, mFFTA_[inxSig, :] == 1]
 
     # Return the matrices with frequncies and amplitudes
     return (mFrqsReal, mAmpsReal)
@@ -1675,7 +1681,6 @@ def _computePhs(mSig, fFFTR, nTones):
         mPhsReal: matrix with phases of tones in the signal |br|
     """
 
-
     # Get the number of signals
     (nSigs, _) = mSig.shape
 
@@ -1687,7 +1692,7 @@ def _computePhs(mSig, fFFTR, nTones):
     mFFT[np.abs(mFFT) < 1e-4] = 0
 
     # Take only half of the IFFT spectrum
-    mFFT = mFFT[:, np.arange(nIFFT/2).astype(int) ]
+    mFFT = mFFT[:, np.arange(nIFFT / 2).astype(int)]
 
     # Get the number elements in the half of the IFFT spectrum
     (_, nIFFT) = mFFT.shape
@@ -1697,14 +1702,14 @@ def _computePhs(mSig, fFFTR, nTones):
 
     # Compute the amplitudes of tones
     mFFTA = np.abs(mFFT)
-    mFFTA[mFFTA<1e-4] = 0     # Clear the matrix
+    mFFTA[mFFTA < 1e-4] = 0     # Clear the matrix
 
     # Compute the phases of tones
     mFFTP = np.angle(mFFT)
-    mFFTP[np.abs(mFFTP)<1e-4] = 0    # Clear the matrix
+    mFFTP[np.abs(mFFTP) < 1e-4] = 0    # Clear the matrix
 
     # Denote the present tones with 1
-    mFFTA[mFFTA>0] = 1
+    mFFTA[mFFTA > 0] = 1
 
     # Allocate the matrix for frequencies of tones
     mFrqsReal = np.zeros((nSigs, nTones))
@@ -1716,10 +1721,11 @@ def _computePhs(mSig, fFFTR, nTones):
     for inxSig in np.arange(nSigs):
 
         # Take only these tones, which have an amplitude higher than 1e-4
-        mFrqsReal[inxSig,:] = vFrqs[mFFTA[inxSig,:]==1]
+        mFrqsReal[inxSig, :] = vFrqs[mFFTA[inxSig, :] == 1]
 
         # Get phases of the frequencies
-        mPhsReal[inxSig,:] = mFFTP[inxSig,mFFTA[inxSig,:]==1]*180/np.pi
+        pi = np.pi
+        mPhsReal[inxSig, :] = mFFTP[inxSig, mFFTA[inxSig, :] == 1] * 180 / pi
 
     # Return the matrices with frequncies and amplitudes
     return (mFrqsReal, mPhsReal)
@@ -1746,8 +1752,7 @@ def _isequal(iX, iY, iMargin):
            given margin |br|
     """
 
-
-    if (abs(iX-iY) <= np.abs(iMargin)):
+    if (abs(iX - iY) <= np.abs(iMargin)):
         return 1
     else:
         return 0
@@ -1758,4 +1763,3 @@ def _isequal(iX, iY, iMargin):
 # =====================================================================
 if __name__ == '__main__':
     _sigRandMult_test()
-
