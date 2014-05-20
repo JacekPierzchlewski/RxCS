@@ -148,25 +148,24 @@ def main(dSigConf):
     # iMinPhs   -  minimum phase of random tones
     # iGraPhs   -  gradation of phase of random tones
     # iMaxPhs   -  maximum phase of random tones
-    (nSigs,    \
-    bMute,     \
-    tS,        \
-    fR,        \
-    iSNR,      \
-    iP,        \
-    fMax,      \
-    fRes,      \
-    vFrqs,     \
-    vAmps,     \
-    vPhs,      \
-    nTones,    \
-    iMinAmp,   \
-    iGraAmp,   \
-    iMaxAmp,   \
-    iMinPhs,   \
-    iGraPhs,   \
-    iMaxPhs)   \
-    = _getConf(dSigConf)
+    (nSigs,
+     bMute,
+     tS,
+     fR,
+     iSNR,
+     iP,
+     fMax,
+     fRes,
+     vFrqs,
+     vAmps,
+     vPhs,
+     nTones,
+     iMinAmp,
+     iGraAmp,
+     iMaxAmp,
+     iMinPhs,
+     iGraPhs,
+     iMaxPhs) = _getConf(dSigConf)
 
     # - - - - - - - - - - - - - - - - - - -
 
@@ -226,7 +225,7 @@ def main(dSigConf):
     dSig['nSmp'] = nSmp
 
     # Generate the time vector for the signal and add it to the output dict.
-    vTSig = np.arange(1,nSmp+1) / fR
+    vTSig = np.arange(1, nSmp+1) / fR
     dSig['vTSig'] = vTSig
 
     # - - - - - - - - - - - - - - - - - - -
@@ -450,25 +449,24 @@ def _checkConf(dSigConf):
     # iMinPhs   -  minimum phase of random tones
     # iGraPhs   -  gradation of phase of random tones
     # iMaxPhs   -  maximum phase of random tones
-    (nSigs,    \
-    bMute,     \
-    tS,        \
-    fR,        \
-    iSNR,      \
-    iP,        \
-    fMax,      \
-    fRes,      \
-    vFrqs,     \
-    vAmps,     \
-    vPhs,      \
-    nTones,    \
-    iMinAmp,   \
-    iGraAmp,   \
-    iMaxAmp,   \
-    iMinPhs,   \
-    iGraPhs,   \
-    iMaxPhs)   \
-    = _getConf(dSigConf)
+    (nSigs,
+     bMute,
+     tS,
+     fR,
+     iSNR,
+     iP,
+     fMax,
+     fRes,
+     vFrqs,
+     vAmps,
+     vPhs,
+     nTones,
+     iMinAmp,
+     iGraAmp,
+     iMaxAmp,
+     iMinPhs,
+     iGraPhs,
+     iMaxPhs) = _getConf(dSigConf)
 
     #----------------------------------------------------------------------
     # Check the Nyquist vs. highest possible frequency
@@ -493,7 +491,7 @@ def _checkConf(dSigConf):
 
     strErr = 'The signal spectrum consists of %d tones. ' % (nSpectTones)
     strErr = strErr + 'I can not put there %d [vFrqs] + %d [nTones] tones' \
-        % (nFG,nTones)
+        % (nFG, nTones)
     if nSpectTones < nSigTones:
         rxcs.console.cerror(strFunc, strErr)
 
@@ -657,6 +655,7 @@ def _checkConf(dSigConf):
     #----------------------------------------------------------------------
     return
 
+
 # =================================================================
 # # Print the configuration and signal parameters to the console
 # =================================================================
@@ -680,32 +679,31 @@ def _printParam(dSigConf):
     # iMinPhs   -  minimum phase of random tones
     # iGraPhs   -  gradation of phase of random tones
     # iMaxPhs   -  maximum phase of random tones
-    (nSigs,    \
-    bMute,     \
-    tS,        \
-    fR,        \
-    iSNR,      \
-    iP,        \
-    fMax,      \
-    fRes,      \
-    _,         \
-    _,         \
-    _,         \
-    nTones,    \
-    iMinAmp,   \
-    iGraAmp,   \
-    iMaxAmp,   \
-    iMinPhs,   \
-    iGraPhs,   \
-    iMaxPhs)   \
-    = _getConf(dSigConf)
+    (nSigs,
+     bMute,
+     tS,
+     fR,
+     iSNR,
+     iP,
+     fMax,
+     fRes,
+     _,
+     _,
+     _,
+     nTones,
+     iMinAmp,
+     iGraAmp,
+     iMaxAmp,
+     iMinPhs,
+     iGraPhs,
+     iMaxPhs) = _getConf(dSigConf)
 
     #----------------------------------------------------------------------
     # Print the configuration if the 'mute' flag is not set
     if bMute == 0:
 
         # Print out the header of the signal generator
-        rxcs.console.progress('Signal generator','Random multitone')
+        rxcs.console.progress('Signal generator', 'Random multitone')
 
         # - - - - - - - - - - - - - - - - - - -
         # Time parameters
@@ -713,10 +711,10 @@ def _printParam(dSigConf):
         # Calculate the number of samples
         nSmp = int(round(tS*fR))
 
-        rxcs.console.bullet_param('signal time',tS,'-m','seconds')
+        rxcs.console.bullet_param('signal time', tS, '-m', 'seconds')
         rxcs.console.param('representation sampling frequency',
-                                fR,'-M','MHz')
-        rxcs.console.param('the number of samples',nSmp,'-','samples')
+                           fR, '-M', 'MHz')
+        rxcs.console.param('the number of samples', nSmp, '-', 'samples')
 
         # - - - - - - - - - - - - - - - - - - -
         # Frequency parameters
@@ -731,35 +729,34 @@ def _printParam(dSigConf):
         nSpectTones = int(fMax/fRes)
 
         # Calculate the signal sparsity
-        iSpar = 1- nSigTones/nSpectTones
+        iSpar = 1 - nSigTones / nSpectTones
 
         rxcs.console.bullet_param('the highest possible freq. in the signal',
-                                fMax,'-k','Hz')
-        rxcs.console.param('signal spectrum resolution',fRes,'k','Hz')
+                                  fMax, '-k', 'Hz')
+        rxcs.console.param('signal spectrum resolution', fRes, 'k', 'Hz')
         rxcs.console.param('the number of tones in the max possible spectrum',
-                        nSpectTones,'-','')
-
+                           nSpectTones, '-', '')
 
         rxcs.console.param('the total number of tones in the signal',
-                        nSigTones,'-','')
+                           nSigTones, '-', '')
         rxcs.console.param('the signal sparsity',
-                        iSpar,' ','')
+                           iSpar, ' ', '')
 
         rxcs.console.bullet_param('the number of given frequencies',
-                                nFG,'-','')
+                                  nFG, '-', '')
 
         rxcs.console.bullet_param('the number of additional tones',
-                                nTones,'-','')
+                                  nTones, '-', '')
 
         # - - - - - - - - - - - - - - - - - - -
         # Random amplitudes and phases
-        rxcs.console.param('minimum amplitude',iMinAmp,' ','')
-        rxcs.console.param('amplitude gradation',iGraAmp,' ','')
-        rxcs.console.param('maximum amplitude',iMaxAmp,' ','')
+        rxcs.console.param('minimum amplitude', iMinAmp, ' ', '')
+        rxcs.console.param('amplitude gradation', iGraAmp, ' ', '')
+        rxcs.console.param('maximum amplitude', iMaxAmp, ' ', '')
 
-        rxcs.console.param('minimum phase',iMinPhs,' ','')
-        rxcs.console.param('amplitude phase',iGraPhs,' ','')
-        rxcs.console.param('maximum phase',iMaxPhs,' ','')
+        rxcs.console.param('minimum phase', iMinPhs, ' ', '')
+        rxcs.console.param('amplitude phase', iGraPhs, ' ', '')
+        rxcs.console.param('maximum phase', iMaxPhs, ' ', '')
 
         # - - - - - - - - - - - - - - - - - - -
         # Noise
@@ -767,19 +764,19 @@ def _printParam(dSigConf):
             rxcs.console.bullet_info('noise',
                                      'not added to the signal (SNR=inf)')
         else:
-            rxcs.console.bullet_param('noise (SNR)',iSNR,'-','dB')
+            rxcs.console.bullet_param('noise (SNR)', iSNR, '-', 'dB')
 
         # - - - - - - - - - - - - - - - - - - -
         # Signal power
         if np.isinf(iP) or np.isnan(iP):
-            rxcs.console.bullet_info('signal power','not adjusted')
+            rxcs.console.bullet_info('signal power', 'not adjusted')
         else:
-            rxcs.console.bullet_param('signal power',iP,'-','W')
+            rxcs.console.bullet_param('signal power', iP, '-', 'W')
 
         # - - - - - - - - - - - - - - - - - - -
         # The number of signals
         rxcs.console.bullet_param('the number of signals to be generated',
-                                nSigs,'-','signals')
+                                  nSigs, '-', 'signals')
 
         # - - - - - - - - - - - - - - - - - - -
         # Information about the computations start
@@ -806,17 +803,17 @@ def _drawFreq(vFrqs, nTones, fMax, nSigs, fRes):
 
     # Create a vector with GIVEN (not nan) indices of frequencies in the
     # vFrqs vector
-    vFrqsInx_ =(vFrqsInx[np.isnan(vFrqsInx) == False]).astype(int)
+    vFrqsInx_ = (vFrqsInx[np.isnan(vFrqsInx) == False]).astype(int)
 
     #----------------------------------------------------------------------
     # Create the vector with indices of avaialble frequencies in the spectrum
 
     # Create a vector with inidces of all the tones in the spectrum
-    vSpecInx = np.arange(1,nSpectTones+1)
+    vSpecInx = np.arange(1, nSpectTones + 1)
 
     # Boolean vector which indicates if the frequency is free
     vFreqIsFree = np.ones(nSpectTones).astype(bool)
-    vFreqIsFree[vFrqsInx_-1] = False
+    vFreqIsFree[vFrqsInx_ - 1] = False
 
     # Create the vector with indices of available frequencies
     vAvailFreqsInx = vSpecInx[vFreqIsFree]
@@ -825,28 +822,29 @@ def _drawFreq(vFrqs, nTones, fMax, nSigs, fRes):
     # Construct a vector with indices of frequencies for all the needed signals
 
     # Add unknown frequencies of the additional tones to the vFrqsInx vector
-    vFrqsInx = np.concatenate((vFrqsInx,np.nan*np.zeros(nTones)))
+    vFrqsInx = np.concatenate((vFrqsInx, np.nan*np.zeros(nTones)))
 
     # Calculate the number of missing frequencies in the vector with
     # frequencies
     iMissF = len(vFrqsInx) - len(vFrqsInx_)
 
     # Construct a matrix with indices of frequencies for all the needed signals
-    mFrqsInx = np.tile(vFrqsInx,(nSigs,1))
+    mFrqsInx = np.tile(vFrqsInx, (nSigs, 1))
 
     #----------------------------------------------------------------------
     # Draw the frequencies
     for inxSig in np.arange(nSigs):
 
-      # Permute all the indices of frequencies in the spectrum
-      vPermutedFreqsInx = ((np.random.permutation(vAvailFreqsInx)).T)
+        # Permute all the indices of frequencies in the spectrum
+        vPermutedFreqsInx = ((np.random.permutation(vAvailFreqsInx)).T)
 
-      # From the permuted indices of frequencices take as many as it is missing
-      vTakenFreqsInx = vPermutedFreqsInx[np.arange(iMissF)]
+        # From the permuted indices of frequencices take as many
+        # as it is missing
+        vTakenFreqsInx = vPermutedFreqsInx[np.arange(iMissF)]
 
-      # Put the taken indices of frequencies to the matrix with frequency
-      # indices for all the signals
-      mFrqsInx[inxSig,np.isnan(mFrqsInx[inxSig,:])] = vTakenFreqsInx
+        # Put the taken indices of frequencies to the matrix with frequency
+        # indices for all the signals
+        mFrqsInx[inxSig, np.isnan(mFrqsInx[inxSig, :])] = vTakenFreqsInx
 
     return mFrqsInx
 
@@ -857,7 +855,7 @@ def _drawFreq(vFrqs, nTones, fMax, nSigs, fRes):
 def _drawAmps(vAmps, nTones, nSigs, iMinAmp, iGraAmp, iMaxAmp):
 
     # Add unknown amplitudes of the additional tones to the vAmps vector
-    vAmps = np.concatenate((vAmps,np.nan*np.zeros(nTones)))
+    vAmps = np.concatenate((vAmps, np.nan*np.zeros(nTones)))
 
     # Compute the number of missing amplitudes for every signal
     iMissA = (vAmps[np.isnan(vAmps)]).size
@@ -865,7 +863,7 @@ def _drawAmps(vAmps, nTones, nSigs, iMinAmp, iGraAmp, iMaxAmp):
     #----------------------------------------------------------------------
 
     # Compute the number of possible amplitude values
-    nAmpVal = np.floor((iMaxAmp - iMinAmp)/iGraAmp) + 1
+    nAmpVal = np.floor((iMaxAmp - iMinAmp) / iGraAmp) + 1
 
     #----------------------------------------------------------------------
 
@@ -874,7 +872,7 @@ def _drawAmps(vAmps, nTones, nSigs, iMinAmp, iGraAmp, iMaxAmp):
         iMinAmp + iGraAmp*(np.random.randint(0, nAmpVal, (nSigs*iMissA)))
 
     # Construct a matrix with amplitudes of tones for all the needed signals
-    mAmps = np.tile(vAmps,(nSigs,1))
+    mAmps = np.tile(vAmps, (nSigs, 1))
 
     # Put the draw amplitudes to the matrix with amplitudes of tones for
     # all the needed signals
@@ -889,7 +887,7 @@ def _drawAmps(vAmps, nTones, nSigs, iMinAmp, iGraAmp, iMaxAmp):
 def _drawPhases(vPhs, nTones, nSigs, iMinPhs, iGraPhs, iMaxPhs):
 
     # Add unknown phases of the additional tones to the vAmps vector
-    vPhs = np.concatenate((vPhs,np.nan*np.zeros(nTones)))
+    vPhs = np.concatenate((vPhs, np.nan*np.zeros(nTones)))
 
     # Compute the number of missing phases for every signal
     iMissP = (vPhs[np.isnan(vPhs)]).size
@@ -906,7 +904,7 @@ def _drawPhases(vPhs, nTones, nSigs, iMinPhs, iGraPhs, iMaxPhs):
         iMinPhs + iGraPhs*(np.random.randint(0, nPhsVal, (nSigs*iMissP)))
 
     # Construct a matrix with phases of tones for all the needed signals
-    mPhs = np.tile(vPhs,(nSigs,1))
+    mPhs = np.tile(vPhs, (nSigs, 1))
 
     # Put the draw phases to the matrix with phases of tones for
     # all the needed signals
@@ -958,22 +956,23 @@ def _genSigs(mFrqsInx, mAmps, mPhs, nSigs, tS, fR, fRes):
     for inxSig in np.arange(nSigs):
 
         # IFFT indices of tones for the current signal
-        vInx = mIFFTFrqsInx[inxSig,:]
+        vInx = mIFFTFrqsInx[inxSig, :]
 
         # Put the tones for the current signal
-        mIFFT[inxSig, vInx]  = mAmPh[inxSig,:]
+        mIFFT[inxSig, vInx] = mAmPh[inxSig, :]
 
         # IFFT indices of conjugate tones for the current signal
-        vInxConj = (nSmp - mIFFTFrqsInx[inxSig,:]).astype(int)
+        vInxConj = (nSmp - mIFFTFrqsInx[inxSig, :]).astype(int)
 
         # Put the conjugate tones for the current signal
-        mIFFT[inxSig, vInxConj] = mAmPh_conj[inxSig,:]
+        mIFFT[inxSig, vInxConj] = mAmPh_conj[inxSig, :]
 
     #----------------------------------------------------------------------
     # Generate the signals (perform the IFFT)
-    mSig = np.fft.ifftn(mIFFT,axes=[1]).real
+    mSig = np.fft.ifftn(mIFFT, axes=[1]).real
 
     return (mSig, mAmPh, mFrqs, fFFTR)
+
 
 # =================================================================
 # Add the AWGN noise to the signals
@@ -995,23 +994,23 @@ def _addNoise(mSig, vP, iSNR):
         mNoise = np.random.randn(nSigs, nSmp)
 
         # Measure the current powers of the noise signals
-        vNoisePReal = (np.sum(mNoise*mNoise,axis=1) / nSmp).reshape(nSigs,1)
+        vNoisePReal = (np.sum(mNoise*mNoise, axis=1) / nSmp).reshape(nSigs, 1)
 
         # Compute the requested noise power for every signal
-        vNoiseP = (vP/(10**(iSNR/10))).reshape(nSigs,1)
+        vNoiseP = (vP / (10**(iSNR/10))).reshape(nSigs, 1)
 
         # Compute power adjustments coefficients for the noise signals
-        vPNoiseCoef = np.sqrt(vNoiseP/vNoisePReal)
+        vPNoiseCoef = np.sqrt(vNoiseP / vNoisePReal)
 
         # Adjust the noise power
-        mPNoiseCoef = np.tile(vPNoiseCoef,(1,nSmp))
+        mPNoiseCoef = np.tile(vPNoiseCoef, (1, nSmp))
         mNoise = mPNoiseCoef * mNoise
 
         # Add the noise to the signals
         mSig = mSig + mNoise
 
         # Measure the power of the signals
-        vP = np.sum(mSig*mSig,axis=1) / nSmp
+        vP = np.sum(mSig * mSig, axis=1) / nSmp
 
     return (vPNN, mSigNN, mSig, vP)
 
@@ -1025,29 +1024,29 @@ def _adjPower(mSig, iP, mAmps, mAmPh):
     (nSigs, nSmp) = mSig.shape
 
     # Measure the power of the signals
-    vP = (np.sum(mSig*mSig,axis=1) / nSmp).reshape(nSigs,1)
+    vP = (np.sum(mSig * mSig, axis=1) / nSmp).reshape(nSigs, 1)
 
     # Adjust the signal power, if needed
     if not np.isnan(iP) or np.isinf(iP):
 
         # Compute power adjustments coefficients for the noise signals
-        vPCoef = np.sqrt(iP/vP)
+        vPCoef = np.sqrt(iP / vP)
 
         # Adjust the signal power
-        mPCoef = np.tile(vPCoef,(1,nSmp))
+        mPCoef = np.tile(vPCoef, (1, nSmp))
         mSig = mSig * mPCoef
 
         # Adjust the reported amplitudes of tones
-        (_,nAmps) = mAmps.shape
-        mPCoef = np.tile(vPCoef,(1,nAmps))
+        (_, nAmps) = mAmps.shape
+        mPCoef = np.tile(vPCoef, (1, nAmps))
         mAmps = mAmps * mPCoef
         mAmPh = mAmPh * mPCoef
 
         # Measure the power of the adjusted signals
-        vP = np.sum(mSig*mSig,axis=1) / nSmp
+        vP = np.sum(mSig*mSig, axis=1) / nSmp
 
     else:
         # Power adjustment coefficients are equal to 1 (no adjustment)
-        vPCoef = np.ones((nSigs,1))
+        vPCoef = np.ones((nSigs, 1))
 
     return (mSig, vP, vPCoef, mAmps, mAmPh)

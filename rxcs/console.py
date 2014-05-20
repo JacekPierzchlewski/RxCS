@@ -818,7 +818,6 @@ def _colors(strKey):
     dColors['OK'] = dColors['DARK_GREEN']
     dColors['ENDC'] = '\033[0m'
 
-
     # Return the correct color
     strColor = dColors[strKey]
     return strColor
