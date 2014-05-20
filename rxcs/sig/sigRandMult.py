@@ -14,7 +14,7 @@ function contains all the settings given to the generator.
     0.2  | 16-MAY-2014 : * Docstrings added. |br|
     0.3  | 19-MAY-2014 : * The main func. divided into smaller functions. |br|
     0.4  | 20-MAY-2014 : * Errors are served by 'raise'. |br|
-
+    0.5  | 20-MAY-2014 : * Docstrings are added to the internal functions. |br|
 
 *License*:
     BSD 2-Clause
@@ -57,11 +57,11 @@ def main(dSigConf):
 
     - g. **fRes** (*float*): tones frequency resolution
 
-    - h. **vFrqs** (*numpy vector*): vector with requested frequencies of tones
+    - h. **vFrqs** (*vector*): vector with requested frequencies of tones
 
-    - i. **vAmps** (*numpy vector*): vector with requested amplitudes of tones
+    - i. **vAmps** (*vector*): vector with requested amplitudes of tones
 
-    - j. **vPhs** (*numpy vector*): vector with requested phases of tones
+    - j. **vPhs** (*vector*): vector with requested phases of tones
 
     - k. **iMinAmp** (*float*): min amplitude of a tone present in a signal
 
@@ -75,7 +75,7 @@ def main(dSigConf):
 
     - p. **iMaxPhs** (*float*): max allowed phase of a tone present in a signal
 
-    - q. **nSigPack** (*int*): the number of signals to be generated
+    - q. **nSigPack** (*float*): the number of signals to be generated
 
 
     Fields in the output dictionary:
@@ -94,30 +94,29 @@ def main(dSigConf):
 
     - g. **vTSig** (*float*): The time vector for the generated signals
 
-    - h. **iSNR** (*numpy vector*): Signal 2 noise ratio
+    - h. **iSNR** (*vector*): Signal 2 noise ratio
 
-    - i. **iP** (*numpy vector*): Requested power of the signals
+    - i. **iP** (*vector*): Requested power of the signals
 
-    - j. **vP** (*numpy vector*): Power of the signals
+    - j. **vP** (*vector*): Power of the signals
 
-    - k. **vPNN** (*float*): Power of the non noisy signals
+    - k. **vPNN** (*vector*): Power of the non noisy signals
 
-    - l. **vPCoef** (*float*): Power adjustment coefficients
+    - l. **vPCoef** (*vector*): Power adjustment coefficients
 
-    - m. **mFrqs** (*float*): Frequencies of tones in the signals
+    - m. **mFrqs** (*matrix*): Frequencies of tones in the signals
 
-    - n. **mAmps** (*float*): Amplitudes of tones in the signals
+    - n. **mAmps** (*matrix*): Amplitudes of tones in the signals
 
-    - o. **mPhs** (*float*): Phases of tones in the signals
+    - o. **mPhs** (*matrix*): Phases of tones in the signals
 
-    - p. **mAmPh** (*float*): Amp/Phases tones complex vector
+    - p. **mAmPh** (*matrix*): Complex matrix with amplitudes/phases of tones
 
-    - q. **fFFTR** (*int*): Signal FFT frequency resolution
+    - q. **fFFTR** (*float*): Signal FFT frequency resolution
 
 
     Args:
-        dSigConf (dictionary): dictionary with configuration for
-        the generator
+        dSigConf (dictionary): dictionary with configuration for the generator        dSigConf (dictionary): dictionary with configuration for the generator
 
     Returns:
         dSig (dictionary): dictionary with generated signals and their
@@ -264,6 +263,33 @@ def main(dSigConf):
 # Check the configuration dictionary and get the configuration from it
 # ====================================================================
 def _getConf(dSigConf):
+    """
+    This function checks if all the needed configuration fields are in
+    the configuration dictionary and gets these configuration fields.
+
+    Args:
+        dSigConf (dictionary): dictionary with configuration for the generator
+
+    Returns:
+        nSigs (float):     the number of signals
+        bMute (float):     mute the conole output flag
+        tS (float):        time of the signal
+        fR (float):        signal representation sampling frequency
+        iSNR (float):      signal-to-noise-ratio
+        iP (float):        power of the signal
+        fMax (float):      maximum frequency
+        fRes (float):      signal resolution frequency
+        vFrqs (vector):    vector with specified freqs
+        vAmps (vector):    vector with amplitudes of specified freqs
+        vPhs (vector):     vector with phases of specified freqs
+        nTones (float):    the number of additional tones
+        iMinAmp (float):   minimum amplitude of random tones
+        iGraAmp (float):   gradation of amplitude of random tones
+        iMaxAmp (float):   maximum amplitude of random tones
+        iMinPhs (float):   minimum phase of random tones
+        iGraPhs (float):   gradation of phase of random tones
+        iMaxPhs (float):   maximum phase of random tones
+    """
 
     # -----------------------------------------------------------------
     # Get the number of signals to be generated
@@ -429,6 +455,16 @@ def _getConf(dSigConf):
 # Check the configuration
 # =================================================================
 def _checkConf(dSigConf):
+    """
+    This function checks the configuration of the generator.
+
+    Args:
+        dSigConf (dictionary): dictionary with configuration for the generator
+
+    Returns:
+        nothing
+
+    """
 
     # =================================================================
     # Get the configuration from the configuration dictionary
@@ -659,6 +695,17 @@ def _checkConf(dSigConf):
 # # Print the configuration and signal parameters to the console
 # =================================================================
 def _printParam(dSigConf):
+    """
+    This function prints the generator configuration and the signal parameters
+    to the console, if the 'bMute' flag on the configuration is cleared.
+
+    Args:
+        dSigConf (dictionary): dictionary with configuration for the generator
+
+    Returns:
+        nothing
+
+    """
 
     #----------------------------------------------------------------------
     # Get the configuration from the configuration dictionary
@@ -789,6 +836,25 @@ def _printParam(dSigConf):
 # Draw frequencies of the signals
 # =================================================================
 def _drawFreq(vFrqs, nTones, fMax, nSigs, fRes):
+    """
+    This function draws frequencies of tones for all the signals
+    according to the rules specified by users,
+
+    Args:
+        vFrqs (vector):  vector with specified frequencies
+        nTones (int):    the number of additional tones
+        fMax (int):      the max allowed frequency in the signal spectrum
+        nSigs (int):     the number of signals to be generated
+        fRes (int):      signal spectrum resolution
+                         (distance between the tones in the spectrum)
+
+    Returns:
+        mFrqsInx (matrix):  matrix with frequencies of tones for all
+                            the signals (one row - one signal)
+                            The frequencies are represented as indices of
+                            frequencies from the allowed signal spectrum.
+
+    """
 
     # The number of tones in the maximum possible signal spectrum
     nSpectTones = int(fMax/fRes)
@@ -852,6 +918,24 @@ def _drawFreq(vFrqs, nTones, fMax, nSigs, fRes):
 # Draw amplitudes of the signals
 # =================================================================
 def _drawAmps(vAmps, nTones, nSigs, iMinAmp, iGraAmp, iMaxAmp):
+    """
+    This function draws amplitudes of tones for all the signals
+    according to the rules specified by users,
+
+    Args:
+        vAmps (vector):  vector with specified amplitudes of tones in signals
+        nTones (int):    the number of additional tones
+        nSigs (int):     the number of signals to be generated
+        iMinAmp (int):   min amplitude of a random tone present in a signal
+        iGraAmp (int):   gradation of a amplitude of a random tone
+        iMaxAmp (int):   max amplitude of a random tone present in a signal
+
+    Returns:
+        mAmps (matrix):  matrix with amplitudes of tones for all
+                         the signals (one row - one signal)
+
+    """
+
 
     # Add unknown amplitudes of the additional tones to the vAmps vector
     vAmps = np.concatenate((vAmps, np.nan*np.zeros(nTones)))
@@ -884,6 +968,23 @@ def _drawAmps(vAmps, nTones, nSigs, iMinAmp, iGraAmp, iMaxAmp):
 # Draw phases of the signals
 # =================================================================
 def _drawPhases(vPhs, nTones, nSigs, iMinPhs, iGraPhs, iMaxPhs):
+    """
+    This function draws phases of tones for all the signals
+    according to the rules specified by users,
+
+    Args:
+        vPhs (vector):   vector with specified phases of tones in signals
+        nTones (int):    the number of additional tones
+        nSigs (int):     the number of signals to be generated
+        iMinPhs (int):   min phase of a random tone present in a signal
+        iGraPhs (int):   gradation of a phase of a random tone
+        iMaxPhs (int):   max phase of a random tone present in a signal
+
+    Returns:
+        mPhs (matrix):   matrix with phases of tones for all
+                         the signals (one row - one signal)
+
+    """
 
     # Add unknown phases of the additional tones to the vAmps vector
     vPhs = np.concatenate((vPhs, np.nan*np.zeros(nTones)))
@@ -916,6 +1017,26 @@ def _drawPhases(vPhs, nTones, nSigs, iMinPhs, iGraPhs, iMaxPhs):
 # Generate the signals by IFFT
 # =================================================================
 def _genSigs(mFrqsInx, mAmps, mPhs, nSigs, tS, fR, fRes):
+    """
+    This function generate the multitone signals using the IFFT algorithm.
+
+    Args:
+        mFrqsInx (matrix):  matrix with freqs of tones for all the signals
+                            (as indices of tones in the allowed spectrum)
+        mAmps (matrix):     matrix with amplitudes of tones for all the signals
+        mPhs (matrix):      matrix with phases of tones for all the signals
+        nSigs (float):      the number of signals
+        tS (float):         time of the signals
+        fR (float):         signal representation sampling frequency
+        fRes (float):       signal spectrum resolution
+                            (distance between the tones in the spectrum)
+
+    Returns:
+        mSig (matrix):   matrix with signals (one row - one signal)
+        mAmPh (float):   complex matrix with amplitudes/phases of tones
+        mFrqs (matrix):  matrix with freqs of tones for all the signals
+        fFFTR (float):   signal FFT frequency resolution
+    """
 
     # Calculate the number of samples in the signals
     nSmp = int(round(tS*fR))
@@ -977,6 +1098,23 @@ def _genSigs(mFrqsInx, mAmps, mPhs, nSigs, tS, fR, fRes):
 # Add the AWGN noise to the signals
 # =================================================================
 def _addNoise(mSig, vP, iSNR):
+    """
+    This function adds noise to the generated signals.
+    If the requested level of noise is equal to NaN or inf,
+    then no noise is added.
+
+
+    Args:
+        mSig (matrix):   matrix with signals (one row - one signal)
+        vP (vector):     vector with powers of signals
+        iSNR (float):    wanted level of noise in the signals
+
+    Returns:
+        mSigNN (matrix): matrix with non noisy signals
+        vPNN (vector):   vector with powers of non noisy signals
+        mSig (matrix):   matrix with noisy signals
+        vP (vector):     vector with powers of noisy signals
+    """
 
     # Backup the non noisy signals
     mSigNN = mSig.copy()      # Matrix with signals
@@ -1011,12 +1149,31 @@ def _addNoise(mSig, vP, iSNR):
         # Measure the power of the signals
         vP = np.sum(mSig * mSig, axis=1) / nSmp
 
-    return (vPNN, mSigNN, mSig, vP)
+    return (mSigNN, vPNN, mSig, vP)
 
 
 # =================================================================
 # Adjust the signal power
 # =================================================================
+    """
+    This function adjustes powers of the generated signals.
+    If the requested power of the signals is equal to NaN or inf, then
+    the signals are not adjusted.
+
+    Args:
+        mSig (matrix):   matrix with signals (one row - one signal)
+        iP (float):      requested power of the signals
+        mAmps (matrix):  matrix with amplitudes of tones in the signals
+        mAmPh (matrix):  complex matrix with amplitudes/phases of tones
+
+    Returns:
+        mSig (matrix):   matrix with noisy signals
+        vP (vector):     vector with powers of noisy signals
+        vPCoef (vector): vector with coefficients which adjsuted the signals
+        mAmps (matrix):  matrix with adjusted amplitudes of tones
+        mAmPh (matrix):  complex matrix with adjusted amplitudes/phases
+    """
+
 def _adjPower(mSig, iP, mAmps, mAmPh):
 
     # Get the number of signals and the size of signals (the number of samples)
