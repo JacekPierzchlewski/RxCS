@@ -12,7 +12,9 @@ function contains all the settings given to the generator.
 *Version*:
     0.1  | 15-MAY-2014 : * Initial version. |br|
     0.2  | 16-MAY-2014 : * Docstrings added. |br|
-    0.3  | 19-MAY-2014 : * The main func. divided into smaller functions |br|
+    0.3  | 19-MAY-2014 : * The main func. divided into smaller functions. |br|
+    0.4  | 20-MAY-2014 : * Errors are served by 'raise'. |br|
+
 
 *License*:
     BSD 2-Clause
@@ -282,7 +284,7 @@ def _getConf(dSigConf):
     strErr = ('The time of the signal [s] (tS) ')
     strErr = strErr + ('is not given in the configuration!')
     if not 'tS' in dSigConf:
-        rxcs.console.cerror(strFunc, strErr)
+        raise NameError(strErr)
     tS = dSigConf['tS']
 
     # The signal representation sampling freuqency [Hz]
@@ -290,7 +292,7 @@ def _getConf(dSigConf):
     strErr = ('The signal representation sampling freuqency [Hz] (fR) ')
     strErr = strErr + ('is not given in the configuration!')
     if not 'fR' in dSigConf:
-        rxcs.console.cerror(strFunc, strErr)
+        raise NameError(strErr)
     fR = dSigConf['fR']
 
     # -----------------------------------------------------------------
@@ -315,7 +317,7 @@ def _getConf(dSigConf):
     strErr = ('The highest possible frequency in the signal [Hz] (fMax) ')
     strErr = strErr + ('is not given in the configuration!')
     if not 'fMax' in dSigConf:
-        rxcs.console.cerror(strFunc, strErr)
+        raise NameError(strErr)
     fMax = dSigConf['fMax']
 
     # Signal spectrum resolution [Hz]
@@ -323,7 +325,7 @@ def _getConf(dSigConf):
     strErr = ('Signal spectrum resolution [Hz] (fRes) ')
     strErr = strErr + ('is not given in the configuration!')
     if not 'fRes' in dSigConf:
-        rxcs.console.cerror(strFunc, strErr)
+        raise NameError(strErr)
     fRes = dSigConf['fRes']
 
     # -----------------------------------------------------------------
@@ -472,7 +474,7 @@ def _checkConf(dSigConf):
     # Check the Nyquist vs. highest possible frequency
     strErr = 'The representation sampling frequency is to low!'
     if fR <= 2*fMax:
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
 
     #----------------------------------------------------------------------
     # Check the highest possible frequency in the signal vs spectrum
@@ -480,7 +482,7 @@ def _checkConf(dSigConf):
     strErr = 'The highest possible frequency in the signal is not a multiple '
     strErr = strErr + 'of the signal spectrum resolution'
     if (round(fMax/fRes) - fMax/fRes) > 1e-15:
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
 
     #----------------------------------------------------------------------
     # Check if there is a space for all the frequencies requested in
@@ -493,7 +495,7 @@ def _checkConf(dSigConf):
     strErr = strErr + 'I can not put there %d [vFrqs] + %d [nTones] tones' \
         % (nFG, nTones)
     if nSpectTones < nSigTones:
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
 
     #----------------------------------------------------------------------
     # Check the vector with given frequencies
@@ -509,7 +511,7 @@ def _checkConf(dSigConf):
             strErr = ('A frequency given in the vFrqs vector is ')
             strErr = strErr + ('incoherent with the resolution of signal ')
             strErr = strErr + ('spectrum!\n')
-            rxcs.console.cerror(strFunc, strErr)
+            raise ValueError(strErr)
 
         # Correct possible representation errors in the vector with frequencies
         vFrqs = np.round(vFrqs/fRes)*fRes
@@ -518,7 +520,7 @@ def _checkConf(dSigConf):
         if max(vFrqs) > fMax:
             strErr = ('The highest frequency in vFrqs vector is higher than ')
             strErr = strErr + ('the highest possible in the signal spectrum!')
-            rxcs.console.cerror(strFunc, strErr)
+            raise ValueError(strErr)
 
         # 3. Repeated frequency
         # Check if there is any frequency repeated in the
@@ -530,13 +532,13 @@ def _checkConf(dSigConf):
             if (vFrqsUnique.size != vFrqs.size):
                 strErr = ('There are frequencies repeated in ')
                 strErr = strErr + ('the vFrqs vector!')
-                rxcs.console.cerror(strFunc, strErr)
+                raise ValueError(strErr)
 
         # 4. All the frequencies higher than 0
         for inxFreq in np.arange(vFrqs.size):
             if vFrqs[inxFreq] <= 0:
                 strErr = ('Frequencies in the vFrqs must be higher than 0!')
-                rxcs.console.cerror(strFunc, strErr)
+                raise ValueError(strErr)
 
     # Check the vector with given frequencies is equal to
     # the vector with given amplitudes
@@ -547,7 +549,7 @@ def _checkConf(dSigConf):
     if not ((nFG == nAG) and (nFG == nPG)):
         strErr = ('Size of the vector with given frequencies (vFrqs) must ')
         strErr = strErr + ('be equal to size of the vectors vAmps and vPhs')
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
 
     #----------------------------------------------------------------------
     # Check the vector with given amplitudes
@@ -559,7 +561,7 @@ def _checkConf(dSigConf):
         for inxAmps in np.arange(vAmps.size):
             if vAmps[inxAmps] <= 0:
                 strErr = ('Amplitudes in the vAmps must be higher than 0!')
-                rxcs.console.cerror(strFunc, strErr)
+                raise ValueError(strErr)
 
     #----------------------------------------------------------------------
     # Check the vector with given phases, if it is longer then 0
@@ -569,10 +571,10 @@ def _checkConf(dSigConf):
         for inxPhs in np.arange(vPhs.size):
             if vPhs[inxPhs] <= -180:
                 strErr = ('Phases in the vPhs must be higher than -180!')
-                rxcs.console.cerror(strFunc, strErr)
+                raise ValueError(strErr)
             if vPhs[inxPhs] > 180:
                 strErr = ('Phases in the vPhs must be lower than 180!')
-                rxcs.console.cerror(strFunc, strErr)
+                raise ValueError(strErr)
 
     #----------------------------------------------------------------------
     # The number of additional tones can not be lower than 0
@@ -580,7 +582,7 @@ def _checkConf(dSigConf):
 
         strErr = ('The number of additional tones can not be lower')
         strErr = strErr + (' than 0')
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
 
     #----------------------------------------------------------------------
     # Check if the given amplitudes boundaries make sense
@@ -589,20 +591,20 @@ def _checkConf(dSigConf):
     if iMinAmp > iMaxAmp:
         strErr = ('Minimum possible amplitude can not be greater ')
         strErr = strErr + ('than the maximum possible amplitude!')
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
 
     # 2. amplitude gradation
     if iGraAmp <= 0:
         strErr = ('Amplitude gradation must be higher than zero!')
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
 
     # 3. Min amplitude and max amplitude must be higher than 0
     if iMinAmp < 0:
         strErr = ('Minimum amplitude must be higher than zero!')
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
     if iMaxAmp < 0:
         strErr = ('Maximum amplitude must be higher than zero!')
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
 
     #----------------------------------------------------------------------
     # Check if the given phase boundaries make sense
@@ -611,33 +613,33 @@ def _checkConf(dSigConf):
     if iMinPhs > iMaxPhs:
         strErr = ('Minimum possible phase can not be greater than ')
         strErr = strErr + ('the maximum possible phase!')
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
 
     # 2. phase gradation
     if iGraPhs <= 0:
         strErr = ('Phase gradation must be higher than zero!')
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
 
     # 3. Min phase and max phase must be higher than -180 and lower than + 180
     if iMinPhs <= -180:
         strErr = ('Minimum phase must be higher than -180!')
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
     if iMinPhs > 180:
         strErr = ('Minimum phase must be lower than 180!')
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
     if iMaxPhs <= -180:
         strErr = ('Maximum phase must be higher than -180!')
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
     if iMaxPhs > 180:
         strErr = ('Maximum phase must be lower than 180!')
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
 
     #----------------------------------------------------------------------
     # Check the number of signals to be generated
     if (nSigs < 1):
         strErr = ('The number of signals to be generated must ')
         strErr = strErr + ('be higher than one!')
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
 
     #----------------------------------------------------------------------
     # Check if there is a frequency leackage
@@ -647,7 +649,7 @@ def _checkConf(dSigConf):
     if abs(round(fRes/fFFTR) - fRes/fFFTR) > 0:
         strErr = ('Frequency leackage! Signal spectrum resolution can not be ')
         strErr = strErr + ('represented with the current signal parameters!')
-        rxcs.console.cerror(strFunc, strErr)
+        raise ValueError(strErr)
 
     #----------------------------------------------------------------------
     return
