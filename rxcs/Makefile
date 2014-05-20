@@ -15,13 +15,14 @@
 # Version:
 #
 #	0.1 | 13-MAY-2014: * Initial version
+#	0.2 | 20-MAy-2014: * PEP8 and cleaner do not treat softlink to rxcs as a subdirectory
 #
 # License:
 #
 #	BSD 2-Clause
 
 # Get a list of subdirectories (all except subdirs which begin with __)
-SRC_DIR := $(shell ls -d */ 2>/dev/null | sed '/__/d')
+SRC_DIR := $(shell ls -d */ 2>/dev/null | sed '/__/d' | sed '/rxcs/d')
 
 # Get a list of python files (all .py files except files which begin with __)
 PYTHON_FILES := $(shell ls *.py 2>/dev/null | sed '/__/d')
@@ -30,7 +31,7 @@ PYTHON_FILES := $(shell ls *.py 2>/dev/null | sed '/__/d')
 PYC_FILES := $(shell ls *.pyc 2>/dev/null)
 
 # Get the name of the current dir
-CUR_DIR := $(shell pwd  | sed 's/^.*pates/pates/')
+CUR_DIR := $(shell pwd  | sed 's/^.*rxcs/rxcs/')
 
 
 # #############################################################################
@@ -41,7 +42,7 @@ CUR_DIR := $(shell pwd  | sed 's/^.*pates/pates/')
 pep8:
 ifneq ($(PYTHON_FILES),)
 	@echo $(CUR_DIR):
-	pep8 $(PYTHON_FILES)
+	pep8 $(PYTHON_FILES)	
 endif
 	for i in $(SRC_DIR); do \
 		cd "$$i"; make pep8; cd ..; \
