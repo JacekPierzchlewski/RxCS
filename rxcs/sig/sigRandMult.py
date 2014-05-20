@@ -533,10 +533,10 @@ def _checkConf(dSigConf):
                 rxcs.console.cerror(strFunc, strErr)
 
         # 4. All the frequencies higher than 0
-        vFrqsLowerOrEqualZero = vFrqs[vFrqs <= 0]
-        if vFrqsLowerOrEqualZero.size > 0:
-            strErr = ('Frequencies in the vFrqs vector must be higher than 0!')
-            rxcs.console.cerror(strFunc, strErr)
+        for inxFreq in np.arange(vFrqs.size):
+            if vFrqs[inxFreq] <= 0:
+                strErr = ('Frequencies in the vFrqs must be higher than 0!')
+                rxcs.console.cerror(strFunc, strErr)
 
     # Check the vector with given frequencies is equal to
     # the vector with given amplitudes
@@ -556,26 +556,23 @@ def _checkConf(dSigConf):
     if nAG > 0:
 
         # 1. All the amplitudes higher than 0
-        vAmpsLowerOrEqualZero = vAmps[vAmps <= 0]
-        if vAmpsLowerOrEqualZero.size > 0:
-            strErr = ('Amplitudes in the vAmps vector must be higher than 0!')
-            rxcs.console.cerror(strFunc, strErr)
+        for inxAmps in np.arange(vAmps.size):
+            if vAmps[inxAmps] <= 0:
+                strErr = ('Amplitudes in the vAmps must be higher than 0!')
+                rxcs.console.cerror(strFunc, strErr)
 
     #----------------------------------------------------------------------
     # Check the vector with given phases, if it is longer then 0
     if nPG > 0:
 
-        # 1. All the phases must be higher than -180
-        vPhsLowerOrEqualMin180 = vPhs[vPhs <= -180]
-        if vPhsLowerOrEqualMin180.size > 0:
-            strErr = ('Phases in the vPhs vector must be higher than -180!')
-            rxcs.console.cerror(strFunc, strErr)
-
-        # 2. All the phases must be lower than 180
-        vPhsHigher180 = vPhs[vPhs > 180]
-        if vPhsHigher180.size > 0:
-            strErr = ('Phases in the vPhs vector must be lower than 180!')
-            rxcs.console.cerror(strFunc, strErr)
+        # 1. All the phases must be higher than -180 and lower than 180
+        for inxPhs in np.arange(vPhs.size):
+            if vPhs[inxPhs] <= -180:
+                strErr = ('Phases in the vPhs must be higher than -180!')
+                rxcs.console.cerror(strFunc, strErr)
+            if vPhs[inxPhs] > 180:
+                strErr = ('Phases in the vPhs must be lower than 180!')
+                rxcs.console.cerror(strFunc, strErr)
 
     #----------------------------------------------------------------------
     # The number of additional tones can not be lower than 0
