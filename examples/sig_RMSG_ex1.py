@@ -34,6 +34,7 @@ and ploted.
 *Version*:
     0.1  | 15-MAY-2014 : * Initial version. |br|
     0.2  | 20-MAY-2014 : * Docstrings added and PEP8 adjustments. |br|
+    1.0  | 20-MAY-2014 : * Version 1.0 released. |br|
 
 *License*:
     BSD 2-Clause
