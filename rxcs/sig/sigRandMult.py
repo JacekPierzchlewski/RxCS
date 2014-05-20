@@ -15,6 +15,7 @@ function contains all the settings given to the generator.
     0.3  | 19-MAY-2014 : * The main func. divided into smaller functions. |br|
     0.4  | 20-MAY-2014 : * Errors are served by 'raise'. |br|
     0.5  | 20-MAY-2014 : * Docstrings are added to the internal functions. |br|
+    0.5r1| 20-MAY-2014 : * Order of the internal functions was changed. |br|
 
 *License*:
     BSD 2-Clause
@@ -1095,6 +1096,62 @@ def _genSigs(mFrqsInx, mAmps, mPhs, nSigs, tS, fR, fRes):
 
 
 # =================================================================
+# Adjust the signal power
+# =================================================================
+    """
+    This function adjustes powers of the generated signals.
+    If the requested power of the signals is equal to NaN or inf, then
+    the signals are not adjusted.
+
+    Args:
+        mSig (matrix):   matrix with signals (one row - one signal)
+        iP (float):      requested power of the signals
+        mAmps (matrix):  matrix with amplitudes of tones in the signals
+        mAmPh (matrix):  complex matrix with amplitudes/phases of tones
+
+    Returns:
+        mSig (matrix):   matrix with noisy signals
+        vP (vector):     vector with powers of noisy signals
+        vPCoef (vector): vector with coefficients which adjsuted the signals
+        mAmps (matrix):  matrix with adjusted amplitudes of tones
+        mAmPh (matrix):  complex matrix with adjusted amplitudes/phases
+    """
+
+def _adjPower(mSig, iP, mAmps, mAmPh):
+
+    # Get the number of signals and the size of signals (the number of samples)
+    (nSigs, nSmp) = mSig.shape
+
+    # Measure the power of the signals
+    vP = (np.sum(mSig * mSig, axis=1) / nSmp).reshape(nSigs, 1)
+
+    # Adjust the signal power, if needed
+    if not np.isnan(iP) or np.isinf(iP):
+
+        # Compute power adjustments coefficients for the noise signals
+        vPCoef = np.sqrt(iP / vP)
+
+        # Adjust the signal power
+        mPCoef = np.tile(vPCoef, (1, nSmp))
+        mSig = mSig * mPCoef
+
+        # Adjust the reported amplitudes of tones
+        (_, nAmps) = mAmps.shape
+        mPCoef = np.tile(vPCoef, (1, nAmps))
+        mAmps = mAmps * mPCoef
+        mAmPh = mAmPh * mPCoef
+
+        # Measure the power of the adjusted signals
+        vP = np.sum(mSig*mSig, axis=1) / nSmp
+
+    else:
+        # Power adjustment coefficients are equal to 1 (no adjustment)
+        vPCoef = np.ones((nSigs, 1))
+
+    return (mSig, vP, vPCoef, mAmps, mAmPh)
+
+
+# =================================================================
 # Add the AWGN noise to the signals
 # =================================================================
 def _addNoise(mSig, vP, iSNR):
@@ -1150,59 +1207,3 @@ def _addNoise(mSig, vP, iSNR):
         vP = np.sum(mSig * mSig, axis=1) / nSmp
 
     return (mSigNN, vPNN, mSig, vP)
-
-
-# =================================================================
-# Adjust the signal power
-# =================================================================
-    """
-    This function adjustes powers of the generated signals.
-    If the requested power of the signals is equal to NaN or inf, then
-    the signals are not adjusted.
-
-    Args:
-        mSig (matrix):   matrix with signals (one row - one signal)
-        iP (float):      requested power of the signals
-        mAmps (matrix):  matrix with amplitudes of tones in the signals
-        mAmPh (matrix):  complex matrix with amplitudes/phases of tones
-
-    Returns:
-        mSig (matrix):   matrix with noisy signals
-        vP (vector):     vector with powers of noisy signals
-        vPCoef (vector): vector with coefficients which adjsuted the signals
-        mAmps (matrix):  matrix with adjusted amplitudes of tones
-        mAmPh (matrix):  complex matrix with adjusted amplitudes/phases
-    """
-
-def _adjPower(mSig, iP, mAmps, mAmPh):
-
-    # Get the number of signals and the size of signals (the number of samples)
-    (nSigs, nSmp) = mSig.shape
-
-    # Measure the power of the signals
-    vP = (np.sum(mSig * mSig, axis=1) / nSmp).reshape(nSigs, 1)
-
-    # Adjust the signal power, if needed
-    if not np.isnan(iP) or np.isinf(iP):
-
-        # Compute power adjustments coefficients for the noise signals
-        vPCoef = np.sqrt(iP / vP)
-
-        # Adjust the signal power
-        mPCoef = np.tile(vPCoef, (1, nSmp))
-        mSig = mSig * mPCoef
-
-        # Adjust the reported amplitudes of tones
-        (_, nAmps) = mAmps.shape
-        mPCoef = np.tile(vPCoef, (1, nAmps))
-        mAmps = mAmps * mPCoef
-        mAmPh = mAmPh * mPCoef
-
-        # Measure the power of the adjusted signals
-        vP = np.sum(mSig*mSig, axis=1) / nSmp
-
-    else:
-        # Power adjustment coefficients are equal to 1 (no adjustment)
-        vPCoef = np.ones((nSigs, 1))
-
-    return (mSig, vP, vPCoef, mAmps, mAmPh)
