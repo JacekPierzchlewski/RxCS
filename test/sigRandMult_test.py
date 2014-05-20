@@ -66,6 +66,8 @@ when in *rxcs/test* directory. The results are then printed to the console.
 *Version*:
     0.1  | 15-MAY-2014 : * Initial version. |br|
     0.2  | 15-MAY-2014 : * Docstrings added. |br|
+    0.3  | 20-MAY-2014 : * PEP8 adjustments. |br|
+    1.0  | 20-MAY-2014 : * Version 1.0 released. |br|
 
 *License*:
     BSD 2-Clause
