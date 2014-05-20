@@ -16,6 +16,7 @@ function contains all the settings given to the generator.
     0.4  | 20-MAY-2014 : * Errors are served by 'raise'. |br|
     0.5  | 20-MAY-2014 : * Docstrings are added to the internal functions. |br|
     0.5r1| 20-MAY-2014 : * Order of the internal functions was changed. |br|
+    1.0  | 20-MAY-2014 : * Version 1.0 released. |br|
 
 *License*:
     BSD 2-Clause
