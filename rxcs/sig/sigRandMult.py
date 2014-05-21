@@ -17,6 +17,8 @@ function contains all the settings given to the generator.
     0.5  | 20-MAY-2014 : * Docstrings are added to the internal functions. |br|
     0.5r1| 20-MAY-2014 : * Order of the internal functions was changed. |br|
     1.0  | 20-MAY-2014 : * Version 1.0 released. |br|
+    1.1  | 21-MAY-2014 : * Error in progress printing is fixed. |br|
+    1.2  | 21-MAY-2014 : * Error in default random amplitude is fixed. |br|
 
 *License*:
     BSD 2-Clause
@@ -409,7 +411,7 @@ def _getConf(dSigConf):
     if 'iMaxAmp' in dSigConf:
         iMaxAmp = dSigConf['iMaxAmp']
     else:
-        iMaxAmp = 0
+        iMaxAmp = 1
 
     # -----------------------------------------------------------------
     # Get the boundaries for phases
