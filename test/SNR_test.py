@@ -522,6 +522,9 @@ def _TestCase5(iTolerance):
 # =====================================================================
 def _checkSNR(dSigConf, iTolerance):
 
+    # Succcess ratio if SNR > 20 [db]
+    iSNRSuccess = 20
+
     # -----------------------------------------------------------------
     # Run the multtone signal generator
     tStart = \
@@ -533,7 +536,7 @@ def _checkSNR(dSigConf, iTolerance):
     # Run the SNR evaluation
     dAna = {}  # Initialize the dictionary with system analysis results
     tStart = rxcs.console.module_progress('test (case 1) SNR computation')
-    dAna = rxcs.ana.SNR.main(dSig,dSig,dAna)
+    dAna = rxcs.ana.SNR.main(dSig,dSig,dAna,iSNRSuccess)
     rxcs.console.module_progress_done(tStart)
 
     # -----------------------------------------------------------------
@@ -554,6 +557,19 @@ def _checkSNR(dSigConf, iTolerance):
     # Check the average SNR
     if not _isequal(dSig['iSNR'], dAna['iSNR'], iTolerance):
         raise Exception('measured SNR: error!!!')
+
+    # -----------------------------------------------------------------
+    # Check the success ratio
+
+    # The expected success ratio
+    if dSig['iSNR'] >= iSNRSuccess:
+        iSR_expected = 1
+    else:
+        iSR_expected = 0
+
+    # Check the expected success ratio
+    if not _isequal(iSR_expected, dAna['iSR'], iTolerance):
+        raise Exception('measured SNR success ratio: error!!!')
 
     # -----------------------------------------------------------------
 
