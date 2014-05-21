@@ -11,7 +11,8 @@ This module contains SNR evaluation function of the reconstructed signals. |br|
     0.3  | 21-MAY-2014 : * Docstrings added. |br|
     0.4  | 21-MAY-2014 : * Configuration with a dictionary |br|
     0.5  | 21-MAY-2014 : * Progress and results printing |br|
-
+    1.0  | 21-MAY-2014 : * Version 1.0 released. |br|
+    
 *License*:
     BSD 2-Clause
 """
