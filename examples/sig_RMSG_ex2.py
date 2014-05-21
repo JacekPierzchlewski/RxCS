@@ -1,3 +1,45 @@
+"""
+This script is an example of how to use the Random Multitone Signal
+Generator module. |br|
+
+In this example 1 random multitone signal is generated. |br|
+
+Time of the signal is 10 us, the signal representation sampling frequency is
+5 MHz. The highest possible frequency of a tone in the signal is 2 MHz,
+the signal spectrum resolution is 100 kHz. |br|
+
+The signal contains 5 tones with specified frequencies (100 kHz, 300kHz,
+500kHz, 700kHz, 900kHz). The amplitudes of these tones are specified,
+the phases of these tones are randomly chosen by the generator. |br|
+
+The above is given in the 3 fields in the generator configuration dictionary:
+
+    dSigConf['vFrqs'] = np.array([100e3, 300e3, 500e3, 700e3, 900e3]) |br|
+
+    dSigConf['vAmps'] = np.array([1, 0.8, 1, 0.8, 1]) |br|
+
+    dSigConf['vPhs'] = np.nan*np.zeros(5) |br|
+
+Additonally, there is 1 completely random tone in the signal. |br|
+
+The power of the signal is not regulated. |br|
+
+The noise is not added to the signal. |br|
+
+After the generation, spectrum fo the signal is analyzed with an FFT
+and ploted.
+
+*Author*:
+    Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
+
+*Version*:
+    0.1  | 15-MAY-2014 : * Initial version. |br|
+    0.2  | 21-MAY-2014 : * Docstrings added and PEP8 adjustments. |br|
+    1.0  | 21-MAY-2014 : * Version 1.0 released. |br|
+
+*License*:
+    BSD 2-Clause
+"""
 from __future__ import division
 import rxcs
 import numpy as np
