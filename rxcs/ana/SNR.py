@@ -1,6 +1,7 @@
 from __future__ import division
 import numpy as np
 
+
 def main(dSigOrig, dSigRecon, dAna, iSNRSuccess):
 
     ## Get the original unnoisy signals, the number of signal and their length
@@ -32,10 +33,10 @@ def main(dSigOrig, dSigRecon, dAna, iSNRSuccess):
     (_, iSizNoise) = mNoise.shape  # Size of the noise
 
     # Compute the power of noise
-    vNoiseP = (np.sum(mNoise * mNoise,axis=1) / iSizNoise)
+    vNoiseP = (np.sum(mNoise * mNoise, axis=1) / iSizNoise)
 
     # Compute the power of orignal signals
-    vSigP = (np.sum(mSig_orig * mSig_orig,axis=1) / iSiz_orig)
+    vSigP = (np.sum(mSig_orig * mSig_orig, axis=1) / iSiz_orig)
 
     # Compute the SNR for every reconstructed signal and the average SNR
     vSNR = 10 * np.log10(vSigP / vNoiseP)

@@ -120,7 +120,7 @@ def _sig_RMSG_ex0():
     hSubPlot1.grid(True)
     hSubPlot1.set_title('Spectrum of a random multitone signal')
     hSubPlot1.set_xlabel('Frequency [Hz]')
-    hSubPlot1.plot(vTSig, vSig,'b-')
+    hSubPlot1.plot(vTSig, vSig, 'b-')
 
     # -----------------------------------------------------------------
     plt.show(block=True)

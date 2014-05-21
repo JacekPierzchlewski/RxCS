@@ -583,14 +583,14 @@ def _checkSNR(dSigConf, iTolerance):
     # Run the SNR evaluation
     dAna = {}  # Initialize the dictionary with system analysis results
     tStart = rxcs.console.module_progress('test (case 1) SNR computation')
-    dAna = rxcs.ana.SNR.main(dSig,dSig,dAna,iSNRSuccess)
+    dAna = rxcs.ana.SNR.main(dSig, dSig, dAna, iSNRSuccess)
     rxcs.console.module_progress_done(tStart)
 
     # -----------------------------------------------------------------
     # Check the measured SNR vs the reported orignal SNR
 
     # Get the number of signals
-    nSigPack= dSigConf['nSigPack']
+    nSigPack = dSigConf['nSigPack']
 
     # Get the vector with measured SNR values
     vSNR = dAna['vSNR']
@@ -598,7 +598,7 @@ def _checkSNR(dSigConf, iTolerance):
     # Check the vector with measured SNR values
     for inxSig in np.arange(nSigPack):
         iSNR_meas = vSNR[inxSig]
-        if not _isequal(dSig['iSNR'] ,iSNR_meas, iTolerance):
+        if not _isequal(dSig['iSNR'], iSNR_meas, iTolerance):
             raise Exception('measured SNR: error!!!')
 
     # Check the average SNR

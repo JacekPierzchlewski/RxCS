@@ -837,7 +837,7 @@ def _printParam(dSigConf):
         tStart = rxcs.console.module_progress('signal generation starts!!!')
 
     #----------------------------------------------------------------------
-    else:   #<- the output was muted
+    else:   # <- the output was muted
         tStart = np.nan
 
     #----------------------------------------------------------------------
