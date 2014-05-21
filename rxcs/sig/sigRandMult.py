@@ -707,7 +707,7 @@ def _printParam(dSigConf):
         dSigConf (dictionary): dictionary with configuration for the generator
 
     Returns:
-        nothing
+        tStart (float): time stamp of starting the generator
 
     """
 
@@ -834,6 +834,10 @@ def _printParam(dSigConf):
         # - - - - - - - - - - - - - - - - - - -
         # Information about the computations start
         tStart = rxcs.console.module_progress('signal generation starts!!!')
+
+    #----------------------------------------------------------------------
+    else:   #<- the output was muted
+        tStart = np.nan
 
     #----------------------------------------------------------------------
     return tStart
