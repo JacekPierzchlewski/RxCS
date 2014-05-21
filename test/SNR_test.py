@@ -1,3 +1,45 @@
+"""
+.. role:: bash(code)
+    :language: bash
+
+This is the test module for the SNR evaluation of the reconstructed signal.
+|br|
+
+It tests the SNR evaluator with the number of test cases,
+and analyzes the results.
+
+In every case random multitone signals are generated with a specified
+level of noise. The Random Multitone Signal Generator is used to generate
+the signals. The non noisy signal from the generator is treated as the orignal
+signal, the noisy signal is treated as the reconstructed signal. |br|
+
+The following tests are performed on the results of evaluation:
+
+- if the measured level of noise for every signal is correct?
+
+- if the measured average level of noise is correct?
+
+- if the measured success ratio of the reconsteruction is correct?
+
+
+To start the test run this module directly as a script:
+
+    :bash:`$ python SNR_test.py`
+
+when in *rxcs/test* directory. The results are then printed to the console.
+|br|
+
+*Author*:
+    Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
+
+*Version*:
+    0.1  | 20-MAY-2014 : * Initial version. |br|
+    0.2  | 21-MAY-2014 : * Success Ratio check added. |br|
+    0.3  | 21-MAY-2014 : * Docstrings added. |br|
+
+*License*:
+    BSD 2-Clause
+"""
 from __future__ import division
 import numpy as np
 import rxcs
@@ -55,10 +97,8 @@ def _TestCase1(iTolerance):
     """
     This is test case function #1. |br|
 
-    The function configures the Random Multitone Signal Generator,
-    runs the generator and checks the generated signals using the
-    *_checkSignals* function.
-
+    The function sets up the configuration dictionary for the Random Multitone
+    Signal Generator and runs the engine of the test.
 
     Args:
         iTolerance: maximum tolerance of a difference between an expected value
@@ -139,6 +179,7 @@ def _TestCase1(iTolerance):
     # Generate signals with a given SNR, measure the SNR and check if
     # the measured value is correct
     _checkSNR(dSigConf, iTolerance)
+
     return
 
 
@@ -149,10 +190,8 @@ def _TestCase2(iTolerance):
     """
     This is test case function #2. |br|
 
-    The function configures the Random Multitone Signal Generator,
-    runs the generator and checks the generated signals using the
-    *_checkSignals* function.
-
+    The function sets up the configuration dictionary for the Random Multitone
+    Signal Generator and runs the engine of the test.
 
     Args:
         iTolerance: maximum tolerance of a difference between an expected value
@@ -243,10 +282,8 @@ def _TestCase3(iTolerance):
     """
     This is test case function #3. |br|
 
-    The function configures the Random Multitone Signal Generator,
-    runs the generator and checks the generated signals using the
-    *_checkSignals* function.
-
+    The function sets up the configuration dictionary for the Random Multitone
+    Signal Generator and runs the engine of the test.
 
     Args:
         iTolerance: maximum tolerance of a difference between an expected value
@@ -337,10 +374,8 @@ def _TestCase4(iTolerance):
     """
     This is test case function #4. |br|
 
-    The function configures the Random Multitone Signal Generator,
-    runs the generator and checks the generated signals using the
-    *_checkSignals* function.
-
+    The function sets up the configuration dictionary for the Random Multitone
+    Signal Generator and runs the engine of the test.
 
     Args:
         iTolerance: maximum tolerance of a difference between an expected value
@@ -350,7 +385,7 @@ def _TestCase4(iTolerance):
         Nothing
     """
 
-   # Start the dictionary with signal generator configuration
+    # Start the dictionary with signal generator configuration
     dSigConf = {}
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -431,10 +466,8 @@ def _TestCase5(iTolerance):
     """
     This is test case function #5. |br|
 
-    The function configures the Random Multitone Signal Generator,
-    runs the generator and checks the generated signals using the
-    *_checkSignals* function.
-
+    The function sets up the configuration dictionary for the Random Multitone
+    Signal Generator and runs the engine of the test.
 
     Args:
         iTolerance: maximum tolerance of a difference between an expected value
@@ -521,7 +554,21 @@ def _TestCase5(iTolerance):
 #                     check it
 # =====================================================================
 def _checkSNR(dSigConf, iTolerance):
+    """
+    This is the engine of the test.
 
+    The function runs the signal generator, measure the SNR using the tested
+    SNR evaluation and tests the measured SNR values for every signal and
+    the average level of SNR. Is also checks the reported Success Ratio.
+
+    Args:
+        dSigConf: Configuration dict. for the Random Multitone Signal Generator
+        iTolerance (float): maximum tolerance of a difference between an
+                            expected value and a real value
+    Returns:
+        nothing
+
+    """
     # Succcess ratio if SNR > 20 [db]
     iSNRSuccess = 20
 
