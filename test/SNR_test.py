@@ -582,8 +582,12 @@ def _checkSNR(dSigConf, iTolerance):
     # -----------------------------------------------------------------
     # Run the SNR evaluation
     dAna = {}  # Initialize the dictionary with system analysis results
+    dAnaConf = {}  # Initialize the dictionary with configuration
+                   # for the system analysis
+    dAnaConf['iSNRSuccess'] = iSNRSuccess
+    dAnaConf['bMute'] = 1
     tStart = rxcs.console.module_progress('test (case 1) SNR computation')
-    dAna = rxcs.ana.SNR.main(dSig, dSig, dAna, iSNRSuccess)
+    dAna = rxcs.ana.SNR.main(dSig, dSig, dAna, dAnaConf)
     rxcs.console.module_progress_done(tStart)
 
     # -----------------------------------------------------------------
