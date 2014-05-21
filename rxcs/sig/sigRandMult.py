@@ -757,7 +757,7 @@ def _printParam(dSigConf):
     if bMute == 0:
 
         # Print out the header of the signal generator
-        tStart = rxcs.console.progress('Signal generator', 'Random multitone')
+        rxcs.console.progress('Signal generator', 'Random multitone')
 
         # - - - - - - - - - - - - - - - - - - -
         # Time parameters
