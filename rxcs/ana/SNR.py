@@ -1,7 +1,7 @@
 from __future__ import division
 import numpy as np
 
-def main(dSigOrig, dSigRecon, dAna):
+def main(dSigOrig, dSigRecon, dAna, iSNRSuccess):
 
     ## Get the original unnoisy signals, the number of signal and their length
     mSig_orig = dSigOrig['mSigNN']
@@ -25,6 +25,7 @@ def main(dSigOrig, dSigRecon, dAna):
         raise ValueError(strErr)
 
     # -------------------------------------------------------------------
+    # Compute the SNR
 
     # Compute the noise
     mNoise = np.abs(mSig_orig - mSig_recon)
@@ -40,7 +41,10 @@ def main(dSigOrig, dSigRecon, dAna):
     vSNR = 10 * np.log10(vSigP / vNoiseP)
     iSNR = vSNR.mean()
 
-    # Compute the
+    # -------------------------------------------------------------------
+    # Compute the success ratio
+    iSR = (vSNR >= iSNRSuccess).mean()
+
     # -------------------------------------------------------------------
     # Add the vector with computed SNR to the dictionary with system
     # analysis results
@@ -48,6 +52,9 @@ def main(dSigOrig, dSigRecon, dAna):
 
     # Add the average SNR to the dictionary with system analysis results
     dAna['iSNR'] = iSNR
+
+    # Add the success ratio to the dictionary with system analysis results
+    dAna['iSR'] = iSR
 
     # -------------------------------------------------------------------
     return dAna
