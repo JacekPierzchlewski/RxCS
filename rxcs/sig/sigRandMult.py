@@ -178,7 +178,7 @@ def main(dSigConf):
     # - - - - - - - - - - - - - - - - - - -
 
     # Print the configuration and signal parameters to the console
-    _printParam(dSigConf)
+    tStart = _printParam(dSigConf)
 
     # =================================================================
     # Signal generation starts here
@@ -720,6 +720,9 @@ def _printParam(dSigConf):
     # iP        -  power of the signal
     # fMax      -  maximum frequency
     # fRes      -  signal resolution frequency
+    # vFrqs     -  vector with specified freqs
+    # vAmps     -  vector with amplitudes of specified freqs
+    # vPhs      -  vector with phases of specified freqs
     # nTones    -  the number of additional tones
     # iMinAmp   -  minimum amplitude of random tones
     # iGraAmp   -  gradation of amplitude of random tones
@@ -735,9 +738,9 @@ def _printParam(dSigConf):
      iP,
      fMax,
      fRes,
-     _,
-     _,
-     _,
+     vFrqs,
+     vAmps,
+     vPhs,
      nTones,
      iMinAmp,
      iGraAmp,
@@ -751,7 +754,7 @@ def _printParam(dSigConf):
     if bMute == 0:
 
         # Print out the header of the signal generator
-        rxcs.console.progress('Signal generator', 'Random multitone')
+        tStart = rxcs.console.progress('Signal generator', 'Random multitone')
 
         # - - - - - - - - - - - - - - - - - - -
         # Time parameters
@@ -831,7 +834,7 @@ def _printParam(dSigConf):
         tStart = rxcs.console.module_progress('signal generation starts!!!')
 
     #----------------------------------------------------------------------
-    return
+    return tStart
 
 
 # =================================================================
