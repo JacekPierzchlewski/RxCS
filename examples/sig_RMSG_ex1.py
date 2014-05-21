@@ -35,6 +35,7 @@ and ploted.
     0.1  | 15-MAY-2014 : * Initial version. |br|
     0.2  | 20-MAY-2014 : * Docstrings added and PEP8 adjustments. |br|
     1.0  | 20-MAY-2014 : * Version 1.0 released. |br|
+    1.0r1| 21-MAY-2014 : * Cosmetics in the comments. |br|
 
 *License*:
     BSD 2-Clause
@@ -62,7 +63,7 @@ def _sig_RMSG_ex1():
     # The signal representation sampling frequency is 100 kHz
     dSigConf['fR'] = 1e5
 
-    # The highest possible frequency in the signal is 20 kHz
+    # The highest possible frequency in the signal is 40 kHz
     dSigConf['fMax'] = 40e3
 
     # The signal spectrum resolution is 1 kHz
