@@ -37,7 +37,7 @@ when in *rxcs/test* directory. The results are then printed to the console.
     0.2  | 21-MAY-2014 : * Success Ratio check added. |br|
     0.3  | 21-MAY-2014 : * Docstrings added. |br|
     0.4  | 21-MAY-2014 : * UUT now configured with a dicionary. |br|
-    1.0  | 21-MAY-2014 : * Version 1.0 
+    1.0  | 21-MAY-2014 : * Version 1.0 released. |br|
 
 *License*:
     BSD 2-Clause
