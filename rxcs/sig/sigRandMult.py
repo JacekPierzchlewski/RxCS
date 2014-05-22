@@ -129,9 +129,6 @@ def main(dSigConf):
 
     """
 
-    # The name of the function (for error purposes)
-    strFunc = 'sigRandMult.main'
-
     # =================================================================
     # Check the configuration dictionary and get the configuration from it
     # =================================================================
