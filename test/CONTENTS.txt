@@ -9,3 +9,5 @@ contents:
     3. Makefile               - local Makefile
 
     4. sigRandMult_test.py    - test function for Random Multitone Signal Generator
+
+    5. SNR_test.py            - test function for SNR evaluation of the reconstructed signal

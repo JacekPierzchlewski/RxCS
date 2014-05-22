@@ -7,3 +7,5 @@ contents:
     2. Makefile       - local Makefile
 
     3. __init__.py    - module initialization file
+
+    4, SNR.py         - SNR evaluation of the reconstructed signal
