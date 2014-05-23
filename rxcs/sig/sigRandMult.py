@@ -397,7 +397,7 @@ def _getConf(dSigConf):
     if 'iMinAmp' in dSigConf:
         iMinAmp = dSigConf['iMinAmp']
     else:
-        iMinAmp = 0
+        iMinAmp = 0.1
 
     # Amplitude gradation
     if 'iGraAmp' in dSigConf:
@@ -637,10 +637,10 @@ def _checkConf(dSigConf):
         raise ValueError(strErr)
 
     # 3. Min amplitude and max amplitude must be higher than 0
-    if iMinAmp < 0:
+    if iMinAmp <= 0:
         strErr = ('Minimum amplitude must be higher than zero!')
         raise ValueError(strErr)
-    if iMaxAmp < 0:
+    if iMaxAmp <= 0:
         strErr = ('Maximum amplitude must be higher than zero!')
         raise ValueError(strErr)
 
