@@ -31,11 +31,17 @@ def main(dAcqConf,dSig):
 
     # - - - - - - - - - - - - - - - - - - -
 
-    # Get the signals to be sampled and their representation samp. freq.
+    # Get the signals to be sampled and get their representation sampling
+    # frequency and time
     # mSigs     -  the signals to be sampled
     # fR        -  signals representation sampling frequency
-    (mSigs,
-     fR) = _getSigs(dSig)
+    # tS        -  time  of signals
+    (mSig, fR, tS) = _getSigs(dSig)
+
+    # - - - - - - - - - - - - - - - - - - -
+
+    # Print the configuration to the console
+    tStart = _printConf(dAcqConf, dSig)
 
     # - - - - - - - - - - - - - - - - - - -
 
@@ -43,9 +49,6 @@ def main(dAcqConf,dSig):
     _checkConf(dAcqConf, dSig)
 
     # - - - - - - - - - - - - - - - - - - -
-
-    # Print the configuration to the console
-    tStart = _printConf(dAcqConf, dSig)
 
     # =================================================================
     # Generate the sampling patterns
@@ -123,11 +126,9 @@ def _getConf(dAcqConf, dSig):
     else:
         tTau = dAcqConf['tTau']
 
-    # Check if the time of patterns is equal to the time of signals to be
-    # sampled
-    if tTau != tS:
-        strError = ('The given time of patterns is different than the time ')
-        strError = strError + ('of signals to be sampled')
+    # The time of patterns must be higher than zero
+    if not tTau > 0:
+        strError = ('The time of patterns must be higher than zero')
         raise ValueError(strError)
 
     # -----------------------------------------------------------------
@@ -139,6 +140,11 @@ def _getConf(dAcqConf, dSig):
     else:
         Tg = dAcqConf['Tg']
 
+    # The sampling grid period must be higher than zero
+    if not Tg > 0:
+        strError = ('The sampling grid period must be higher than zero')
+        raise ValueError(strError)
+
     # -----------------------------------------------------------------
     # Get the average sampling frequency
     if not 'fSamp' in dAcqConf:
@@ -148,12 +154,22 @@ def _getConf(dAcqConf, dSig):
     else:
         fSamp = dAcqConf['fSamp']
 
+    # The average sampling frequency must be higher than zero
+    if not fSamp > 0:
+        strError = ('The average sampling frequency must be higher than zero')
+        raise ValueError(strError)
+
     # -----------------------------------------------------------------
     # Get the sigma parameter
     if not 'iSigma' in dAcqConf:
         iSigma = 1
     else:
         iSigma = dAcqConf['iSigma']
+
+    # The sigma parameter must be higher than zero
+    if not iSigma > 0:
+        strError = ('The sigma parameter must be higher than zero')
+        raise ValueError(strError)
 
     # -----------------------------------------------------------------
     # Get the minimum distance between sampling points
@@ -162,12 +178,24 @@ def _getConf(dAcqConf, dSig):
     else:
         tMin = dAcqConf['tMin']
 
+    # The minimum distance between sampling points must be higher than zero
+    if not tMin > 0:
+        strError = ('The min. distance between sampling points must be ')
+        strError = strError + ('higher than zero')
+        raise ValueError(strError)
+
     # -----------------------------------------------------------------
     # Get the maximum distance between sampling points
     if not 'tMax' in dAcqConf:
         tMax = np.nan
     else:
         tMax = dAcqConf['tMax']
+
+    # The maximum distance between sampling points must be higher than zero
+    if not tMax > 0:
+        strError = ('The max distance between sampling points must be ')
+        strError = strError + ('higher than zero')
+        raise ValueError(strError)
 
     # -----------------------------------------------------------------
     return (nPatts,    # the number of patterns to be generated
@@ -195,17 +223,27 @@ def _getSigs(dSig):
         mSig = dSig['mSig']
 
     # -----------------------------------------------------------------
-    # Get the signal representation sampling frequency
+    # Get the signals representation sampling frequency
     if not 'fR' in dSig:
         strError = ('Dictionary with signals to be sampled does not contain')
-        strError = strError + ('signal representation sampling frequency')
+        strError = strError + ('signals representation sampling frequency')
         raise NameError(strError)
     else:
         fR = dSig['fR']
 
     # -----------------------------------------------------------------
+    # Get the signals time
+    if not 'tS' in dSig:
+        strError = ('Dictionary with signals to be sampled does not contain')
+        strError = strError + ('signals time')
+        raise NameError(strError)
+    else:
+        tS = dSig['tS']
+
+    # -----------------------------------------------------------------
     return (mSig,   # the signals to be sampled
-            fR)     # the signal representation sampling frequency
+            fR,     # the signals representation sampling frequency
+            tS)     # the signals time
 
 
 # =================================================================
@@ -222,7 +260,7 @@ def _checkConf(dAcqConf, dSig):
     # Tg        -  sampling grid period
     # fSamp     -  the average sampling frequency
     # iSigma    -  sigma parameter
-    # tMin      -  minimum time betweeen sampling points
+    # tMin      -  minimum time between sampling points
     # tMax      -  maximum time between sampling points
     (nPatts,
      bMute,
@@ -235,7 +273,8 @@ def _checkConf(dAcqConf, dSig):
 
     # -----------------------------------------------------------------
     # Get the representation sampling frequency of signals to be sampled
-    (_, fR) = _getSigs(dSig)
+    # and the time of the signals
+    (_, fR, tS) = _getSigs(dSig)
 
     # -----------------------------------------------------------------
     # Compute the real parameters of the sampling patterns
@@ -245,15 +284,21 @@ def _checkConf(dAcqConf, dSig):
     # nHatKdag_s  -  the expected number of sampling points in a pattern
     # fHatdag_s,  -  the expected average sampling frequency
     # nHatdag_s,  -  the expected average sampling period (as grid pts)
+    # tHatT_s,    -  the expected average sampling period
     # nK_min      -  min t between the samp pts as the number of grid pts
     # nK_max      -  max t between the samp pts as the number of grid pts
+    # tHatMin,    -  the real minimum time between sampling points
+    # tHatMax)    -  the real maximum time between sampling points
     (nK_g,
      tHatTau,
      nHatKdag_s,
      fHatdag_s,
      nHatdag_s,
+     tHatT_s,
      nK_min,
-     nK_max) = _computeRealParam(dAcqConf, dSig)
+     nK_max,
+     tHatMin,
+     tHatMax) = _computeRealParam(dAcqConf, dSig)
 
     # -----------------------------------------------------------------
     # Check if the real time of patterns is higher than 0
@@ -273,6 +318,14 @@ def _checkConf(dAcqConf, dSig):
     if not nHatKdag_s > 0:
         strError = ('The expected number of sampling points in patterns ')
         strError = strError + ('must be higher than zero')
+        raise ValueError(strError)
+
+    # -----------------------------------------------------------------
+    # Check if the time of patterns is equal to the time of signals to be
+    # sampled
+    if tHatTau != tS:
+        strError = ('The real time of patterns is different than the time ')
+        strError = strError + ('of signals to be sampled')
         raise ValueError(strError)
 
     # -----------------------------------------------------------------
@@ -340,32 +393,37 @@ def _computeRealParam(dAcqConf, dSig):
      tMax) = _getConf(dAcqConf, dSig)
 
     # Calculate the number of grid points in the sampling period
-    nK_g = math.floor(tTau/Tg)
+    nK_g = math.floor(tTau / Tg)
 
     # Calculate the real time of sampling patterns
     tHatTau = nK_g * Tg
 
     # Calculate the expected number of sampling points in a pattern
-    nHatKdag_s = int(round(tHatTau*fSamp))
+    nHatKdag_s = int(round(tHatTau * fSamp))
 
     # Calculate the expected average sampling frequency
-    fHatdag_s = nHatKdag_s/tHatTau
+    fHatdag_s = nHatKdag_s / tHatTau
+
+    # Calculate the expected average sampling period
+    tHatT_s = 1 / fHatdag_s
 
     # Calculate the expected average sampling period and recalculate it to
     # the grid
-    nHatdag_s = int(math.ceil(1/(fHatdag_s*Tg)))
+    nHatdag_s = int(math.ceil(1 / (fHatdag_s * Tg)))
 
     # Minimum time between the sampling points as the number of grid:
     if np.isnan(tMin):
         nK_min = 1
     else:
-        nK_min = int(math.ceil(tMin/Tg))
+        nK_min = int(math.ceil(tMin / Tg))
+    tHatMin = nK_min * Tg   # The real minimum time between sampling points
 
     # Maximum time between the sampling points as the number of grid:
     if np.isnan(tMax):
         nK_max = np.inf
     else:
         nK_max = int(math.floor(tMax/Tg))
+    tHatMax = nK_max * Tg   # The real maximum time between sampling points
 
     # -----------------------------------------------------------------
     return (nK_g,        # the number of grid points in the sampling period
@@ -373,8 +431,11 @@ def _computeRealParam(dAcqConf, dSig):
             nHatKdag_s,  # the expected number of sampling points in a pattern
             fHatdag_s,   # the expected average sampling frequency
             nHatdag_s,   # the expected average sampling period (as grid pts)
+            tHatT_s,     # the expected average sampling period
             nK_min,      # min t between the samp pts as the number of grid pts
-            nK_max)      # max t between the samp pts as the number of grid pts
+            nK_max,      # max t between the samp pts as the number of grid pts
+            tHatMin,     # the real minimum time between sampling points
+            tHatMax)     # the real maximum time between sampling points
 
 
 # =================================================================
@@ -404,7 +465,8 @@ def _printConf(dAcqConf, dSig):
 
     # -----------------------------------------------------------------
     # Get the representation sampling frequency of signals to be sampled
-    (_, fR) = _getSigs(dSig)
+    # and the time of the signals
+    (_, fR, tS) = _getSigs(dSig)
 
     # -----------------------------------------------------------------
     # Compute the real parameters of the sampling patterns
@@ -414,15 +476,21 @@ def _printConf(dAcqConf, dSig):
     # nHatKdag_s  -  the expected number of sampling points in a pattern
     # fHatdag_s,  -  the expected average sampling frequency
     # nHatdag_s,  -  the expected average sampling period (as grid pts)
+    # tHatT_s,    -  the expected average sampling period
     # nK_min      -  min t between the samp pts as the number of grid pts
     # nK_max      -  max t between the samp pts as the number of grid pts
+    # tHatMin     -  the real minimum time between sampling points
+    # tHatMax     -  the real maximum time between sampling points
     (nK_g,
      tHatTau,
      nHatKdag_s,
      fHatdag_s,
      nHatdag_s,
+     tHatT_s,
      nK_min,
-     nK_max) = _computeRealParam(dAcqConf, dSig)
+     nK_max,
+     tHatMin,
+     tHatMax) = _computeRealParam(dAcqConf, dSig)
 
     #----------------------------------------------------------------------
     # Print the configuration if the 'mute' flag is not set
@@ -435,8 +503,7 @@ def _printConf(dAcqConf, dSig):
         # Print the time of patterns
         rxcs.console.bullet_param('patterns time', tHatTau, '-', 'seconds')
         if tHatTau != tTau:
-            rxcs.console.warning('requested patterns time',
-                                 tTau, '-', 'seconds')
+            rxcs.console.param('requested patterns time', tTau, '-', 'seconds')
 
         # - - - - - - - - - - - - - - - - - - -
         # Print the grid period
@@ -448,27 +515,36 @@ def _printConf(dAcqConf, dSig):
         rxcs.console.bullet_param('the expected average samp. freq',
                                   fHatdag_s, '-', 'Hz')
         if fHatdag_s != fSamp:
-            rxcs.console.warning('requested average samp. freq.',
-                                 fSamp, '-', 'Hz')
+            rxcs.console.param('requested average samp. freq.',
+                               fSamp, '-', 'Hz')
 
         rxcs.console.param('the number of sampling points',
                            nHatKdag_s, '-', '')
+
+        rxcs.console.param('the expected average samp. period',
+                           tHatT_s, '-', 'seconds')
 
         # - - - - - - - - - - - - - - - - - - -
         # The minimum time between sampling points
         if not np.isnan(tMin):
             rxcs.console.bullet_param('the min time between sampling points',
-                                      tMin, '-', 'seconds')
-            rxcs.console.param('which corresponds to ',
+                                      tHatMin, '-', 'seconds')
+            rxcs.console.param('which corresponds to',
                                nK_min, '-', 'grid points')
+            if tMin != tHatMin:
+                rxcs.console.param('the requested min time',
+                                   tMin, '-', 'seconds')
 
         # - - - - - - - - - - - - - - - - - - -
         # The maximum time between sampling points
         if not np.isnan(tMax):
             rxcs.console.bullet_param('the max time between sampling points',
-                                      tMax, '-', 'seconds')
+                                      tHatMax, '-', 'seconds')
             rxcs.console.param('which corresponds to ',
                                nK_max, '-', 'grid points')
+            if tMax != tHatMax:
+                rxcs.console.param('the requested max time',
+                                   tMax, '-', 'seconds')
 
         # - - - - - - - - - - - - - - - - - - -
         # Information about the computations start

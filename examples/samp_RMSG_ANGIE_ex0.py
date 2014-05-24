@@ -65,10 +65,10 @@ def _samp_RMSG_ANGIE_ex0():
     dAcqConf['fSamp'] = 0.5e6
 
     # The minimum distance between sampling points
-    dAcqConf['tMin'] = 1e-6
+    #dAcqConf['tMin'] = 2.5e-6
 
     # The maximum distance between sampling points
-    dAcqConf['tMax'] = 1e-6
+    #dAcqConf['tMax'] = 4.1e-6
 
     # -----------------------------------------------------------------
     # Run the multtone signal generator and the sampler
