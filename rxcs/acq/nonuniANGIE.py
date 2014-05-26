@@ -88,7 +88,7 @@ def _printConf(dAcqConf, dSig):
     # Compute the real parameters of the sampling patterns
 
     # nPatts      -  the number of patterns to be generated
-    # nK_g        -  the number of grid points in the sampling period
+    # nK_g        -  the number of grid points in the sampling pattern
     # tHatTau     -  the real time of sampling patterns
     # nHatKdag_s  -  the expected number of sampling points in a pattern
     # fHatdag_s,  -  the expected average sampling frequency
@@ -231,18 +231,18 @@ def _checkConf(dAcqConf, dSig):
     # Compute the real parameters of the sampling patterns
 
     # nPatts      -  the number of patterns to be generated
-    # nK_g        -  the number of grid points in the sampling period
-    # tHatTau     -  the real time of sampling patterns
-    # nHatKdag_s  -  the expected number of sampling points in a pattern
-    # nHatdag_s,  -  the expected average sampling period (as grid pts)
+    # nK_g        -  the number of grid points in the sampling pattern
+    # tTau_real   -  the real time of sampling patterns
+    # nK_s        -  the expected number of sampling points in a pattern
+    # nT,         -  the expected average sampling period (as grid pts)
     # nK_min      -  min t between the samp pts as the number of grid pts
     # nK_max      -  max t between the samp pts as the number of grid pts
     (nPatts,
      nK_g,
-     tHatTau,
-     nHatKdag_s,
+     tTau_real,
+     nK_s,
      _,
-     nHatdag_s,
+     nT,
      _,
      nK_min,
      nK_max,
@@ -259,7 +259,7 @@ def _checkConf(dAcqConf, dSig):
 
     # -----------------------------------------------------------------
     # Check if the real time of patterns is higher than 0
-    if not tHatTau > 0:
+    if not tTau_real > 0:
         strError = ('Real time of patterns must be higher than zero')
         raise ValueError(strError)
 
@@ -272,7 +272,7 @@ def _checkConf(dAcqConf, dSig):
 
     # -----------------------------------------------------------------
     # Check if the expected number of sampling points is higher than 0
-    if not nHatKdag_s > 0:
+    if not nK_s > 0:
         strError = ('The expected number of sampling points in patterns ')
         strError = strError + ('must be higher than zero')
         raise ValueError(strError)
@@ -280,7 +280,7 @@ def _checkConf(dAcqConf, dSig):
     # -----------------------------------------------------------------
     # Check if the time of patterns is equal to the time of signals to be
     # sampled
-    if tHatTau != tS:
+    if tTau_real != tS:
         strError = ('The real time of patterns is different than the time ')
         strError = strError + ('of signals to be sampled')
         raise ValueError(strError)
@@ -288,7 +288,7 @@ def _checkConf(dAcqConf, dSig):
     # -----------------------------------------------------------------
     # Check if the expected number of sampling points is lower or equal
     # to the number of grid points
-    if not nK_g >= nHatKdag_s:
+    if not nK_g >= nK_s:
         strError = ('The real number of grid points in patterns must be ')
         strError = strError + ('higher or equal to the number of expected ')
         strError = strError + ('sampling points')
@@ -297,7 +297,7 @@ def _checkConf(dAcqConf, dSig):
     # -----------------------------------------------------------------
     # Check if the minimum time between the sampling points is lower or
     # equal to the average sampling period
-    if not nHatdag_s >= nK_min:
+    if not nT >= nK_min:
         strError = ('The minimum time between the sampling points must be ')
         strError = strError + ('lower or equal to the expected average ')
         strError = strError + ('sampling period ')
@@ -306,7 +306,7 @@ def _checkConf(dAcqConf, dSig):
     # -----------------------------------------------------------------
     # Check if the maximum time between the sampling points is higher or
     # equal to the average sampling period
-    if not nK_max >= nHatdag_s:
+    if not nK_max >= nT:
         strError = ('The maximum time between the sampling points must be ')
         strError = strError + ('higher or equal to the expected average ')
         strError = strError + ('sampling period ')
@@ -463,17 +463,17 @@ def _getConf(dAcqConf):
 # =================================================================
 def _getSigs(dSig):
     """
-    This function checks if all the needed fields are in the dictionary
-    with the signals to be sampled and gets these fields.
+    This function checks if the dictionary with signals to be sampled
+    contains all the needed fields. Then the function gets these fields.
 
     Args:
         dSig (dictionary): dictionary with the signals to be sampled
 
     Returns:
         mSig (matrix):  the matrix with signals to be sampled
-        nSigs (float): the number of signals to be sampled
-        fR (float):  the signals representation sampling frequency
-        tS (float):  time of the signals
+        nSigs (float):  the number of signals to be sampled
+        fR (float):     the signals representation sampling frequency
+        tS (float):     time of the signals
     """
 
     # -----------------------------------------------------------------
@@ -523,17 +523,17 @@ def _computeRealParam(dAcqConf, dSig):
         dSig (dictionary): dictionary with the signals to be sampled
 
     Returns:
-        nPatts (float):     the number of patterns
-        nK_g (float):       the number of grid points in the sampling period
-        tHatTau (float):    the real time of sampling patterns
-        nHatKdag_s (float): the expected number of sampling points in a pattern
-        fHatdag_s (float):  the expected average sampling frequency
-        nHatdag_s (float):  the expected average sampling period (as grid pts)
-        tHatT_s (float):    the expected average sampling period
+        nPatts (float):    the number of patterns
+        nK_g (float):      the number of grid points in the sampling pattern
+        tTau_real (float): the real time of sampling patterns
+        nK_s (float):      the expected number of sampling points in a pattern
+        f_s (float):       the expected average sampling frequency
+        nT (float):        the expected average sampling period (as grid pts)
+        tT_s (float):      the expected average sampling period
         nK_min (float):    min t between the samp pts as the number of grid pts
         nK_max (float):    max t between the samp pts as the number of grid pts
-        tHatMin (float):   the real minimum time between sampling points
-        tHatMax (float):   the real maximum time between sampling points
+        tMin_real (float): the real minimum time between sampling points
+        tMax_real (float): the real maximum time between sampling points
     """
 
     # Get the configuration from the configuration directory
@@ -542,7 +542,7 @@ def _computeRealParam(dAcqConf, dSig):
     # tTau      -  time of sampling patterns
     # Tg        -  sampling grid period
     # fSamp     -  the average sampling frequency
-    # tMin      -  minimum time betweeen sampling points
+    # tMin      -  minimum time between sampling points
     # tMax      -  maximum time between sampling points
     (nPatts,
      _,
@@ -579,53 +579,65 @@ def _computeRealParam(dAcqConf, dSig):
     nK_g = math.floor(tTau / Tg)
 
     # Calculate the real time of sampling patterns
-    tHatTau = nK_g * Tg
+    tTau_real = nK_g * Tg
 
     # Calculate the expected number of sampling points in a pattern
-    nHatKdag_s = int(round(tHatTau * fSamp))
+    nK_s = int(round(tTau_real * fSamp))
 
     # Calculate the expected average sampling frequency
-    fHatdag_s = nHatKdag_s / tHatTau
+    f_s = nK_s / tTau_real
 
     # Calculate the expected average sampling period
-    tHatT_s = 1 / fHatdag_s
+    tT_s = 1 / f_s
 
     # Calculate the expected average sampling period and recalculate it to
     # the grid
-    nHatdag_s = int(math.ceil(1 / (fHatdag_s * Tg)))
+    nT = int(math.ceil(1 / (f_s * Tg)))
 
     # Minimum time between the sampling points as the number of grid:
     if np.isnan(tMin):
         nK_min = 1
     else:
         nK_min = int(math.ceil(tMin / Tg))
-    tHatMin = nK_min * Tg   # The real minimum time between sampling points
+    tMin_real = nK_min * Tg   # The real minimum time between sampling points
 
     # Maximum time between the sampling points as the number of grid:
     if np.isnan(tMax):
         nK_max = np.inf
     else:
         nK_max = int(math.floor(tMax/Tg))
-    tHatMax = nK_max * Tg   # The real maximum time between sampling points
+    tMax_real = nK_max * Tg   # The real maximum time between sampling points
 
     # -----------------------------------------------------------------
     return (nPatts,      # the number of patterns
-            nK_g,        # the number of grid points in the sampling period
-            tHatTau,     # the real time of sampling patterns
-            nHatKdag_s,  # the expected number of sampling points in a pattern
-            fHatdag_s,   # the expected average sampling frequency
-            nHatdag_s,   # the expected average sampling period (as grid pts)
-            tHatT_s,     # the expected average sampling period
+            nK_g,        # the number of grid points in the sampling pattern
+            tTau_real,   # the real time of sampling patterns
+            nK_s,        # the expected number of sampling points in a pattern
+            f_s,         # the expected average sampling frequency
+            nT,          # the expected average sampling period (as grid pts)
+            tT_s,        # the expected average sampling period
             nK_min,      # min t between the samp pts as the number of grid pts
             nK_max,      # max t between the samp pts as the number of grid pts
-            tHatMin,     # the real minimum time between sampling points
-            tHatMax)     # the real maximum time between sampling points
+            tMin_real,   # the real minimum time between sampling points
+            tMax_real)   # the real maximum time between sampling points
 
 
 # =================================================================
 # Generate the patterns
 # =================================================================
 def _generate_patterns(dAcqConf, dSig):
+    """
+    This function generates the required number of sampling patterns.
+
+    Args:
+        dAcqConf (dictionary): dictionary with configuration for the sampler
+        dSig (dictionary): dictionary with the signals to be sampled
+
+    Returns:
+        mPatts (matrix): the sampling patterns (grid indices)
+        mPattsRep (matrix): the sampling patterns (signal rep. sampling points)
+        mPattsT (matrix): the sampling patterns (time moments)
+    """
 
     # -----------------------------------------------------------------
     # Get the configuration from the configuration dictionary
@@ -649,14 +661,14 @@ def _generate_patterns(dAcqConf, dSig):
     # Compute the real parameters of the sampling patterns
 
     # nPatts      -  the number of patterns to be generated
-    # nK_g        -  the number of grid points in the sampling period
-    # nHatKdag_s  -  the expected number of sampling points in a pattern
+    # nK_g        -  the number of grid points in the sampling pattern
+    # nK_s        -  the expected number of sampling points in a pattern
     # nK_min      -  min t between the samp pts as the number of grid pts
     # nK_max      -  max t between the samp pts as the number of grid pts
     (nPatts,
      nK_g,
      _,
-     nHatKdag_s,
+     nK_s,
      _,
      _,
      _,
@@ -667,14 +679,14 @@ def _generate_patterns(dAcqConf, dSig):
 
     # --------------------------------------------------------------
     # Allocate the matrix for all the sampling patterns
-    mPatts = np.ones((nPatts, nHatKdag_s), dtype='int64')
+    mPatts = np.ones((nPatts, nK_s), dtype='int64')
 
     # Generate all the needed sampling patterns
     for inxP in np.arange(nPatts):
 
         # ------------------------------------------
         # Generate a vector with a sampling pattern
-        vPattern = _angie_engine(nHatKdag_s, nK_g, nK_min, nK_max, iSigma)
+        vPattern = _angie_engine(nK_s, nK_g, nK_min, nK_max, iSigma)
         # ------------------------------------------
 
         # Store the generated pattern
@@ -706,14 +718,14 @@ def _generate_patterns(dAcqConf, dSig):
 # =================================================================
 # ANGIE engine
 # =================================================================
-def _angie_engine(hatKdag_s, K_g, K_min, K_max, sigma):
+def _angie_engine(nK_s, K_g, K_min, K_max, sigma):
     """
-    This function is the engien of ANGIE sampling generator.
+    This function is the engine of ANGIE sampling generator.
     It generates one sampling pattern.
 
     Args:
-        hatKdag_s (float): the number of sampling points in a pattern
-        K_g (float): the number of grid points in a pattern
+        nK_s (float):  the number of sampling points in a pattern
+        K_g (float):   the number of grid points in a pattern
         K_min (float): minimum distance between sampling points
         K_max (float): maximum distance between sampling points
         sigma (float): the sigma parameter
@@ -723,7 +735,7 @@ def _angie_engine(hatKdag_s, K_g, K_min, K_max, sigma):
     """
 
     # Allocate the vector for the sampling points
-    vPattern = np.nan*np.zeros(hatKdag_s)
+    vPattern = np.nan*np.zeros(nK_s)
 
     # Reset the current sampling moment
     nk = 0
@@ -735,15 +747,15 @@ def _angie_engine(hatKdag_s, K_g, K_min, K_max, sigma):
     nminus_k = 1
 
     # Reset the maximum limit
-    nplus_k = K_g - K_min*(hatKdag_s-1)
+    nplus_k = K_g - K_min*(nK_s-1)
 
     # -----------------------------------------------------------------
     # Draw all the points
-    for k in range(hatKdag_s):    # <- Loop over all the expected points
+    for k in range(nK_s):    # <- Loop over all the expected points
 
         # -------------------------------------------------------------
         # The number of sampling points left
-        nLeft = hatKdag_s - k
+        nLeft = nK_s - k
 
         # -------------------------------------------------------------
         # Calculate the expected position of the sample:
@@ -821,7 +833,18 @@ def _angie_engine(hatKdag_s, K_g, K_min, K_max, sigma):
 # =================================================================
 # Sample the signals using the generated patterns
 # =================================================================
-def _sample(mPatterns, dSig):
+def _sample(mPattsRep, dSig):
+    """
+    This function samples signals using the previously generated
+    sampling patterns.
+
+    Args:
+        mPattsRep (matrix): the sampling patterns (signal rep. sampling points)
+        dSig (dictionary): dictionary with the signals to be sampled
+
+    Returns:
+        mObSig (matrix):  the observed signals
+    """
 
     # -----------------------------------------------------------------
     # Get the signals to be sampled and the number of signals to be sampled
@@ -830,7 +853,7 @@ def _sample(mPatterns, dSig):
     # -----------------------------------------------------------------
 
     # Sample the signals
-    mObSig = (mSig[np.arange(nSigs),mPatterns.T]).T
+    mObSig = (mSig[np.arange(nSigs),mPattsRep.T]).T
 
     # -----------------------------------------------------------------
     return mObSig
@@ -840,30 +863,106 @@ def _sample(mPatterns, dSig):
 # Generate the output dictionary
 # =================================================================
 def _generateOutput(dAcqConf, dSig, mObSig, mPatts, mPattsRep, mPattsT):
+    """
+    This function generates the output dictionary.
 
-    # Initialize the dictionary
+    Args:
+        dAcqConf (dictionary): dictionary with configuration for the sampler
+        dSig (dictionary): dictionary with the signals to be sampled
+        mObSig (matrix):  the observed signals
+        mPatts (matrix): the sampling patterns (grid indices)
+        mPattsRep (matrix): the sampling patterns (signal rep. sampling points)
+        mPattsT (matrix): the sampling patterns (time moments)
+
+    Returns:
+        dObSig (dictionary): the observed signals and paramters of sampling
+    """
+
+    # -----------------------------------------------------------------
+    # Get the sampling grid period from the configuration dictionary
+    (_,
+     _,
+     _,
+     Tg,
+     _,
+     _,
+     _,
+     _) = _getConf(dAcqConf)
+
+    # -----------------------------------------------------------------
+    # Compute the real parameters of the sampling patterns
+
+    # nK_g        -  the number of grid points in a sampling pattern
+    # tTau_real   -  the real time of sampling patterns
+    # nK_s        -  the expected number of sampling points in a pattern
+    # f_s         -  the expected average sampling frequency
+    # nT          -  the expected average sampling period (as grid pts)
+    # tT_s        -  the expected average sampling period
+    # nK_min      -  min t between the samp pts as the number of grid pts
+    # nK_max      -  max t between the samp pts as the number of grid pts
+    # tMin_real   -  the real minimum time between sampling points
+    # tMax_real   -  the real maximum time between sampling points
+    (_,
+     nK_g,
+     tTau_real,
+     nK_s,
+     f_s,
+     nT,
+     tT_s,
+     nK_min,
+     nK_max,
+     tMin_real,
+     tMax_real) = _computeRealParam(dAcqConf, dSig)
+
+    # -----------------------------------------------------------------
+    # Initialize the output dictionary
     dObSig = {}
 
-    # The observed signal
-    dObSig['mObSig'] = mObSig
+    # - - - - - - - - - - - - - - - - - -
 
-    # Matrix with the sampling patterns (grid indices)
-    dObSig['mPatts'] = mPatts
+    dObSig['mObSig'] = mObSig   # The observed signal
 
-    # Matrix with the sampling patterns (time moments)
-    dObSig['mPattsT'] = mPattsT
+    # - - - - - - - - - - - - - - - - - -
 
-    # Matrix with the sampling patterns (signal representation sampling points)
-    dObSig['mPattsRep'] = mPattsRep
+    dObSig['mPatts'] = mPatts         # The sampling patterns (grid indices)
+
+    dObSig['mPattsT'] = mPattsT       # The sampling patterns (time moments)
+    
+    dObSig['mPattsRep'] = mPattsRep   # The sampling patterns (signal
+                                      # representation sampling points)
+
+    # - - - - - - - - - - - - - - - - - -
+
+    dObSig['Tg'] = Tg       # The grid period
+
+    dObSig['nK_g'] = nK_g   # The number of grid points in a sampling pattern
+
+    dObSig['tTau_real'] = tTau_real   # The real time of sampling patterns
+
+    # - - - - - - - - - - - - - - - - - -
+
+    dObSig['nK_s'] = nK_s   # The number of sampling points in a pattern
+
+    dObSig['f_s'] = f_s   # The expected average sampling frequency
+
+    dObSig['nT'] = nT     # The expected average sampling period (as grid pts)
+
+    dObSig['tT_s'] = tT_s  # The expected average sampling period
+
+    # - - - - - - - - - - - - - - - - - -
+
+    dObSig['nK_min'] = nK_min   # Min t between the samp pts
+                                # (as the number of grid pts)
+
+    dObSig['nK_max'] = nK_max   # Max t between the samp pts
+                                # (as the number of grid pts)
+
+    dObSig['tMin_real'] = tMin_real   # The real minimum time between sampling
+                                      # points
+
+    dObSig['tMax_real'] = tMax_real   # The real maximum time between sampling
+                                      # points
+
+    # - - - - - - - - - - - - - - - - - -
 
     return dObSig
-
-
-
-
-
-
-
-
-
-
