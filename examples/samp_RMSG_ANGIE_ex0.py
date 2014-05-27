@@ -86,15 +86,15 @@ def _samp_RMSG_ANGIE_ex0():
 
     # Get the original signal and its time vector
     mSig = dSig['mSig']
-    vSig = mSig[0,:]
+    vSig = mSig[0, :]
     vT = dSig['vTSig']
 
     # Get the observed signal and sampling moments
     mObSig = dObSig['mObSig']  # the observed signal
-    vObSig = mObSig[0,:]
+    vObSig = mObSig[0, :]
 
     mPattsT = dObSig['mPattsT']  # the sampling moments
-    vPattsT = mPattsT[0,:]
+    vPattsT = mPattsT[0, :]
 
     hFig1 = plt.figure(1)
 
@@ -103,7 +103,7 @@ def _samp_RMSG_ANGIE_ex0():
     hSubPlot1.grid(True)
     hSubPlot1.set_title('Signal and the observed sampling points')
     hSubPlot1.plot(vT, vSig, '-')
-    hSubPlot1.plot(vPattsT, vObSig, 'r*',markersize=10)
+    hSubPlot1.plot(vPattsT, vObSig, 'r*', markersize=10)
 
     # Plot the sampling pattern
     hSubPlot2 = hFig1.add_subplot(212)
