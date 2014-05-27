@@ -10,6 +10,7 @@ THe sampling aptterns are generated using ANGIE scheme.
 *Version*:
     0.1  | 26-MAY-2014 : * Initial version. |br|
     0.2  | 27-MAY-2014 : * Docstrings added. |br|
+    1.0  | 27-MAY-2014 : * Version 1.0 is ready. |br|
 
 *License*:
     BSD 2-Clause
@@ -159,7 +160,7 @@ def _printConf(dAcqConf, dSig):
         # - - - - - - - - - - - - - - - - - - -
         # Print the time of patterns
         rxcs.console.bullet_param('patterns time', tHatTau, '-', 'seconds')
-        if tHatTau != tTau:
+        if not np.isnan(tTau) and tHatTau != tTau:
             rxcs.console.param('requested patterns time', tTau, '-', 'seconds')
 
         # - - - - - - - - - - - - - - - - - - -
@@ -692,12 +693,13 @@ def _generate_patterns(dAcqConf, dSig):
 
     # nPatts      -  the number of patterns to be generated
     # nK_g        -  the number of grid points in the sampling pattern
+    # tTau_real   -  the real time of sampling patterns
     # nK_s        -  the expected number of sampling points in a pattern
     # nK_min      -  min t between the samp pts as the number of grid pts
     # nK_max      -  max t between the samp pts as the number of grid pts
     (nPatts,
      nK_g,
-     _,
+     tTau_real,
      nK_s,
      _,
      _,
@@ -729,17 +731,27 @@ def _generate_patterns(dAcqConf, dSig):
     # one grid point
     iGridvsRep = int(np.round((Tg * fR)))
 
-    # Recalculate the sampling patterns from grid to signal representation
-    # points
-    if iGridvsRep != 1:
+    # Get the time vector of the original signal (if it is given)
+    # and the first sample
+    if 'vTSig' in dSig:
+        vTSig = dSig['vTSig']
+    else:
+        vTSig = np.arange(int(np.round(tTau_real*fR)))
+    iT1 = vTSig[0]
+
+    if iT1 == 0:  # <- If the time stamp of the first sample is zero,
+                  #    then ANGIE should count the grid indices from zero.
+                  #    By default the grid indices counts from 1, so there is
+                  #    a need to decrease the gird indices by 1
+        mPatts = mPatts - 1
         mPattsRep = iGridvsRep * mPatts
     else:
-        mPattsRep = mPatts.copy()
-    mPattsRep = mPattsRep - 1
+        mPattsRep = iGridvsRep * mPatts
+        mPattsRep = mPattsRep - 1
 
     # --------------------------------------------------------------
     # Recalculate the patterns to the time moments
-    mPattsT = Tg * mPatts
+    mPattsT = vTSig[mPattsRep]
 
     # --------------------------------------------------------------
     return (mPatts, mPattsRep, mPattsT)
