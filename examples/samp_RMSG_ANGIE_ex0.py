@@ -1,3 +1,29 @@
+"""
+This script is an example of how to use the nonuniform sampler with the ANGIE
+scheme. |br|
+
+In this example 1 random multitone signal is generated and sampled |br|
+
+The signal contains 3 random tones, the highest possible frequency in the
+signal is 10 kHz.
+
+The signal is nonuniformly sampled with the average sampling frequency
+equal to 8 kHz. The sampling gird is 1 us. A sampling patterns is generated
+using ANGIE scheme.
+
+After the signal generation and sampling, the original signal and the observed
+signal is plotted in the time domain. Additionally, the sampling pattern is
+plotted.
+
+*Author*:
+    Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
+
+*Version*:
+    1.0  | 27-MAY-2014 : * Version 1.0 released. |br|
+
+*License*:
+    BSD 2-Clause
+"""
 
 from __future__ import division
 import rxcs
@@ -30,16 +56,8 @@ def _samp_RMSG_ANGIE_ex0():
 
     # - - - - - - - - - - - - - - - -
 
-    # The number of additional tones
-    dSigConf['nTones'] = 1
-
-    # - - - - - - - - - - - - - - - -
-
-    # The power of the signal
-    dSigConf['iP'] = 1
-
-    # The noise added to the signal
-    dSigConf['iSNR'] = 5
+    # The number of tones
+    dSigConf['nTones'] = 3
 
     # - - - - - - - - - - - - - - - -
 
@@ -52,29 +70,58 @@ def _samp_RMSG_ANGIE_ex0():
     # Start the dictionary with signal acquisition configuration
     dAcqConf = {}
 
-    # The number of patterns
-    dAcqConf['nPatts'] = 1
-
-    # The time
-    dAcqConf['tTau'] = 1e-3
-
     # The sampling grid period
     dAcqConf['Tg'] = 1e-6
 
     # The average sampling frequency
-    dAcqConf['fSamp'] = 0.5e6
-
-    # The minimum distance between sampling points
-    dAcqConf['tMin'] = 2e-6
-
-    # The maximum distance between sampling points
-    dAcqConf['tMax'] = 4e-6
+    dAcqConf['fSamp'] = 8e3
 
     # -----------------------------------------------------------------
     # Run the multtone signal generator and the sampler
-    dSig = rxcs.sig.sigRandMult.main(dSigConf)   # the generator
-    rxcs.acq.nonuniANGIE.main(dAcqConf, dSig)    # the sampler
+    dSig = rxcs.sig.sigRandMult.main(dSigConf)            # the generator
+    dObSig = rxcs.acq.nonuniANGIE.main(dAcqConf, dSig)    # the sampler
 
+    # -----------------------------------------------------------------
+    # Plot the results of sampling
+
+    # Get the original signal and its time vector
+    mSig = dSig['mSig']
+    vSig = mSig[0,:]
+    vT = dSig['vTSig']
+
+    # Get the observed signal and sampling moments
+    mObSig = dObSig['mObSig']  # the observed signal
+    vObSig = mObSig[0,:]
+
+    mPattsT = dObSig['mPattsT']  # the sampling moments
+    vPattsT = mPattsT[0,:]
+
+    hFig1 = plt.figure(1)
+
+    # Plot the signal and the observed sampling points
+    hSubPlot1 = hFig1.add_subplot(211)
+    hSubPlot1.grid(True)
+    hSubPlot1.set_title('Signal and the observed sampling points')
+    hSubPlot1.plot(vT, vSig, '-')
+    hSubPlot1.plot(vPattsT, vObSig, 'r*',markersize=10)
+
+    # Plot the sampling pattern
+    hSubPlot2 = hFig1.add_subplot(212)
+    hSubPlot2.grid(True)
+    hSubPlot2.set_title('The sampling pattern')
+    hSubPlot2.set_xlabel('Time [s]')
+    (markerline, stemlines, baseline) = hSubPlot2.stem(vPattsT,
+                                                       np.ones(vPattsT.shape),
+                                                       linefmt='b-',
+                                                       markerfmt='bo',
+                                                       basefmt='-')
+    hSubPlot2.set_ylim(0, 1.1)
+    hSubPlot2.set_xlim(0, 0.001)
+    plt.setp(stemlines, color='b', linewidth=2.0)
+    plt.setp(markerline, color='b', markersize=10.0)
+
+    # -----------------------------------------------------------------
+    plt.show(block=True)
 
 
 # =====================================================================
