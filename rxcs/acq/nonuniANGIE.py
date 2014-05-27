@@ -23,7 +23,7 @@ import rxcs
 import numpy as np
 
 
-def main(dAcqConf,dSig):
+def main(dAcqConf, dSig):
     """
     This the main function of the sampler. |br|
 
@@ -883,7 +883,7 @@ def _sample(mPattsRep, dSig):
     # -----------------------------------------------------------------
 
     # Sample the signals
-    mObSig = (mSig[np.arange(nSigs),mPattsRep.T]).T
+    mObSig = (mSig[np.arange(nSigs), mPattsRep.T]).T
 
     # -----------------------------------------------------------------
     return mObSig
