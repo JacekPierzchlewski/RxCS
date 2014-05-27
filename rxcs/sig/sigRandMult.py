@@ -794,10 +794,10 @@ def _printParam(dSigConf):
                            iSpar, ' ', '')
 
         rxcs.console.bullet_param('the number of given frequencies',
-                                  nFG, '-', '')
+                                  nFG, ' ', '')
 
         rxcs.console.bullet_param('the number of additional tones',
-                                  nTones, '-', '')
+                                  nTones, ' ', '')
 
         # - - - - - - - - - - - - - - - - - - -
         # Random amplitudes and phases
