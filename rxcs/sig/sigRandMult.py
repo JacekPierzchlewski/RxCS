@@ -20,6 +20,8 @@ function contains all the settings given to the generator.
     1.0r1| 21-MAY-2014 : * Error in progress printing is fixed. |br|
     1.0r2| 21-MAY-2014 : * Error in default random amplitude is fixed. |br|
     1.0r3| 21-MAY-2014 : * Error in progress printing (if muted) is fixed. |br|
+    1.0r4| 27-MAY-2014 : * Error in the number of given frqs is fixed. |br|
+    1.0r5| 27-MAY-2014 : * Error in the vector with signal time is fixed. |br|
 
 *License*:
     BSD 2-Clause
@@ -228,7 +230,7 @@ def main(dSigConf):
     dSig['nSmp'] = nSmp
 
     # Generate the time vector for the signal and add it to the output dict.
-    vTSig = np.arange(1, nSmp+1) / fR
+    vTSig = np.arange(nSmp) / fR
     dSig['vTSig'] = vTSig
 
     # - - - - - - - - - - - - - - - - - - -
