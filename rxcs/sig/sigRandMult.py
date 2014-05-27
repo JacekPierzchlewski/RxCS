@@ -418,7 +418,7 @@ def _getConf(dSigConf):
     if 'iMinPhs' in dSigConf:
         iMinPhs = dSigConf['iMinPhs']
     else:
-        iMinPhs = 0
+        iMinPhs = -90
 
     # Phase gradation
     if 'iGraPhs' in dSigConf:
@@ -430,7 +430,7 @@ def _getConf(dSigConf):
     if 'iMaxPhs' in dSigConf:
         iMaxPhs = dSigConf['iMaxPhs']
     else:
-        iMaxPhs = 0
+        iMaxPhs = 90
 
     # -----------------------------------------------------------------
     return (nSigs,            # the number of signals
