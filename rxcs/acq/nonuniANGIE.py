@@ -1,3 +1,20 @@
+"""
+This a nonuniform sampler with ANGIE scheme. |br|
+
+The modules samples the given signals nonuniformly. |br|
+THe sampling aptterns are generated using ANGIE scheme.
+
+*Author*:
+    Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
+
+*Version*:
+    0.1  | 26-MAY-2014 : * Initial version. |br|
+    0.2  | 27-MAY-2014 : * Docstrings added. |br|
+
+*License*:
+    BSD 2-Clause
+"""
+
 from __future__ import division
 import sys
 import math
@@ -7,6 +24,17 @@ import numpy as np
 
 
 def main(dAcqConf,dSig):
+    """
+    This the main function of the sampler. |br|
+
+    Args:
+        dAcqConf (dictionary): dictionary with configuration for the sampler
+        dSig (dictionary): dictionary with the signals to be sampled
+
+
+    Returns:
+        dObSig (dictionary): the observed signals and paramters of sampling
+    """
 
     # =================================================================
     # Check the configuration and print it to the console
@@ -927,7 +955,7 @@ def _generateOutput(dAcqConf, dSig, mObSig, mPatts, mPattsRep, mPattsT):
     dObSig['mPatts'] = mPatts         # The sampling patterns (grid indices)
 
     dObSig['mPattsT'] = mPattsT       # The sampling patterns (time moments)
-    
+
     dObSig['mPattsRep'] = mPattsRep   # The sampling patterns (signal
                                       # representation sampling points)
 
