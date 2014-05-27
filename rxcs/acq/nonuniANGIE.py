@@ -73,6 +73,8 @@ def main(dAcqConf,dSig):
     if not np.isnan(tStart):   # <-tStart is nan = console output is off
         rxcs.console.module_progress_done(tStart)
 
+    return dObSig
+
 
 # =================================================================
 # Print the configuration to the console
