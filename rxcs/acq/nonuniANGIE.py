@@ -93,7 +93,7 @@ def _printConf(dAcqConf, dSig):
     """
 
     # -----------------------------------------------------------------
-    # Check and get the configuration from the configuration directory
+    # Check and get the configuration from the configuration dictionary
 
     # bMute     -  mute the conole output flag
     # tTau      -  time of sampling patterns
@@ -241,7 +241,7 @@ def _checkConf(dAcqConf, dSig):
     """
 
     # -----------------------------------------------------------------
-    # Get the grid period from the sampler configuration directory
+    # Get the grid period from the sampler configuration dictionary
 
     # Tg        -  sampling grid period
     (_,
@@ -567,7 +567,7 @@ def _computeRealParam(dAcqConf, dSig):
         tMax_real (float): the real maximum time between sampling points
     """
 
-    # Get the configuration from the configuration directory
+    # Get the configuration from the configuration dictionary
 
     # nPatts    -  the number of patterns
     # tTau      -  time of sampling patterns
