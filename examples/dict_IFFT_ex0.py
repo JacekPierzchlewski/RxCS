@@ -14,8 +14,8 @@ def _dict_IFFT_ex0():
     # Time of the dictionary is 1 ms
     dCSConf['tS'] = 1e-3
 
-    # The signal representation sampling frequency is 1 MHz
-    dCSConf['fR'] = 1e4
+    # The signal representation sampling frequency is 20 kHz
+    dCSConf['fR'] = 4e4
 
     # The frequency separation between tones
     dCSConf['fDelta'] = 1e3
@@ -25,15 +25,35 @@ def _dict_IFFT_ex0():
 
     # -----------------------------------------------------------------
     # Generate the IFFT dictionary
-    rxcs.cs.dict.IFFTdict.main(dCSConf)
-    #mIFFT = rxcs.cs.dict.IFFTdict.main(dCSConf)
+    (mIFFT, dDict) = rxcs.cs.dict.IFFToNoDC.main(dCSConf)
+
+    # Get the signal time vector from the dictionary
+    vT = dDict['vT']
 
     # -----------------------------------------------------------------
     # Generate the signal using the dictionary
 
-    # -----------------------------------------------------------------
-    # Plot the signal
+    # Vector with Fourier coefficients
+    vFcoef = np.zeros((1,20)).astype(complex)
+    vFcoef[0, 0] = 1
+    vFcoef[0, 19] = 1
 
+    # Generate a signal and change its shape to a signle vector
+    vSig = np.real(np.dot(vFcoef,mIFFT))
+    vSig.shape = (vSig.size,)
+
+
+    # -----------------------------------------------------------------
+    # Plot signal in the time domain
+    hFig1 = plt.figure(1)
+    hSubPlot1 = hFig1.add_subplot(111)
+    hSubPlot1.grid(True)
+    hSubPlot1.set_title('Signal')
+    hSubPlot1.set_xlabel('Time [s]')
+    hSubPlot1.plot(vT, vSig)
+    hSubPlot1.set_xlim(min(vT), max(vT))
+    hSubPlot1.set_ylim(-1.1, 1.1)
+    plt.show(block=True)
 
 # =====================================================================
 # Trigger when start as a script
