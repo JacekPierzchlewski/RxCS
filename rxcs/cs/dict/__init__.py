@@ -1,3 +1,3 @@
 
-# Import IFFT dictionary generator
-import IFFTdict
+# Import the generator of oversampeld IFFT dictionary without DC
+import IFFToNoDC
