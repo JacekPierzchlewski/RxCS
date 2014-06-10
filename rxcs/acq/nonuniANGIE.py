@@ -11,6 +11,7 @@ THe sampling aptterns are generated using ANGIE scheme.
     0.1  | 26-MAY-2014 : * Initial version. |br|
     0.2  | 27-MAY-2014 : * Docstrings added. |br|
     1.0  | 27-MAY-2014 : * Version 1.0 is ready. |br|
+    1.1  | 11-JUN-2014 : * Observation matrices added to the output. |br|
 
 *License*:
     BSD 2-Clause
@@ -62,11 +63,17 @@ def main(dAcqConf, dSig):
     mObSig = _sample(mPattsRep, dSig)
 
     # =================================================================
+    # Generate the observation matrices
+    # =================================================================
+    m3Phi = _generObser(mPattsRep, dAcqConf, dSig)
+
+    # =================================================================
     # Generate the output dictionary
     # =================================================================
     dObSig = _generateOutput(dAcqConf, dSig,
                              mObSig,
-                             mPatts, mPattsRep, mPattsT)
+                             mPatts, mPattsRep, mPattsT,
+                             m3Phi)
 
     # =================================================================
     # Signal sampling is done!
@@ -424,7 +431,7 @@ def _getConf(dAcqConf):
         raise ValueError(strError)
 
     # -----------------------------------------------------------------
-    # Get the average sampling frequency
+    # Get the average sampling frequencyparamet
     if not 'fSamp' in dAcqConf:
         strError = ('The average sampling frequency (fSamp) is not given in ')
         strError = strError + ('the configuration')
@@ -902,9 +909,71 @@ def _sample(mPattsRep, dSig):
 
 
 # =================================================================
+# Generate the observation matrix
+# =================================================================
+def _generObser(mPattsRep, dAcqConf, dSig):
+    """
+    This function generates the observation matrices.
+
+    Args:
+        mPattsRep (matrix): the sampling patterns (signal rep. sampling points)
+        dAcqConf (dictionary): dictionary with configuration for the sampler
+        dSig (dictionary): dictionary with the signals to be sampled
+
+    Returns:
+        m3Phi (3D matrix): observation matrices
+    """
+
+    # -----------------------------------------------------------------
+    # Get the representation sampling frequency of signals to be sampled
+    # and the time of signals to be sampled
+    (_, _, fR, tS) = _getSigs(dSig)
+
+    # Calculate the number of representation samples in the signals
+    nSmp = int(round(tS * fR))
+
+    # -----------------------------------------------------------------
+    # Compute the real parameters of the sampling patterns
+
+    # nPatts      -  the number of patterns to be generated
+    # nK_s        -  the expected number of sampling points in a pattern
+    (nPatts,
+     _,
+     _,
+     nK_s,
+     _,
+     _,
+     _,
+     _,
+     _,
+     _,
+     _) = _computeRealParam(dAcqConf, dSig)
+
+    # -----------------------------------------------------------------
+
+    # Allcoate the observation matrices
+    m3Phi = np.zeros((nK_s, nSmp, nPatts))
+
+    # Generate the observation matrices
+    for inxPat in np.arange(nPatts):  # <- loop over all observation matrices
+
+        # Get the current pattern
+        vPatts = mPattsRep[inxPat, :]
+
+        # Generate the current observation matrix
+        inxRow = 0
+        for inxCol in vPatts:    # <- loop over all samling points in pattern
+            m3Phi[inxRow, inxCol, inxPat] = 1
+            inxRow = inxRow + 1
+
+    # -----------------------------------------------------------------
+
+    return m3Phi
+
+# =================================================================
 # Generate the output dictionary
 # =================================================================
-def _generateOutput(dAcqConf, dSig, mObSig, mPatts, mPattsRep, mPattsT):
+def _generateOutput(dAcqConf, dSig, mObSig, mPatts, mPattsRep, mPattsT, m3Phi):
     """
     This function generates the output dictionary.
 
@@ -915,6 +984,7 @@ def _generateOutput(dAcqConf, dSig, mObSig, mPatts, mPattsRep, mPattsT):
         mPatts (matrix): the sampling patterns (grid indices)
         mPattsRep (matrix): the sampling patterns (signal rep. sampling points)
         mPattsT (matrix): the sampling patterns (time moments)
+        m3Phi (3D matrix): observation matrices
 
     Returns:
         dObSig (dictionary): the observed signals and paramters of sampling
@@ -972,6 +1042,10 @@ def _generateOutput(dAcqConf, dSig, mObSig, mPatts, mPattsRep, mPattsT):
 
     dObSig['mPattsRep'] = mPattsRep   # The sampling patterns (signal
                                       # representation sampling points)
+
+    # - - - - - - - - - - - - - - - - - -
+
+    dObSig['m3Phi'] = m3Phi           # The observation matrices
 
     # - - - - - - - - - - - - - - - - - -
 
