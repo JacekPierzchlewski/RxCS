@@ -962,7 +962,7 @@ def _generateOutput(dAcqConf, dSig, mObSig, mPatts, mPattsRep, mPattsT):
 
     # - - - - - - - - - - - - - - - - - -
 
-    dObSig['mObSig'] = mObSig   # The observed signal
+    dObSig['mObSig'] = mObSig   # The observed signals
 
     # - - - - - - - - - - - - - - - - - -
 
