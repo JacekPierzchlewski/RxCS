@@ -156,7 +156,7 @@ def _printConf(dAcqConf, dSig):
     # Print the configuration if the 'mute' flag is not set
     if bMute == 0:
 
-        # Print out the header of the signal generator
+        # Print out the header of the sampler
         rxcs.console.progress('Signal sampling', 'Nonuniform sampler (ANGIE)')
 
         # - - - - - - - - - - - - - - - - - - -
