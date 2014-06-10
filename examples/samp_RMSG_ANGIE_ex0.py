@@ -121,6 +121,31 @@ def _samp_RMSG_ANGIE_ex0():
     plt.setp(markerline, color='b', markersize=10.0)
 
     # -----------------------------------------------------------------
+
+    # -----------------------------------------------------------------
+    # APPENDIX:
+    # This part is to show how to use the observation matrix, if it is needed
+    # (for example in compressed sensing systems)
+
+    # Get a 3D matrix with observation matrices
+    m3Phi = dObSig['m3Phi']
+
+    # Get the first observation matrix (1st page of the m3Phi matrix)
+    mPhi = m3Phi[: ,:, 0]
+
+    # Sample the signal using the observation matrix
+    vObSigPhi = np.dot(mPhi, vSig)
+
+    # Plot the signal and the observed sampling points
+    hFig2 = plt.figure(2)
+    hSubPlot1 = hFig2.add_subplot(111)
+    hSubPlot1.grid(True)
+    hSubPlot1.set_title('Signal and the observed sampling points')
+    hSubPlot1.plot(vT, vSig, '-')
+    hSubPlot1.plot(vPattsT, vObSigPhi, 'ro', markersize=10)
+
+    # -----------------------------------------------------------------
+
     plt.show(block=True)
 
 
