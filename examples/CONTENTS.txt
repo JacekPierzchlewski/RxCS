@@ -2,22 +2,22 @@ RXCS toolbox, examples\ - directory with RxCS examples
 
 contents:
 
-    1. rxcs~                  - soft link to the directory with all the RxCS modules
+    1. CONTENTS.txt           - this file
 
-    2. CONTENTS.txt           - this file
-
-    3. Makefile               - local Makefile
+    2. Makefile               - local Makefile
 
 
-    # Single run Random Multitone Signal (RaMuS) Generator examples:
+    # Directories with examples:
 
-    4. sig_RMSG_ex0.py        - the simplest example. FFT analysis of the signal.
+    4. acquisitions\    - directory with examples on how to use the acquisition
+                          systems
 
-    5. sig_RMSG_ex1.py        - single RaMuS generation with specified frequencies
-                                of 3 tones + 1 fully random tone. FFT analysis of the signal
+    5. dictionaries\    - directory with examples on how to use the dictionaries
 
-    6. sig_RMSG_ex2.py        - single RaMuS generation with 3 fully random tones.
-                                FFT analysis of the signal
 
-    7. sig_RMSG_ex3.py        - multiple RaMuS generation with 11 tones with specfied frequencies.
-                                Welch's analysis of the signals
+    6. reconstruction\  - directory with examples on how to use the reconstruction
+                          modules
+
+    7. signals\         - directory with examples on how to use the signal generators
+
+

@@ -1,0 +1,18 @@
+RXCS toolbox, examples\reconstruction\ - directory with examples on how to use
+                                         the reconstruction modules
+
+contents:
+
+    1. rxcs~                  - soft link to the directory with all the RxCS modules
+
+    2. CONTENTS.txt           - this file
+
+    3. Makefile               - local Makefile
+
+
+    # L1 reconstruction (reg. regression) with cvxopt examples:
+
+    4. L1recon_ex0.py        - the simplest example of CS L1 reconstruction
+
+    5. L1recon_ex1.py        - a more complicated example of CS L1 reconstruction
+                               with IDFT complex dictionary

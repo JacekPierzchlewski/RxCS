@@ -1,0 +1,15 @@
+RXCS toolbox, examples\acquisitions\ - directory with examples on how to use
+                                       the acquisition systems
+
+contents:
+
+    1. rxcs~                    - soft link to the directory with all the RxCS modules
+
+    2. CONTENTS.txt             - this file
+
+    3. Makefile                 - local Makefile
+
+
+    # ANGIE nonuniform sampler examples:
+
+    4. samp_RMSG_ANGIE_ex0.py   - example #0 on how to use the ANGIE sampler
