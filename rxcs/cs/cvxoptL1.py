@@ -7,42 +7,44 @@ from cvxopt import blas, lapack, solvers
 
 def main(dCSConf):
 
-    # =================================================================
-    # Check the configuration and print it to the console
-    # =================================================================
-
     # Print the configuration to the console
     tStart = _printConf(dCSConf)
 
-    # - - - - - - - - - - - - - - - - - - -
-
-    # =================================================================
-    # Signal reconstruction starts here
-    # =================================================================
+    # Signal reconstruction is here
     mCoef = _recon(dCSConf)
 
-    # =================================================================
-    # Signal reconstruction is done!
-    # =================================================================
+    # Print an info that the signal reconstruction is done! (if needed)
     if not np.isnan(tStart):   # <-tStart is nan = console output is off
         rxcs.console.module_progress_done(tStart)
 
+    # Return the matrix with signal coefficients
     return mCoef
 
 # =================================================================
 # Check the configuration dict. and get the configuration from it
 # =================================================================
 def _printConf(dCSConf):
+    """
+    This function prints reconstruction parameters to the console,
+    if only the 'bMute' flag is not set.
 
+    Args:
+        dCSConf (dictionary): CS reconstruction configuration dictionary
+
+    Returns:
+        tStart (time): time stamp of reconstruction start
+    """
+
+    # -----------------------------------------------------------------
+    # Get the configuration parameters
+    #
     # bMute    -  mute the conole output flag
     # iK       -  the K parameter
     # mObSig   -  matrix with the observed signals
-    (bMute,
-     iK,
-     _,
-     mObSig,
-     _) = _getData(dCSConf)
+    (bMute, iK,_, mObSig, _) = _getData(dCSConf)
 
+    #----------------------------------------------------------------------
+    # Print the configuration if the 'mute' flag is not set
     if bMute == 0:
 
         # Print out the header of the sampler
@@ -65,6 +67,7 @@ def _printConf(dCSConf):
         strStartMessage = ('signals reconstruction starts!!!')
         tStart = rxcs.console.module_progress(strStartMessage)
 
+    #----------------------------------------------------------------------
     return tStart
 
 
@@ -84,7 +87,7 @@ def _getData(dCSConf):
         iK (float):        the K parameter
         m3Theta (matrix)   the Theta matrices
         mObSig (matrix)    matrix with the observed signals
-        bComplex (float)   complex flag
+        bComplex (float)   complex optinmization flag
 
     """
 
@@ -147,10 +150,27 @@ def _getData(dCSConf):
 
 
 # =================================================================
-# Check it the number of the observed signals is equal to the number
-# of the Theta matrices
+# Check it the number of observed signals is equal to the number
+# of Theta matrices
 # =================================================================
 def _checkNObs(m3Theta, mObSig):
+    """
+    This function checks if the number of observed signals equals
+    the number of Theta matrices.
+
+    The number of Theta matrices is the number of pages in the 3D matrix
+    'm3Theta'.
+
+    The number of observed signals is equal to the number of columns in
+    the 'mObSig' matrix.
+
+    Args:
+        m3Theta (3D matrix): 3D matrix with Theta matrices
+        mObSig (matrix): matrix with observed signals
+
+    Returns:
+        nothing
+    """
 
     # Get the number of the observed signals
     (_ , nObSig) = mObSig.shape
@@ -179,9 +199,20 @@ def _checkNObs(m3Theta, mObSig):
 # size of the observed signals
 # =================================================================
 def _checkThetaRows(m3Theta, mObSig):
+    """
+    This function checks if the number of rows in the Theta matrices
+    equals the size of the observed signals.
 
-    # Get the number of rowss
-    # check if the Theta matrix is truly 3D, or just a 2D
+    Args:
+        m3Theta (3D matrix): 3D matrix with Theta matrices
+        mObSig (matrix): matrix with observed signals
+
+    Returns:
+        nothing
+    """
+
+    # Get the number of rows.
+    # Check if the Theta matrix is truly 3D, or just a 2D
     if len(m3Theta.shape) == 2:
         (nRows , _) = m3Theta.shape
     else:
@@ -202,15 +233,27 @@ def _checkThetaRows(m3Theta, mObSig):
 
 
 # =================================================================
-# Signal reconstruction
+# Main functio of the signal reconstruction
 # =================================================================
 def _recon(dCSConf):
+
+    """
+    This function reconstructs the signals based on the data given
+    in the input dictionary.
+
+    Args:
+        dCSConf (dictionary): dictionary with configuration for the module
+
+    Returns:
+        mCoeff (matrix):
+    """
 
     # -----------------------------------------------------------------
     # Get the input data
     # iK       -  the K parameter
     # m3Theta  -  3D matrix with the Theta matrices
     # mObSig   -  matrix with the observed signals
+    # bComplex -  complex optmization flag
     (_,
      iK,
      m3Theta,
@@ -220,16 +263,12 @@ def _recon(dCSConf):
     # Get the number of the observed signals
     (_ , nObSig) = mObSig.shape
 
-    # Check if the Theta matrix is 2D, if it is, then make it a 3D with one
-    # page
-    if len(m3Theta.shape) == 2:
-        (nRows , nCols) = m3Theta.shape
-        m3Theta_ = m3Theta.copy()
-        m3Theta = np.zeros((1, nRows , nCols))+1j*np.zeros((1, nRows , nCols))
-        m3Theta[0, :, :] = m3Theta_
+    # Check if the Theta matrix is 2D.
+    # If it is, then make it a 3D with one page
+    m3Theta = _make3Dmatrix(m3Theta, bComplex)
 
     # If the optimization problems are complex, make them real
-    if bComplex:
+    if bComplex == 1:
         m3Theta = _makeRealProblem(m3Theta)
 
     # Get the number of columns in the Theta matrix,
@@ -257,11 +296,27 @@ def _recon(dCSConf):
         mCoeff[:, inxSig] = vCoef
 
     # Construct the complex output coefficients vector (if needed)
-    if bComplex:
+    if bComplex == 1:
         mCoeff = _makeComplexOutput(mCoeff)
 
     # -----------------------------------------------------------------
     return mCoeff
+
+
+# =================================================================
+# Make a one page 3D matrix from 2D matrix, if needed
+# =================================================================
+def _make3Dmatrix(m3Theta, bComplex):
+
+    if len(m3Theta.shape) == 2:
+        (nRows , nCols) = m3Theta.shape
+        m3Theta_ = m3Theta.copy()
+        m3Theta = np.zeros((1, nRows , nCols))
+        if bComplex == 1:
+            m3Theta = m3Theta + 1j*np.zeros((1, nRows ,nCols))
+        m3Theta[0, :, :] = m3Theta_
+
+    return m3Theta
 
 
 # =================================================================
@@ -278,6 +333,7 @@ def _makeRealProblem(m3Theta):
     m3ThetaR[:, :, np.arange(nCols, 2*nCols)] = m3Theta.imag
 
     return m3ThetaR
+
 
 # =================================================================
 # Make complex output vector, if it is needed
@@ -352,22 +408,23 @@ def _reconEngine(mmTheta_, vvSig_, iK, bSilence):
     iR, iC = mmTh.size
 
     # --------------------------------------------------------------------
+    # Silence the outoput from the cvxopt
     if bSilence == 1:
         solvers.options['show_progress'] = False
 
     # --------------------------------------------------------------------
 
-    #
     # Q = -2.0 * A' * y
     vvQ = matrix(float(iK), (2*iC,1))
-
     blas.gemv(mmTh, vvSig_, vvQ, alpha = -2.0, trans = 'T')
 
+    # Run the solver
     mmH = matrix(0.0, (2*iC,1))
     vvCoef = solvers.coneqp(P, vvQ, G, mmH, kktsolver = Fkkt)['x'][:iC]
 
+    # --------------------------------------------------------------------
+    # Return the vecto with coefficients
     return vvCoef
-
 
 
 # =====================================================================
@@ -407,6 +464,11 @@ def G(u, vvV, alpha = 1.0, beta = 0.0, trans = 'N'):
 # Custom solver
 # =====================================================================
 def Fkkt(W):
+    """
+        Custom solver:
+
+          v := alpha * 2*A'*A * u + beta * v
+    """
 
     global mmS
     mmS = matrix(0.0, (iR,iR))
