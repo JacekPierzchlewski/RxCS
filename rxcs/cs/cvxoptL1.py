@@ -251,6 +251,17 @@ def _getData(dCSConf):
         bComplex = dCSConf['bComplex']
 
     # -----------------------------------------------------------------
+    # Check if the matrix with observed signals is a numpy vector.
+    # If it is a numpy vector (vector - array with one dimension),
+    # make it a 2D matrix (2D matrix - array with 2 dimensions).
+    mObSig = _make2Dmatrix(mObSig)
+
+    # -----------------------------------------------------------------
+    # Check if the Theta matrix is 2D.
+    # If it is, then make it a 3D with one page
+    m3Theta = _make3Dmatrix(m3Theta, bComplex)
+
+    # -----------------------------------------------------------------
     # Check it the number of the observed signals is equal to the number
     # of the Theta matrices
     _checkNObs(m3Theta, mObSig)
@@ -266,6 +277,66 @@ def _getData(dCSConf):
             m3Theta,   # Theta matrices
             mObSig,    # Observed signals
             bComplex)  # The complex optimization flag
+
+
+# =================================================================
+# Make a one column 2D matrix from 1D vector, if needed
+# =================================================================
+def _make2Dmatrix(mObSig):
+    """
+    This function checks if the matrix with observation signals
+    is a 1D numpy vecotr.
+    If it is a 1D numpy matrix, then the function makes it a 2D matrix with
+    one column.
+
+    If the input matrix is a 2D matrix, then the function returns it
+    as it is.
+
+    Args:
+        mObSig (matrix): Corrected matrix with observation signals
+
+    Returns:
+        mObSig (matrix): Corrected matrix with observation signals
+    """
+
+    if len(mObSig.shape) == 1:
+        nRows = mObSig.size
+        mObSig_ = mObSig.copy()
+        mObSig = np.zeros((nRows,1))
+        mObSig[:,0] = mObSig_
+
+    return mObSig
+
+
+# =================================================================
+# Make a one page 3D matrix from 2D matrix, if needed
+# =================================================================
+def _make3Dmatrix(m3Theta, bComplex):
+    """
+    This function checks if the m3Theta matrix is a 2D numpy matrix.
+    If it is a 2D matrix, then the function makes it a 3D matrix with
+    one page,
+
+    If the input matrix is a 3D matrix, then the function returns it
+    as it is.
+
+    Args:
+        m3Theta (matrix): The Theta matrix
+        bComplex (float): Compelx data flag
+
+    Returns:
+        m3Theta (matrix): The Theta matrix
+    """
+
+    if len(m3Theta.shape) == 2:
+        (nRows , nCols) = m3Theta.shape
+        m3Theta_ = m3Theta.copy()
+        m3Theta = np.zeros((1, nRows , nCols))
+        if bComplex == 1:
+            m3Theta = m3Theta + 1j*np.zeros((1, nRows ,nCols))
+        m3Theta[0, :, :] = m3Theta_
+
+    return m3Theta
 
 
 # =================================================================
@@ -294,13 +365,8 @@ def _checkNObs(m3Theta, mObSig):
     # Get the number of the observed signals
     (_ , nObSig) = mObSig.shape
 
-    # Check if the Theta matrix is truly 3D, or just a 2D
-    if len(m3Theta.shape) == 2:
-        # It is just a 2D matrix
-        nTheta = 1
-    else:
-        # Get the number of Theta matrices
-        (_ , _, nTheta) = m3Theta.shape
+    # Get the number of Theta matrices
+    (nTheta , _, _) = m3Theta.shape
 
     # -----------------------------------------------------------------
 
@@ -330,15 +396,11 @@ def _checkThetaRows(m3Theta, mObSig):
         nothing
     """
 
-    # Get the number of rows.
-    # Check if the Theta matrix is truly 3D, or just a 2D
-    if len(m3Theta.shape) == 2:
-        (nRows , _) = m3Theta.shape
-    else:
-        (nRows , _, _) = m3Theta.shape
+    # Get the number of rows in the theta matrix
+    (_, nRows, _) = m3Theta.shape
 
     # Get the size of the observed signals
-    (nObSiz , _) = mObSig.shape
+    (nObSiz, _) = mObSig.shape
 
     # -----------------------------------------------------------------
 
@@ -381,10 +443,6 @@ def _recon(dCSConf):
     # Get the number of the observed signals
     (_ , nObSig) = mObSig.shape
 
-    # Check if the Theta matrix is 2D.
-    # If it is, then make it a 3D with one page
-    m3Theta = _make3Dmatrix(m3Theta, bComplex)
-
     # If the optimization problems are complex, make them real
     if bComplex == 1:
         m3Theta = _makeRealProblem(m3Theta)
@@ -421,35 +479,7 @@ def _recon(dCSConf):
     return mCoeff
 
 
-# =================================================================
-# Make a one page 3D matrix from 2D matrix, if needed
-# =================================================================
-def _make3Dmatrix(m3Theta, bComplex):
-    """
-    This function checks if the m3Theta matrix is a 2D numpy matrix.
-    If it is a 2D matrix, then the function makes it a 3D matrix with
-    one page,
 
-    If the input matrix is a 3D matrix, then the function returns it
-    as it is.
-
-    Args:
-        m3Theta (matrix): The Theta matrix
-        bComplex (float): Compelx data flag
-
-    Returns:
-        m3Theta (matrix): The Theta matrix
-    """
-
-    if len(m3Theta.shape) == 2:
-        (nRows , nCols) = m3Theta.shape
-        m3Theta_ = m3Theta.copy()
-        m3Theta = np.zeros((1, nRows , nCols))
-        if bComplex == 1:
-            m3Theta = m3Theta + 1j*np.zeros((1, nRows ,nCols))
-        m3Theta[0, :, :] = m3Theta_
-
-    return m3Theta
 
 
 # =================================================================
