@@ -2,16 +2,18 @@ RXCS toolbox, root directory
 
 contents:
 
-    1. doc\         - directory with RxCS documentation
+    1. doc\                      - directory with RxCS documentation
 
-    2. examples\    - directory with RxCS examples
+    2. examples\                 - directory with RxCS examples
 
-    3. rxcs\        - directory with all the RxCS modules
+    3. rxcs\                     - directory with all the RxCS modules
 
-    4. test\        - directory with test functions for toolbox modules
+    4. test\                     - directory with test functions for toolbox modules
 
-    5. CONTENTS.txt - the current file
+    5. CONTENTS.txt              - the current file
 
-    6. LICENSE.txt  - license of the toolbox (2-clause BSD)
+    6. BSD-2CLAUSE0LICESNE.txt   - BSD 2-clause BSD license
 
-    7. Makefile     - main Makefile of the RxCS toolbox
+    7. LICENSING_INFO.txt        - RxCS licensing info
+
+    8. Makefile                  - main Makefile of the RxCS toolbox
