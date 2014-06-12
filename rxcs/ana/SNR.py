@@ -218,7 +218,7 @@ def _getConf(dAnaConf):
 
     # -------------------------------------------------------------------
     # Get the success threshold
-    if not 'bMute' in dAnaConf:
+    if not 'iSNRSuccess' in dAnaConf:
         iSNRSuccess = 20
     else:
         iSNRSuccess = dAnaConf['iSNRSuccess']
