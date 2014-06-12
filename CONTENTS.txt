@@ -12,7 +12,7 @@ contents:
 
     5. CONTENTS.txt              - the current file
 
-    6. BSD-2CLAUSE0LICESNE.txt   - BSD 2-clause BSD license
+    6. BSD-2CLAUSE-LICESNE.txt   - BSD 2-clause BSD license
 
     7. LICENSING_INFO.txt        - RxCS licensing info
 
