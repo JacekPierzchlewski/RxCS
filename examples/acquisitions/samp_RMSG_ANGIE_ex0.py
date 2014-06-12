@@ -131,7 +131,7 @@ def _samp_RMSG_ANGIE_ex0():
     m3Phi = dObSig['m3Phi']
 
     # Get the first observation matrix (1st page of the m3Phi matrix)
-    mPhi = m3Phi[: ,:, 0]
+    mPhi = m3Phi[0, : ,:]
 
     # Sample the signal using the observation matrix
     vObSigPhi = np.dot(mPhi, vSig)
