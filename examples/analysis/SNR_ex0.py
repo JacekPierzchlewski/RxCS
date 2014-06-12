@@ -60,7 +60,7 @@ def _SNR_ex0():
     # - - - - - - - -
     # Compute the Theta matrix
     m3Phi = dObSig['m3Phi']   # Get the observation matrix from the sampler
-    mPhi = m3Phi[:,:,0]       # ^
+    mPhi = m3Phi[0, :, :]     # ^
 
     mTheta = np.dot(mPhi, mDict.T)
 
