@@ -1,0 +1,7 @@
+Copyright (c) 2013-2014, Jacek Pierzchlewski, Aalborg University, Denmark
+
+Most of the code of RxCS is covered by the BSD 2-clause license.
+Parts of the code are covered by the GNU GPL v3 license.
+
+Look at a header of each module for more precise info about a license of a module.
+
