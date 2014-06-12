@@ -951,8 +951,8 @@ def _generObser(mPattsRep, dAcqConf, dSig):
 
     # -----------------------------------------------------------------
 
-    # Allcoate the observation matrices
-    m3Phi = np.zeros((nK_s, nSmp, nPatts))
+    # Allocate the observation matrices
+    m3Phi = np.zeros((nPatts, nK_s, nSmp))
 
     # Generate the observation matrices
     for inxPat in np.arange(nPatts):  # <- loop over all observation matrices
@@ -963,7 +963,7 @@ def _generObser(mPattsRep, dAcqConf, dSig):
         # Generate the current observation matrix
         inxRow = 0
         for inxCol in vPatts:    # <- loop over all samling points in pattern
-            m3Phi[inxRow, inxCol, inxPat] = 1
+            m3Phi[inxPat, inxRow, inxCol] = 1
             inxRow = inxRow + 1
 
     # -----------------------------------------------------------------
