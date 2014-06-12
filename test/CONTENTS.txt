@@ -8,6 +8,9 @@ contents:
 
     3. Makefile               - local Makefile
 
-    4. sigRandMult_test.py    - test function for Random Multitone Signal Generator
+    4. nonuniANGIE_test.py    - test function for nonuniform sampler with
+                                ANGIE sampling scheme
 
-    5. SNR_test.py            - test function for SNR evaluation of the reconstructed signal
+    5. sigRandMult_test.py    - test function for Random Multitone Signal Generator
+
+    6. SNR_test.py            - test function for SNR evaluation of the reconstructed signal

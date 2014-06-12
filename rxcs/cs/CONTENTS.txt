@@ -2,8 +2,14 @@ RXCS toolbox, cs\ - directory with compressed sensing modules
 
 contents:
 
-    1. CONTENTS.txt   - the current file
+    1. dict\          - directory with dictionaries
 
-    2. Makefile       - local Makefile
+    2. CONTENTS.txt   - the current file
 
-    3. __init__.py    - module initialization file
+    3. Makefile       - local Makefile
+
+    4. __init__.py    - module initialization file
+
+    5. cvxoptL1.py    - module with L1-based signal reconstruction (regularized
+                        regression), the optimization uses cvxopt
+

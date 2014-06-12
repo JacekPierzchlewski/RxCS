@@ -2,8 +2,10 @@ RXCS toolbox, acq\ - directory with acquisition systems modules
 
 contents:
 
-    1. CONTENTS.txt   - the current file
+    1. CONTENTS.txt     - the current file
 
-    2. Makefile       - local Makefile
+    2. Makefile         - local Makefile
 
-    3. __init__.py    - module initialization file
+    3. __init__.py      - module initialization file
+
+    4, nonuniANGIE.py   - a nonuniform sampler with an ANGIE sampling scheme
