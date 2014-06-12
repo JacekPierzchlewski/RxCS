@@ -11,9 +11,6 @@ import cs
 # Import system analysis modules
 import ana
 
-# Import main frame1
-import work_frame1
-
 # Import console printing function
 import console
 
