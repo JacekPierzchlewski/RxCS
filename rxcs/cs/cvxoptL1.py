@@ -1,3 +1,25 @@
+"""
+This a L1-optimization signal reconstruction module. |br|
+
+*Authors*:
+    Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
+
+    This module is based on the example of basis pursuit by
+    Martin S. Andersen, Joachim Dahl, and Lieven Vandenberghe.
+
+    The example can be found here:
+    http://cvxopt.org/examples/book/basispursuit.html
+
+*Version*:
+    0.1  | 11-JUN-2014 : * Initial version. |br|
+    0.2  | 12-JUN-2014 : * Docstrings added. |br|
+    1.0  | 12-JUN-2014 : * Version 1.0 released. |br|
+
+*License*:
+    GNU GPL v3
+    WARNING: Ths module has a different license (GNU GPL v3) than most of the
+             RxCS code (BSD 2-clause)!
+"""
 from __future__ import division
 import rxcs
 import numpy as np
@@ -6,6 +28,87 @@ from cvxopt import blas, lapack, solvers
 
 
 def main(dCSConf):
+    """
+    This the main function of the reconstruction and the only one which should
+    be accessed by a user. |br|
+
+    An input dictionary, which is a sole argument to the function
+    contains all the settings and data given to the module. |br|
+
+    The function returns a matrix with found signal coefficients. |br|
+
+    Please go to the *examples* directory for examples on how to use the
+    module. |br|
+
+    Fields in the input dictionary:
+
+    - a. **bMute** (*float*): 'mute the console outpu' flag
+
+    - b. **m3Theta** (*2D or 3D matrix*): matrix with Theta matrices
+
+    - c. **iK** (*float*): k parameter
+
+    - d. **mObSig** (*matrix*): matrix with observed signals
+
+    - e. **bComplex** (*float*): 'complex data' flag
+
+
+    The optimization scheme is:
+
+       min(  |Ax - y|_2^2  +  k * |x|_1  )
+                              ^
+                              |
+                              |
+                       the 'k' parameter
+
+
+    THETA MATRICES:
+    The optimization module 'rxcs.cs.cvxoptL1' is designed to work with
+    multiple observed signals, so that many signals can be reconstructed
+    with one module call.
+
+    Therefore, by default the input matrix with Theta matrices is a 3D matrix,
+    so that many Theta matrices may be given to the module (one page of the
+    'm3Theta' matrix = one Theta matrix).
+
+    If there is a need to reconstruct only 1 signal, then the input
+    Theta matrix may be 2D.
+
+
+    OBSERVATION SIGNALS:
+    Similarly, the observed signals are given as a 2D matrix (one column -
+    one observed signal). If there is a need to reconstruct only 1 signal
+    then the field 'mObSig' in the input dictionary may be a simple vector
+    with the observed signal.
+
+    Always the number of columns in the mObSig matrix must equal the number
+    of pages in the m3Theta matrix.
+
+
+    COMPLEX OPTIMIZATION FLAG:
+    If the 'bComplex' is set, then the module converts the complex
+    optimization problem into a real problem. This flag may not exists in
+    the dictionary, by default it is cleared.
+
+    Warning: the module does not support reconstruction of complex signals!
+             Therefore the conversion to real problem is done with assumption
+             that the complex part of the reconstructed signal is 0.
+
+
+    OUTPUT MATRIX WITH SIGNAL COEFFICIENS:
+    The found signal coefficients are given as a 2D matrix, where one column
+    corresponds to a one vector with found signal coefficients.
+
+    The number of columns in the output matrix equalts the number of columns
+    in the input matrix with observed signals.
+
+    Args:
+        dCSConf (dictionary): dictionary with configuration for the module
+
+    Returns:
+        mCoef (matrix): matrix with found signal coefficients.
+
+    """
 
     # Print the configuration to the console
     tStart = _printConf(dCSConf)
@@ -21,11 +124,11 @@ def main(dCSConf):
     return mCoef
 
 # =================================================================
-# Check the configuration dict. and get the configuration from it
+# Print the configuration of the module to the console
 # =================================================================
 def _printConf(dCSConf):
     """
-    This function prints reconstruction parameters to the console,
+    This function prints module parameters to the console,
     if only the 'bMute' flag is not set.
 
     Args:
@@ -150,7 +253,7 @@ def _getData(dCSConf):
 
 
 # =================================================================
-# Check it the number of observed signals is equal to the number
+# Check if the number of observed signals is equal to the number
 # of Theta matrices
 # =================================================================
 def _checkNObs(m3Theta, mObSig):
@@ -236,7 +339,6 @@ def _checkThetaRows(m3Theta, mObSig):
 # Main functio of the signal reconstruction
 # =================================================================
 def _recon(dCSConf):
-
     """
     This function reconstructs the signals based on the data given
     in the input dictionary.
@@ -288,7 +390,7 @@ def _recon(dCSConf):
         vvObSig = matrix(mObSig[:, inxSig])
 
         # Run the engine: Reconstruct the signal coefficients
-        vvCoef = _reconEngine(mmTheta, vvObSig, iK, 1)
+        vvCoef = _reconEngine(mmTheta, vvObSig, iK)
 
         # Store the signal coefficients in the output matrix
         vCoef = np.array(vvCoef)
@@ -307,6 +409,21 @@ def _recon(dCSConf):
 # Make a one page 3D matrix from 2D matrix, if needed
 # =================================================================
 def _make3Dmatrix(m3Theta, bComplex):
+    """
+    This function checks if the m3Theta matrix is a 2D numpy matrix.
+    If it is a 2D matrix, then the function makes it a 3D matrix with
+    one page,
+
+    If the input matrix is a 3D matrix, then the function returns it
+    as it is.
+
+    Args:
+        m3Theta (matrix): The Theta matrix
+        bComplex (float): Compelx data flag
+
+    Returns:
+        m3Theta (matrix): The Theta matrix
+    """
 
     if len(m3Theta.shape) == 2:
         (nRows , nCols) = m3Theta.shape
@@ -323,6 +440,40 @@ def _make3Dmatrix(m3Theta, bComplex):
 # Make real-only Theta matrices, if it is needed
 # =================================================================
 def _makeRealProblem(m3Theta):
+    """
+    This function makes a real only Theta matrix from a complex
+    Theta matrix.
+
+    The output matrix has twice as many columns as the input matrix.
+
+    This function is used only if the optimization problem
+    is complex and must be transformed to a real problem.
+
+
+    Let's assume that the input complex Theta matrix looks as follows:
+
+    |  r1c1    r1c2    r1c3  |
+    |  r2c1    r2c2    r2c3  |
+    |  r3c1    r3c2    r3c3  |
+    |  r4c1    r4c2    r4c3  |
+    |  r5c1    r5c2    r5c3  |
+
+
+    Then the real output matrix is:
+
+    |  re(r1c1)   re(r1c2)   re(r1c3)   im(r1c1)   im(r1c2)   im(r1c3)  |
+    |  re(r2c1)   re(r2c2)   re(r2c3)   im(r2c1)   im(r2c2)   im(r2c3)  |
+    |  re(r3c1)   re(r3c2)   re(r3c3)   im(r3c1)   im(r3c2)   im(r3c3)  |
+    |  re(r4c1)   re(r4c2)   re(r4c3)   im(r4c1)   im(r4c2)   im(r4c3)  |
+    |  re(r5c1)   re(r5c2)   re(r5c3)   im(r5c1)   im(r5c2)   im(r5c3)  |
+
+
+    Args:
+        m3Theta (matrix): The Theta matrix with complex values
+
+    Returns:
+        m3ThetaR (matrix): The Theta matrix with a real only values
+    """
 
     # Get the size of the 3d matrix with Theta matricess
     (nTheta, nRows, nCols) = m3Theta.shape
@@ -336,9 +487,39 @@ def _makeRealProblem(m3Theta):
 
 
 # =================================================================
-# Make complex output vector, if it is needed
+# Make complex output vectors, if it is needed
 # =================================================================
 def _makeComplexOutput(mCoeff):
+    """
+    This function constructs a complex output matrix with the found
+    signal coefficients,
+
+    This function is used only if the optimization problem
+    is complex and was transformed to a real problem.
+
+    The number of rows in the output matrix equals half the number of
+    rows in the input matrix.
+
+    Let's assume that the input real matrix looks as follows:
+
+    |  r1c1    r1c2    r1c3  |
+    |  r2c1    r2c2    r2c3  |
+    |  r3c1    r3c2    r3c3  |
+    |  r4c1    r4c2    r4c3  |
+
+
+    Then the complex output matrix is:
+
+    |  r1c1 + j*r3c1    r1c2 + j*r3c2    r1c3 + j*r3c3  |
+    |  r2c1 + j*r4c1    r2c2 + j*r4c2    r2c3 + j*r4c3  |
+
+
+    Args:
+        mCoeff (matrix): The real matrix with found signal coefficients
+
+    Returns:
+        mCoeffC (matrix): The complex matrix with found signal coefficients
+    """
 
     # Get the size of the matrix with coefficients
     (nSiz, nSigs) = mCoeff.shape
@@ -346,16 +527,18 @@ def _makeComplexOutput(mCoeff):
     # Get the real and complex parts of the output matrix and construct the
     # output matrix
     mCoeffR = mCoeff[np.arange(int(nSiz/2)), :]
-    mCoeffC = mCoeff[np.arange(int(nSiz/2), nSiz), :]
-    mCoeff = mCoeffR - 1j*mCoeffC
-    return mCoeff
+    mCoeffI = mCoeff[np.arange(int(nSiz/2), nSiz), :]
+    mCoeffC = mCoeffR - 1j*mCoeffI
+    return mCoeffC
 
 
 # =================================================================
 # ENGINE OF THE RECONSTRUCTION: basis pursuit problem
 # =================================================================
-def _reconEngine(mmTheta_, vvSig_, iK, bSilence):
+def _reconEngine(mmTheta_, vvSig_, iK):
     """
+    This is the engine of the reconstruction.
+
     Basis pursuit problem:
 
        minimize    ||A*x - y||_2^2 + k * ||x||_1
@@ -387,8 +570,8 @@ def _reconEngine(mmTheta_, vvSig_, iK, bSilence):
 
     Args:
         mTheta_ (cvxopt matrix):  Theta matrix
-        vvSig_ (cvxopt vector):   vector with observed signal
-        iK (float):  k parameter
+        vvSig_ (cvxopt vector):   vector with an observed signal
+        iK (float):               k parameter
 
     Returns:
         vvCoef (cvxopt vector):   vector with found coefficients
@@ -409,8 +592,7 @@ def _reconEngine(mmTheta_, vvSig_, iK, bSilence):
 
     # --------------------------------------------------------------------
     # Silence the outoput from the cvxopt
-    if bSilence == 1:
-        solvers.options['show_progress'] = False
+    solvers.options['show_progress'] = False
 
     # --------------------------------------------------------------------
 
