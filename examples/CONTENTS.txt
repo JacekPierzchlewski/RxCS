@@ -23,3 +23,6 @@ contents:
     8. signals\         - directory with examples on how to use the signal generators
 
 
+    # Directory with research:
+
+    9. IRFDUCS\         - directory with IRFDUCS research scripts
