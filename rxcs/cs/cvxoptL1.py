@@ -187,6 +187,10 @@ def _printConf(dCSConf):
         tStart = rxcs.console.module_progress(strStartMessage)
 
     #----------------------------------------------------------------------
+    else:   # <- the output was muted
+        tStart = np.nan
+
+    #----------------------------------------------------------------------
     return tStart
 
 
