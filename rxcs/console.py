@@ -54,6 +54,7 @@ def pack(inxPack):
     sys.stdout.write('SIGNAL PACK ')
     sys.stdout.write(_colors('PROGRESS') + strPackNumber + _colors('ENDC'))
     sys.stdout.write(':' + '\n')
+    sys.stdout.flush()
 
     return
 
@@ -89,6 +90,7 @@ def progress(strStage, strModule):
 
     sys.stdout.write(_colors('PROGRESS') + '    >> ' + _colors('ENDC'))
     sys.stdout.write(strStage + ': ' + strModule + ' \n')
+    sys.stdout.flush()
 
     return
 
@@ -121,6 +123,7 @@ def module_progress(strInfo):
 
     sys.stdout.write(_colors('PROGRESS') + '\n        > ' + _colors('ENDC'))
     sys.stdout.write(strInfo + '...')
+    sys.stdout.flush()
 
     # Start the timer
     tStart = time.time()
@@ -161,6 +164,7 @@ def progress_done(tStart):
 
     strTime = ('done in %.2f seconds') % (tTime)
     sys.stdout.write(_colors('OK') + strTime + _colors('ENDC'))
+    sys.stdout.flush()
 
     return
 
@@ -198,6 +202,7 @@ def module_progress_done(tStart):
 
     strTime = ('done in %.2f seconds') % (tTime)
     sys.stdout.write(_colors('OK') + strTime + _colors('ENDC') + '\n\n\n')
+    sys.stdout.flush()
 
     return
 
@@ -229,6 +234,7 @@ def warning(strWarn):
     sys.stdout.write(_colors('WARN'))
     sys.stdout.write(strWarn)
     sys.stdout.write(_colors('ENDC') + '\n')
+    sys.stdout.flush()
 
     return
 
@@ -260,6 +266,7 @@ def info(strInfo):
     sys.stdout.write(_colors('INFO'))
     sys.stdout.write(strInfo)
     sys.stdout.write(_colors('ENDC') + '\n')
+    sys.stdout.flush()
 
     return
 
@@ -299,6 +306,7 @@ def bullet_info(strDesc, strInfo):
     sys.stdout.write(strInfo)
     sys.stdout.write(_colors('ENDC'))
     sys.stdout.write('\n')
+    sys.stdout.flush()
 
     return
 
@@ -329,6 +337,7 @@ def note(strNote):
     # Write the info
     sys.stdout.write(strNote)
     sys.stdout.write('\n')
+    sys.stdout.flush()
 
     return
 
