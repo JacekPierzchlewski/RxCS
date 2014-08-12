@@ -57,7 +57,7 @@ def _sig_RMSG_ex0():
 
     # - - - - - - - - - - - - - - - -
 
-    # The number of additional tones
+    # The number of tones
     dSigConf['nTones'] = 1
 
     # - - - - - - - - - - - - - - - -
