@@ -40,9 +40,6 @@ def _sig_RMSG_ex0():
     # Start the dictionary with signal generator configuration
     dSigConf = {}
 
-    # Signal generator type: random multitone signal
-    dSigConf['strSigType'] = "RandMult"
-
     # Time of the signal is 1 ms
     dSigConf['tS'] = 1e-3
 
