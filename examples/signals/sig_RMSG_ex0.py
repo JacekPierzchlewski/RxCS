@@ -71,12 +71,17 @@ def _sig_RMSG_ex0():
     dSigConf['nSigPack'] = 1
 
     # -----------------------------------------------------------------
-    # Run the multtone signal generator
+    # Run the multitone signal generator
     dSig = rxcs.sig.sigRandMult.main(dSigConf)
+
+    # -----------------------------------------------------------------
 
     # Get the generated signal
     mSig = dSig['mSig']
     vSig = mSig[0, :]
+
+    # -----------------------------------------------------------------
+    # Analyze the signal and plot it
 
     # Get the time vector of the signal
     vTSig = dSig['vTSig']
@@ -115,7 +120,7 @@ def _sig_RMSG_ex0():
     hFig2 = plt.figure(2)
     hSubPlot1 = hFig2.add_subplot(111)
     hSubPlot1.grid(True)
-    hSubPlot1.set_title('Spectrum of a random multitone signal')
+    hSubPlot1.set_title('Random multitone signal in the time domain')
     hSubPlot1.set_xlabel('Frequency [Hz]')
     hSubPlot1.plot(vTSig, vSig, 'b-')
 
