@@ -8,7 +8,7 @@ def _dict_IFFT_ex1():
     # -----------------------------------------------------------------
     # Generate settings for the IFFT dictionary
 
-    # Start the dictionary with dictionary configuration
+    # Start the configuration dictionary
     dCSConf = {}
 
     # Time of the dictionary is 1 ms
@@ -17,14 +17,14 @@ def _dict_IFFT_ex1():
     # Time start is 10 us
     dCSConf['tStart'] = 10e-6
 
-    # The signal representation sampling frequency is 100 kHz
-    dCSConf['fR'] = 1e5
+    # The signal representation sampling frequency is 1 MHz
+    dCSConf['fR'] = 1e6
 
     # The frequency separation between tones
     dCSConf['fDelta'] = 1e3
 
     # The number of tones in the dictionary
-    dCSConf['nTones'] = 10
+    dCSConf['nTones'] = 100
 
     # -----------------------------------------------------------------
     # Generate the IFFT dictionary
@@ -34,7 +34,7 @@ def _dict_IFFT_ex1():
     # Generate the signal using the dictionary
 
     # Vector with Fourier coefficients
-    vFcoef = np.zeros((1,20)).astype(complex)
+    vFcoef = np.zeros((1,200)).astype(complex)
     vFcoef[0, 1] = -1j
     vFcoef[0, 18] = 1j
 

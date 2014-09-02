@@ -39,9 +39,6 @@ def _samp_RMSG_ANGIE_ex0():
     # Start the dictionary with signal generator configuration
     dSigConf = {}
 
-    # Signal generator type: random multitone signal
-    dSigConf['strSigType'] = "RandMult"
-
     # Time of the signal is 1 ms
     dSigConf['tS'] = 1e-3
 
@@ -77,7 +74,7 @@ def _samp_RMSG_ANGIE_ex0():
     dAcqConf['fSamp'] = 8e3
 
     # -----------------------------------------------------------------
-    # Run the multtone signal generator and the sampler
+    # Run the multitone signal generator and the sampler
     dSig = rxcs.sig.sigRandMult.main(dSigConf)            # the generator
     dObSig = rxcs.acq.nonuniANGIE.main(dAcqConf, dSig)    # the sampler
 

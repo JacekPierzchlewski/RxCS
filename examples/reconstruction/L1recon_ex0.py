@@ -223,7 +223,7 @@ def _CosDict(iTSamp, iTones, fSep):
     for inxTone in np.arange(iTones):
         fFreq = (inxTone + 1)*fSep         # Frequency of a tone
         vTone = np.cos(2*np.pi*fFreq*vT)   # Create a tone
-        mDict[:,inxTone] = vTone           # Putt he tone into the matrix
+        mDict[:,inxTone] = vTone           # Put the tone into the matrix
 
     return (vT, mDict)
 

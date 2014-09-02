@@ -8,7 +8,7 @@ def _dict_IFFT_ex0():
     # -----------------------------------------------------------------
     # Generate settings for the IFFT dictionary
 
-    # Start the dictionary with dictionary configuration
+    # Start the configuration dictionary
     dCSConf = {}
 
     # Time of the dictionary is 1 ms
@@ -38,7 +38,7 @@ def _dict_IFFT_ex0():
     vFcoef[0, 0] = 1
     vFcoef[0, 19] = 1
 
-    # Generate a signal and change its shape to a signle vector
+    # Generate a signal and change its shape to a single vector
     vSig = np.real(np.dot(vFcoef,mIFFT))
     vSig.shape = (vSig.size,)
 
