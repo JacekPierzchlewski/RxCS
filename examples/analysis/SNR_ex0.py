@@ -27,7 +27,7 @@ def _SNR_ex0():
     # -----------------------------------------------------------------
     # Sample the generated signals
 
-    dAcqConf = {}             # Init dict. with ssampler configuration
+    dAcqConf = {}             # Init dict. with sampler configuration
     dAcqConf['Tg'] = 1e-6     # The sampling grid period
     dAcqConf['fSamp'] = 40e3  # The average sampling frequency
 
@@ -90,8 +90,6 @@ def _SNR_ex0():
 
     # ---------------------------------------------------------------------
     # Measure the SNR of the reconstruction
-
-    #dAna =       # Initialize the dictionary with system analysis results
     dAnaConf = {}  # Initialize dictionary with configuration for
                    # the system analysis
 
