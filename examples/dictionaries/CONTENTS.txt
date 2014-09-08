@@ -12,6 +12,6 @@ contents:
 
     # IFFT dictionary examples:
 
-    4. dict_IFFT_ex0.py       - example #0 on how to use the IFFT dictionary
+    4. dict_IDFT_ex0.py       - example #0 on how to use the IDFT dictionary
 
-    5. dict_IFFT_ex0.py       - example #1 on how to use the IFFT dictionary
+    5. dict_IDFT_ex0.py       - example #1 on how to use the IDFT dictionary

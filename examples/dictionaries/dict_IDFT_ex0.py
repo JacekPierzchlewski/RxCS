@@ -3,10 +3,10 @@ import rxcs
 import numpy as np
 import matplotlib.pyplot as plt
 
-def _dict_IFFT_ex1():
+def _dict_IDFT_ex0():
 
     # -----------------------------------------------------------------
-    # Generate settings for the IFFT dictionary
+    # Generate settings for the IDFT dictionary
 
     # Start the configuration dictionary
     dCSConf = {}
@@ -14,36 +14,34 @@ def _dict_IFFT_ex1():
     # Time of the dictionary is 1 ms
     dCSConf['tS'] = 1e-3
 
-    # Time start is 10 us
-    dCSConf['tStart'] = 10e-6
-
-    # The signal representation sampling frequency is 1 MHz
-    dCSConf['fR'] = 1e6
+    # The signal representation sampling frequency is 40 kHz
+    dCSConf['fR'] = 4e4
 
     # The frequency separation between tones
     dCSConf['fDelta'] = 1e3
 
     # The number of tones in the dictionary
-    dCSConf['nTones'] = 100
+    dCSConf['nTones'] = 10
 
     # -----------------------------------------------------------------
-    # Generate the IFFT dictionary
-    (mIFFT, dDict) = rxcs.cs.dict.IFFToNoDC.main(dCSConf)
+    # Generate the IDFT dictionary
+    (mIDFT, dDict) = rxcs.cs.dict.IDFToNoDC.main(dCSConf)
+
+    # Get the signal time vector from the dictionary
+    vT = dDict['vT']
 
     # -----------------------------------------------------------------
     # Generate the signal using the dictionary
 
     # Vector with Fourier coefficients
-    vFcoef = np.zeros((1,200)).astype(complex)
-    vFcoef[0, 1] = -1j
-    vFcoef[0, 18] = 1j
+    vFcoef = np.zeros((1,20)).astype(complex)
+    vFcoef[0, 0] = 1
+    vFcoef[0, 19] = 1
 
-    # Generate a signal and change its shape to a signle vector
-    vSig = np.real(np.dot(vFcoef,mIFFT))
+    # Generate a signal and change its shape to a single vector
+    vSig = np.real(np.dot(vFcoef,mIDFT))
     vSig.shape = (vSig.size,)
 
-    # Get the signal time vector
-    vT = dDict['vT']
 
     # -----------------------------------------------------------------
     # Plot signal in the time domain
@@ -55,11 +53,10 @@ def _dict_IFFT_ex1():
     hSubPlot1.plot(vT, vSig)
     hSubPlot1.set_xlim(min(vT), max(vT))
     hSubPlot1.set_ylim(-1.1, 1.1)
-
     plt.show(block=True)
 
 # =====================================================================
 # Trigger when start as a script
 # =====================================================================
 if __name__ == '__main__':
-    _dict_IFFT_ex1()
+    _dict_IDFT_ex0()
