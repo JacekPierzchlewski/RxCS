@@ -21,9 +21,9 @@ def main(dCSConf):
     # - - - - - - - - - - - - - - - - - - -
 
     # =================================================================
-    # Generate the IFFT dictionary matrix
+    # Generate the IDFT dictionary matrix
     # =================================================================
-    (mDict, vF, vT) = _generateIFFToNoDC(dCSConf)
+    (mDict, vF, vT) = _generateIDFToNoDC(dCSConf)
 
     # =================================================================
     # Generate the output dictionary
@@ -85,7 +85,7 @@ def _printConf(dCSConf):
     if bMute == 0:
 
         # Print out the header of the dictionary matrix generator
-        rxcs.console.progress('Signal dictionary', 'IFFT')
+        rxcs.console.progress('Signal dictionary', 'IDFT')
 
         # - - - - - - - - - - - - - - - - - - -
 
@@ -405,7 +405,7 @@ def _isequal(iX, iY, iMargin):
 # =================================================================
 # ENGINE: generate the matrix with dictionary
 # =================================================================
-def _generateIFFToNoDC(dCSConf):
+def _generateIDFToNoDC(dCSConf):
 
     # -----------------------------------------------------------------
     # Check and get the configuration from the configuration dictionary

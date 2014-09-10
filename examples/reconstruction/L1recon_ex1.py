@@ -49,7 +49,7 @@ def _L1_recon_ex0():
     dCSConf['nTones'] = iTones   # The number of tones in the dictionary
 
     # Generate the IDFT dictionary
-    (mDict, dDict) = rxcs.cs.dict.IFFToNoDC.main(dCSConf)
+    (mDict, dDict) = rxcs.cs.dict.IDFToNoDC.main(dCSConf)
 
     # The dictionary contains separate tones in rows.
     # The optimization modules requires the Theta matrix to be column-wise,
