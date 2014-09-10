@@ -8,4 +8,6 @@ contents:
 
     3. __init__.py      - module initialization file
 
-    4, nonuniANGIE.py   - a nonuniform sampler with an ANGIE sampling scheme
+    4. nonuniANGIE.py   - a nonuniform sampler with an ANGIE sampling scheme
+
+    5. nonuniExtern.py  - a nonuniform sampler with an external sampling scheme
