@@ -743,7 +743,7 @@ def _generate_patterns(dAcqConf, dSig):
     if 'vTSig' in dSig:
         vTSig = dSig['vTSig']
     else:
-        vTSig = np.arange(int(np.round(tTau_real*fR)))
+        vTSig = (1 / fR) * np.arange(int(np.round(tTau_real*fR)))
     iT1 = vTSig[0]
 
     if iT1 == 0:  # <- If the time stamp of the first sample is zero,
