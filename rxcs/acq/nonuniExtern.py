@@ -11,14 +11,13 @@ pattern may be uniform.
 
 *Version*:
     0.1  | 1-SEP-2014 : * Initial version. |br|
+    1.0  | 12-SEP-2014 : * Initial version. |br|
 
 *License*:
     BSD 2-Clause
 """
 
 from __future__ import division
-import sys
-import math
 import time
 import rxcs
 import os.path
@@ -61,25 +60,25 @@ def main(dAcqConf, dSig):
     # =================================================================
     # Get and process the sampling patterns
     # =================================================================
-    (mPatts, mPattsRep, mPattsT) = _take_patterns(dAcqConf, dSig, dConf)
+    (mPatts, mPattsRep, mPattsT, vPattInx) = _get_patterns(dAcqConf, dSig, dConf)
 
     # =================================================================
     # Sample the signals
     # =================================================================
-    #mObSig = _sample(dConf, dSig)
+    mObSig = _sample(mPattsRep, dSig)
 
     # =================================================================
     # Generate the observation matrices
     # =================================================================
-    #m3Phi = _generObser(mPattsRep, dAcqConf, dSig)
+    m3Phi = _generObser(mPattsRep, dSig)
 
     # =================================================================
     # Generate the output dictionary
     # =================================================================
-    #dObSig = _generateOutput(dAcqConf, dSig,
-                             #mObSig,
-                             #mPatts, mPattsRep, mPattsT,
-                             #m3Phi)
+    dObSig = _generateOutput(dConf,
+                             mObSig,
+                             mPatts, mPattsRep, mPattsT, vPattInx,
+                             m3Phi)
 
     # =================================================================
     # Signal sampling is done!
@@ -87,11 +86,7 @@ def main(dAcqConf, dSig):
     if not np.isnan(tStart):   # <-tStart is nan = console output is off
         rxcs.console.module_progress_done(tStart)
 
-    #return dObSig
-    return
-
-
-
+    return dObSig
 
 
 # =================================================================
@@ -106,22 +101,26 @@ def _getConf(dAcqConf):
         dAcqConf (dictionary): dictionary with configuration for the sampler
 
     Returns:
-        bMute (float):     mute the conole output flag
-        bFile (float):     patterns from file flag (1-from file,
-                                                    0-from an argument given as
-                                                      a dictionary)
+        dConf (dictionary): dictionary with processed settings for the sampler
 
-        strFile (string):  name of the file with patterns (if bFile == 1,
-                                                           otherwise an empty
-                                                           string)
+            bMute (float):      mute the conole output flag
+            bFile (float):      patterns from file flag (1-from file,
+                                                         0-from an argument given as
+                                                         a dictionary)
 
-        dPatts  (dict):    dictionary with sampling patterns
+            strFile (string):   name of the file with patterns (if bFile == 1,
+                                                                otherwise an empty
+                                                                string)
 
-        iA    (float):     index of the first pattern to be used
-                           (if not given in the configuration, then = 0)
+            dPatts  (dict):     dictionary with sampling patterns
 
-        iB    (float):     index of the last pattern to be used
-                           (if not given in the configuration, then = np.inf)
+            iA    (float):      index of the first pattern to be used
+                                (if not given in the configuration, then = 0)
+
+            iB    (float):      index of the last pattern to be used
+                                (if not given in the configuration, then = np.inf)
+
+            vPattInx (vector):  given indices of patterns to be used
 
     """
 
@@ -160,6 +159,15 @@ def _getConf(dAcqConf):
         raise NameError(strError)
 
     # -----------------------------------------------------------------
+    # Take the given indices of the sampling patterns
+    if not 'vPattInx' in dAcqConf:
+        vPattInx = np.array([])
+    else:
+        vPattInx = dAcqConf['vPattInx']
+        vPattInx = vPattInx.astype(int)
+        vPattInx = vPattInx.reshape(vPattInx.size)
+
+    # -----------------------------------------------------------------
     # Take the indices of first and last sampling pattens to be used
     if not 'iA' in dAcqConf:
         iA = 0
@@ -174,12 +182,13 @@ def _getConf(dAcqConf):
     # -----------------------------------------------------------------
     # Create the configuration dictionary
     dConf = {}
-    dConf['bMute'] = bMute       # mute the conole output flag
-    dConf['bFile'] = bFile       # patterns from file flag
-    dConf['strFile'] = strFile   # name of the file with patterns
-    dConf['dPatts'] = dPatts     # dictionary with sampling patterns
-    dConf['iA'] = iA             # index of the first pattern to be used
-    dConf['iB'] = iB             # index of the last pattern to be used
+    dConf['bMute'] = bMute         # mute the conole output flag
+    dConf['bFile'] = bFile         # patterns from file flag
+    dConf['strFile'] = strFile     # name of the file with patterns
+    dConf['dPatts'] = dPatts       # dictionary with sampling patterns
+    dConf['iA'] = iA               # index of the first pattern to be used
+    dConf['iB'] = iB               # index of the last pattern to be used
+    dConf['vPattInx'] = vPattInx   # given indices of patterns to be used
 
     # -----------------------------------------------------------------
     return (dConf)
@@ -193,8 +202,8 @@ def _printConf(dSig, dConf):
     This function prints the configuration of the sampler to the console.
 
     Args:
-        dAcqConf (dictionary): dictionary with configuration for the sampler
         dSig (dictionary): dictionary with the signals to be sampled
+        dConf (dictionary): dictionary with processed settings for the sampler
 
     Returns:
         tStart (float): time stamp of the beginning of sampling
@@ -202,12 +211,13 @@ def _printConf(dSig, dConf):
 
     # -----------------------------------------------------------------
     # Get the configuration fields from the configuration dictionary
-    bMute = dConf['bMute']       # mute the conole output flag
-    bFile = dConf['bFile']       # patterns from file flag
-    strFile = dConf['strFile']   # name of the file with patterns
-    dPatts = dConf['dPatts']     # dictionary with sampling patterns
-    iA = dConf['iA']             # index of the first pattern to be used
-    iB = dConf['iB']             # index of the last pattern to be used
+    bMute = dConf['bMute']        # mute the conole output flag
+    bFile = dConf['bFile']        # patterns from file flag
+    strFile = dConf['strFile']    # name of the file with patterns
+    dPatts = dConf['dPatts']      # dictionary with sampling patterns
+    iA = dConf['iA']              # index of the first pattern to be used
+    iB = dConf['iB']              # index of the last pattern to be used
+    vPattInx = dConf['vPattInx']  # given indices of patterns to be used
 
     # -----------------------------------------------------------------
     # Get the parameters of the sampling patterns
@@ -219,9 +229,8 @@ def _printConf(dSig, dConf):
      tS_r) = _getPatternsParam(dPatts)
 
     # -----------------------------------------------------------------
-    # Get the representation sampling frequency of signals to be sampled,
-    # the number of signals and the time of the signals
-    (_, nSigs, fR, tS) = _getSigs(dSig)
+    # Get the representation sampling frequency of signals to be sampled
+    (_, _, fR, _) = _getSigs(dSig)
 
    #----------------------------------------------------------------------
     # Print the configuration if the 'mute' flag is not set
@@ -247,22 +256,28 @@ def _printConf(dSig, dConf):
                            'patterns')
 
         # - - - - - - - - - - - - - - - - - - -
-        # Indices of patterns to be used
-        if iA == 0:
-            rxcs.console.info('All the available patterns will be used')
+        # Given indices of patterns to be used
+        if vPattInx.size > 0:
+            rxcs.console.info('User gave indices of patterns to be used')
+
+        # - - - - - - - - - - - - - - - - - - -
+        # First/last Indices of patterns to be used
         else:
-            rxcs.console.bullet_param('Index of the first pattern to be used',
-                                      iA,' ','')
-
-            if np.isinf(iB):
-                rxcs.console.param('The number of pattern to be used',
-                                          nPatts-iA + 1,'-','patterns')
+            if iA == 0:
+                rxcs.console.info('All the available patterns will be used')
             else:
-                rxcs.console.param('Index of the last pattern to be used',
-                                          iB,' ','')
+                rxcs.console.bullet_param('Index of the first pattern to be used',
+                                        iA,' ','')
 
-                rxcs.console.param('The number of pattern to be used',
-                                          iB-iA + 1,'-','patterns')
+                if np.isinf(iB):
+                    rxcs.console.param('The number of pattern to be used',
+                                            nPatts-iA + 1,'-','patterns')
+                else:
+                    rxcs.console.param('Index of the last pattern to be used',
+                                            iB,' ','')
+
+                    rxcs.console.param('The number of pattern to be used',
+                                            iB-iA + 1,'-','patterns')
 
         # - - - - - - - - - - - - - - - - - - -
 
@@ -304,6 +319,7 @@ def _checkConf(dAcqConf, dSig, dConf):
     Args:
         dAcqConf (dictionary): dictionary with configuration for the sampler
         dSig (dictionary): dictionary with the signals to be sampled
+        dConf (dictionary): dictionary with processed settings for the sampler
 
     Returns:
         nothing
@@ -316,12 +332,10 @@ def _checkConf(dAcqConf, dSig, dConf):
 
     # -----------------------------------------------------------------
     # Get the configuration fields from the configuration dictionary
-    bMute = dConf['bMute']       # mute the conole output flag
-    bFile = dConf['bFile']       # patterns from file flag
-    strFile = dConf['strFile']   # name of the file with patterns
-    dPatts = dConf['dPatts']     # dictionary with sampling patterns
-    iA = dConf['iA']             # index of the first pattern to be used
-    iB = dConf['iB']             # index of the last pattern to be used
+    dPatts = dConf['dPatts']      # dictionary with sampling patterns
+    iA = dConf['iA']              # index of the first pattern to be used
+    iB = dConf['iB']              # index of the last pattern to be used
+    vPattInx = dConf['vPattInx']  # given indices of patterns to be used
 
     # -----------------------------------------------------------------
     # Get the parameters of the sampling patterns
@@ -356,31 +370,48 @@ def _checkConf(dAcqConf, dSig, dConf):
         raise ValueError(strError)
 
     # -----------------------------------------------------------------
-    # Check indices of the first and last patterns to be used
-    if not (iA >= 0):
-        strError = ('Index of the first pattern to be used (iA) must be')
-        strError = strError + (' higher than zero')
-        raise ValueError(strError)
+    # Check indices given by user
+    if vPattInx.size > 0:
+        if vPattInx.size != nSigs:
+            strError = ('The number of indices given in \'vPattInx\' must equal ')
+            strError = strError + ('the number of signals')
+            raise ValueError(strError)
 
-    if not (iB >= iA):
-        strError = ('Index of the last pattern to be used (iB) must be')
-        strError = strError + (' higher or equal to the index of the first')
-        strError = strError + (' pattern to be used (iA)')
-        raise ValueError(strError)
+        if vPattInx.min() < 1:
+            strError = ('Indices given in \'vPattInx\' must be higher then 1!')
+            raise ValueError(strError)
 
-    if not (nPatts >= iA):
-        strError = ('Index of the first pattern to be used (iA) must be')
-        strError = strError + ('lower or equal to the number of patterns')
-        raise ValueError(strError)
+        if vPattInx.max() > nPatts:
+            strError = ('Indices given in \'vPattInx\' must not be higher then the number of ')
+            strError = strError + ('patterns!')
+            raise ValueError(strError)
 
-    if not np.isinf(iB) and (iA > 0):
-        if not (nPatts >= iB):
-            strError = ('Index of the last pattern to be used (iB) must be ')
+    # Check first/last indices given by user
+    else:
+        # Check indices of the first and last patterns to be used
+        if not (iA >= 0):
+            strError = ('Index of the first pattern to be used (iA) must be')
+            strError = strError + (' higher than zero')
+            raise ValueError(strError)
+
+        if not (iB >= iA):
+            strError = ('Index of the last pattern to be used (iB) must be')
+            strError = strError + (' higher or equal to the index of the first')
+            strError = strError + (' pattern to be used (iA)')
+            raise ValueError(strError)
+
+        if not (nPatts >= iA):
+            strError = ('Index of the first pattern to be used (iA) must be')
             strError = strError + ('lower or equal to the number of patterns')
             raise ValueError(strError)
 
-    # -----------------------------------------------------------------
+        if not np.isinf(iB) and (iA > 0):
+            if not (nPatts >= iB):
+                strError = ('Index of the last pattern to be used (iB) must be ')
+                strError = strError + ('lower or equal to the number of patterns')
+                raise ValueError(strError)
 
+    # -----------------------------------------------------------------
 
     return
 
@@ -389,6 +420,15 @@ def _checkConf(dAcqConf, dSig, dConf):
 # Read the file with sampling patterns
 # =================================================================
 def _readFile(strFile):
+    """
+    This function reads the file with sampling patterns.
+
+    Args:
+        strFile (string):  name of the file (together with a path)
+
+    Returns:
+        dPatts (dictionary):  dictionary with sampling patterns and their parameters
+    """
 
     # Check fi the file exists
     if os.path.isfile(strFile) == False:
@@ -468,6 +508,17 @@ def _getSigs(dSig):
 # Get the parameters of the sampling patterns
 # =================================================================
 def _getPatternsParam(dPatts):
+    """
+    This function get the parameters from the dictionary with sampling patterns
+
+    Args:
+        dPatts (dictionary):  dictionary with sampling patterns and their parameters
+
+    Returns:
+        nPatts (int): the number of patterns
+        Tg (float): patterns sampling grid
+        tS_r (float): the time of sampling patterns
+    """
 
     # -----------------------------------------------------------------
     # Get the number of patterns
@@ -506,7 +557,23 @@ def _getPatternsParam(dPatts):
 # =================================================================
 # Get and process the sampling patterns
 # =================================================================
-def _take_patterns(dAcqConf, dSig, dConf):
+def _get_patterns(dAcqConf, dSig, dConf):
+    """
+    Chhose and process the patterns from the source of sampling patterns.
+
+    Args:
+        dAcqConf (dictionary): dictionary with configuration for the sampler
+        dSig (dictionary): dictionary with the signals to be sampled
+        dConf (dictionary): dictionary with processed settings for the sampler
+
+    Returns:
+        mPatts (matrix):     matrix with sampling pattens (one pattern p signal)
+        mPattsRep (matrix):  matrix with sampling pattens expressed in signals representation
+                             sampling points (one pattern p signal)
+
+        mPattsT (matrix):    matrix with time moments of sampling
+        vPattInx (matrix):   vector with indices of chosen sampling patterns
+    """
 
     # -----------------------------------------------------------------
     # Get the representation sampling frequency of signals to be sampled,
@@ -515,12 +582,13 @@ def _take_patterns(dAcqConf, dSig, dConf):
 
     # -----------------------------------------------------------------
     # Get the configuration fields from the configuration dictionary
-    bMute = dConf['bMute']       # mute the conole output flag
-    bFile = dConf['bFile']       # patterns from file flag
-    strFile = dConf['strFile']   # name of the file with patterns
-    dPatts = dConf['dPatts']     # dictionary with sampling patterns
-    iA = dConf['iA']             # index of the first pattern to be used
-    iB = dConf['iB']             # index of the last pattern to be used
+    bMute = dConf['bMute']        # mute the conole output flag
+    bFile = dConf['bFile']        # patterns from file flag
+    strFile = dConf['strFile']    # name of the file with patterns
+    dPatts = dConf['dPatts']      # dictionary with sampling patterns
+    iA = dConf['iA']              # index of the first pattern to be used
+    iB = dConf['iB']              # index of the last pattern to be used
+    vPattInx = dConf['vPattInx']  # given indices of patterns to be used
 
     # -----------------------------------------------------------------
     # Get the parameters of the sampling patterns
@@ -531,15 +599,17 @@ def _take_patterns(dAcqConf, dSig, dConf):
      Tg,
      tS_r) = _getPatternsParam(dPatts)
 
-
     # --------------------------------------------------------------
-    # Generate a random index of a sampling patterns for every signal to
+    # Take or generate  a random index of a sampling patterns for every signal to
     # be sampled
-    vPattInx = np.random.randint(iA-1, iB, nSigs)
+    if vPattInx.size == 0:
+        if iA > 0:
+            vPattInx = np.random.randint(iA, iB+1, nSigs)
+        else:
+            vPattInx = np.random.randint(0, nPatts, nSigs)   # <- Take all the patterns
 
     # Take a pattern for every signal
-    mPatts = dPatts['mPatternsGrid'][vPattInx, :]
-
+    mPatts = dPatts['mPatternsGrid'][vPattInx - 1, :]
 
     # --------------------------------------------------------------
     # Recalculate the patterns to the signal representation frequency
@@ -547,40 +617,38 @@ def _take_patterns(dAcqConf, dSig, dConf):
     # Compute the number of signal representation points which equals
     # one grid point
     iGridvsRep = int(np.round((Tg * fR)))
+    mPattsRep = iGridvsRep * mPatts
 
+    # --------------------------------------------------------------
+    # Recalculate the indices of sampling points to the time moments of sampling
     # Get the time vector of the original signal (if it is given)
-    # and the first sample
     if 'vTSig' in dSig:
         vTSig = dSig['vTSig']
     else:
-        vTSig = np.arange(int(np.round(tTau_real*fR)))
-    iT1 = vTSig[0]
+        vTSig = (1/fR) * np.arange(int(np.round(tTau_real*fR)))
 
-    if iT1 == 0:  # <- If the time stamp of the first sample is zero,
-                  #    then the sampler should count the grid indices from zero.
-                  #    By default the grid indices counts from 1, so there is
-                  #    a need to decrease the gird indices by 1
-        mPatts = mPatts - 1
-        mPattsRep = iGridvsRep * mPatts
-    else:
-        mPattsRep = iGridvsRep * mPatts
-        mPattsRep = mPattsRep - 1
+    mPattsT = np.nan*np.ones(mPattsRep.shape)
+    for inxPat in np.arange(nSigs):  # <- loop over all the patterns (there is one pattern p. signal)
 
-    # --------------------------------------------------------------
-    # Recalculate the patterns to the time moments
-    mPattsT = vTSig[mPattsRep]
+        # Take the pattern and clear it (remove -1)
+        vPatt = mPattsRep[inxPat,:]
+        vPatt = vPatt[vPatt >= 0]
+        nSampPts = vPatt.size   # The number of sampling points in a pattern
+
+        # Take the time sampling points
+        mPattsT[inxPat,np.arange(nSampPts)] = vTSig[vPatt-1]
 
     # --------------------------------------------------------------
 
-    return (mPatts, mPattsRep, mPattsT)
+    return (mPatts, mPattsRep, mPattsT, vPattInx)
 
 
 # =================================================================
-# Sample the signals using the generated patterns
+# Sample the signals using the acquired patterns
 # =================================================================
 def _sample(mPattsRep, dSig):
     """
-    This function samples signals using the previously generated
+    This function samples signals using the previously acquired
     sampling patterns.
 
     Args:
@@ -596,9 +664,20 @@ def _sample(mPattsRep, dSig):
     (mSig, nSigs, _, _) = _getSigs(dSig)
 
     # -----------------------------------------------------------------
-
     # Sample the signals
-    mObSig = (mSig[np.arange(nSigs), mPattsRep.T]).T
+
+    # Allocate the matrix for the sampled signal
+    mObSig = np.nan*np.ones(mPattsRep.shape)
+
+    for inxPat in np.arange(nSigs):  # <- loop over all the patterns (there is one pattern p. signal)
+
+        # Take the pattern and clear it (remove -1)
+        vPatt = mPattsRep[inxPat,:]
+        vPatt = vPatt[vPatt >= 0]
+        nSampPts = vPatt.size   # The number of sampling points in a pattern
+
+        # Take the time sampling points
+        mObSig[inxPat,np.arange(nSampPts)] = mSig[inxPat,vPatt-1]
 
     # -----------------------------------------------------------------
     return mObSig
@@ -607,13 +686,12 @@ def _sample(mPattsRep, dSig):
 # =================================================================
 # Generate the observation matrix
 # =================================================================
-def _generObser(mPattsRep, dAcqConf, dSig):
+def _generObser(mPattsRep, dSig):
     """
     This function generates the observation matrices.
 
     Args:
         mPattsRep (matrix): the sampling patterns (signal rep. sampling points)
-        dAcqConf (dictionary): dictionary with configuration for the sampler
         dSig (dictionary): dictionary with the signals to be sampled
 
     Returns:
@@ -628,38 +706,24 @@ def _generObser(mPattsRep, dAcqConf, dSig):
     # Calculate the number of representation samples in the signals
     nSmp = int(round(tS * fR))
 
-    # -----------------------------------------------------------------
-    # Compute the real parameters of the sampling patterns
-
-    # nPatts      -  the number of patterns to be generated
-    # nK_s        -  the expected number of sampling points in a pattern
-    (nPatts,
-     _,
-     _,
-     nK_s,
-     _,
-     _,
-     _,
-     _,
-     _,
-     _,
-     _) = _computeRealParam(dAcqConf, dSig)
+    # Calculate the number of patterns and the number of sampling points in patterns
+    (nPatts, nSamp) = mPattsRep.shape
 
     # -----------------------------------------------------------------
-
     # Allocate the observation matrices
-    m3Phi = np.zeros((nPatts, nK_s, nSmp))
+    m3Phi = np.zeros((nPatts, nSamp, nSmp))
 
     # Generate the observation matrices
     for inxPat in np.arange(nPatts):  # <- loop over all observation matrices
 
         # Get the current pattern
-        vPatts = mPattsRep[inxPat, :]
+        vPatt = mPattsRep[inxPat, :]
+        vPatt = vPatt[vPatt >= 0]
 
         # Generate the current observation matrix
         inxRow = 0
-        for inxCol in vPatts:    # <- loop over all samling points in pattern
-            m3Phi[inxPat, inxRow, inxCol] = 1
+        for inxCol in vPatt:    # <- loop over all samling points in pattern
+            m3Phi[inxPat, inxRow, inxCol-1] = 1
             inxRow = inxRow + 1
 
     # -----------------------------------------------------------------
@@ -669,17 +733,20 @@ def _generObser(mPattsRep, dAcqConf, dSig):
 # =================================================================
 # Generate the output dictionary
 # =================================================================
-def _generateOutput(dAcqConf, dSig, mObSig, mPatts, mPattsRep, mPattsT, m3Phi):
+def _generateOutput(dConf, mObSig, mPatts, mPattsRep, mPattsT, vPattInx, m3Phi):
     """
     This function generates the output dictionary.
 
     Args:
-        dAcqConf (dictionary): dictionary with configuration for the sampler
-        dSig (dictionary): dictionary with the signals to be sampled
+        dConf (dictionary): dictionary with processed settings for the sampler
+
         mObSig (matrix):  the observed signals
+
         mPatts (matrix): the sampling patterns (grid indices)
         mPattsRep (matrix): the sampling patterns (signal rep. sampling points)
         mPattsT (matrix): the sampling patterns (time moments)
+        vPattInx (vector): the vector with indices of chosen sampling patterns
+
         m3Phi (3D matrix): observation matrices
 
     Returns:
@@ -687,40 +754,13 @@ def _generateOutput(dAcqConf, dSig, mObSig, mPatts, mPattsRep, mPattsT, m3Phi):
     """
 
     # -----------------------------------------------------------------
-    # Get the sampling grid period from the configuration dictionary
+    # Get the parameters of the sampling patterns
+    # Tg        -  patterns sampling grid
+    # tS_r      -  the time of sampling patterns
     (_,
-     _,
-     _,
      Tg,
-     _,
-     _,
-     _,
-     _) = _getConf(dAcqConf)
+     tS_r) = _getPatternsParam(dConf['dPatts'])
 
-    # -----------------------------------------------------------------
-    # Compute the real parameters of the sampling patterns
-
-    # nK_g        -  the number of grid points in a sampling pattern
-    # tTau_real   -  the real time of sampling patterns
-    # nK_s        -  the expected number of sampling points in a pattern
-    # f_s         -  the expected average sampling frequency
-    # nT          -  the expected average sampling period (as grid pts)
-    # tT_s        -  the expected average sampling period
-    # nK_min      -  min t between the samp pts as the number of grid pts
-    # nK_max      -  max t between the samp pts as the number of grid pts
-    # tMin_real   -  the real minimum time between sampling points
-    # tMax_real   -  the real maximum time between sampling points
-    (_,
-     nK_g,
-     tTau_real,
-     nK_s,
-     f_s,
-     nT,
-     tT_s,
-     nK_min,
-     nK_max,
-     tMin_real,
-     tMax_real) = _computeRealParam(dAcqConf, dSig)
 
     # -----------------------------------------------------------------
     # Initialize the output dictionary
@@ -739,41 +779,17 @@ def _generateOutput(dAcqConf, dSig, mObSig, mPatts, mPattsRep, mPattsT, m3Phi):
     dObSig['mPattsRep'] = mPattsRep   # The sampling patterns (signal
                                       # representation sampling points)
 
+    dObSig['vPattInx'] = vPattInx     # The vector with indices of chosen sampling patterns
+
     # - - - - - - - - - - - - - - - - - -
 
     dObSig['m3Phi'] = m3Phi           # The observation matrices
 
     # - - - - - - - - - - - - - - - - - -
 
-    dObSig['Tg'] = Tg       # The grid period
+    dObSig['Tg'] = Tg           # The patterns sampling grid
 
-    dObSig['nK_g'] = nK_g   # The number of grid points in a sampling pattern
-
-    dObSig['tTau_real'] = tTau_real   # The real time of sampling patterns
-
-    # - - - - - - - - - - - - - - - - - -
-
-    dObSig['nK_s'] = nK_s   # The number of sampling points in a pattern
-
-    dObSig['f_s'] = f_s   # The expected average sampling frequency
-
-    dObSig['nT'] = nT     # The expected average sampling period (as grid pts)
-
-    dObSig['tT_s'] = tT_s  # The expected average sampling period
-
-    # - - - - - - - - - - - - - - - - - -
-
-    dObSig['nK_min'] = nK_min   # Min t between the samp pts
-                                # (as the number of grid pts)
-
-    dObSig['nK_max'] = nK_max   # Max t between the samp pts
-                                # (as the number of grid pts)
-
-    dObSig['tMin_real'] = tMin_real   # The real minimum time between sampling
-                                      # points
-
-    dObSig['tMax_real'] = tMax_real   # The real maximum time between sampling
-                                      # points
+    dObSig['tS_r'] = tS_r       # The time of sampling patterns
 
     # - - - - - - - - - - - - - - - - - -
 
