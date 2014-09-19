@@ -12,6 +12,7 @@ THe sampling aptterns are generated using ANGIE scheme.
     0.2  | 27-MAY-2014 : * Docstrings added. |br|
     1.0  | 27-MAY-2014 : * Version 1.0 is ready. |br|
     1.1  | 11-JUN-2014 : * Observation matrices added to the output. |br|
+    1.1r1| 18-SEP-2014 : * Bug in checking time of patterns is fixed. |br|
 
 *License*:
     BSD 2-Clause
@@ -318,7 +319,7 @@ def _checkConf(dAcqConf, dSig):
     # -----------------------------------------------------------------
     # Check if the time of patterns is equal to the time of signals to be
     # sampled
-    if tTau_real != tS:
+    if (tTau_real - tS) > tS/1e12:
         strError = ('The real time of patterns is different than the time ')
         strError = strError + ('of signals to be sampled')
         raise ValueError(strError)
