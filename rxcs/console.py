@@ -206,6 +206,45 @@ def module_progress_done(tStart):
 
     return
 
+# =====================================================================
+# Finish the module progress print + print the time of execution
+# (with 1 newline instead of 3)
+# =====================================================================
+def module_progress_doneNoNew(tStart):
+    """
+    Function adds 'done' to a console message previously printed by a
+    'module_progress' function. |br|
+
+    Additionally, the function print an info about an execution time of a
+    module, based on the time stamp of the start of the module.  |br|
+
+    This function do not add new lines after 'done'.
+
+    The function takes care of the proper coloring of the console output. |br|
+
+    >>> tStart = console.module_progress('The module X is starting')
+    >>> time.sleep(1)
+    >>> console.module_progress_doneNoNew(tStart)
+
+    gives an output:
+
+    :bash:`|        > The module X is starting...done in 1.00 seconds`
+
+    Args:
+        tStart (float): time stamp of the start
+
+    Returns:
+        nothing
+    """
+
+    # Measure the time
+    tTime = time.time() - tStart
+
+    strTime = ('done in %.2f seconds') % (tTime)
+    sys.stdout.write(_colors('OK') + strTime + _colors('ENDC') + '\n')
+    sys.stdout.flush()
+
+    return
 
 # =====================================================================
 # Print a warning
