@@ -29,7 +29,7 @@ from cvxopt import matrix
 import matplotlib.pyplot as plt
 
 
-def _L1_recon_ex0():
+def _L1_recon_ex1():
 
     # ---------------------------------------------------------------------
     # Settings for the example
@@ -243,4 +243,4 @@ def _L1_recon_ex0():
 # Trigger when start as a script
 # =====================================================================
 if __name__ == '__main__':
-    _L1_recon_ex0()
+    _L1_recon_ex1()
