@@ -355,7 +355,7 @@ def _checkConf(dAcqConf, dSig, dConf):
     # -----------------------------------------------------------------
     # Check if the time of patterns is equal to the time of signals to be
     # sampled
-    if tS_r != tS:
+    if np.abs(tS_r - tS) > (tS/1e-6):
         strError = ('The real time of patterns is different than the time ')
         strError = strError + ('of signals to be sampled')
         raise ValueError(strError)
