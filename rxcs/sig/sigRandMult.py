@@ -141,6 +141,7 @@ def main(dSigConf):
     # fR        -  signal representation sampling frequency
     # iSNR      -  signal-to-noise-ratio
     # iP        -  power of the signal
+    # fMin      -  minimum frequency of the signal spectrum
     # fMax      -  maximum frequency
     # fRes      -  signal resolution frequency
     # vFrqs     -  vector with specified freqs
@@ -153,12 +154,14 @@ def main(dSigConf):
     # iMinPhs   -  minimum phase of random tones
     # iGraPhs   -  gradation of phase of random tones
     # iMaxPhs   -  maximum phase of random tones
+    # fMin      -  minimum frequency of additional tones
     (nSigs,
      bMute,
      tS,
      fR,
      iSNR,
      iP,
+     fMin,
      fMax,
      fRes,
      vFrqs,
@@ -187,7 +190,7 @@ def main(dSigConf):
     # =================================================================
 
     # Draw frequencies of the signals
-    mFrqsInx = _drawFreq(vFrqs, nTones, fMax, nSigs, fRes)
+    mFrqsInx = _drawFreq(vFrqs, nTones, fMin, fMax, nSigs, fRes)
 
     # Draw amplitudes of the signals
     mAmps = _drawAmps(vAmps, nTones, nSigs, iMinAmp, iGraAmp, iMaxAmp)
@@ -281,6 +284,7 @@ def _getConf(dSigConf):
         fR (float):        signal representation sampling frequency
         iSNR (float):      signal-to-noise-ratio
         iP (float):        power of the signal
+        fMin (float):      minimum frequency of additional tones
         fMax (float):      maximum frequency
         fRes (float):      signal resolution frequency
         vFrqs (vector):    vector with specified freqs
@@ -297,7 +301,10 @@ def _getConf(dSigConf):
 
     # -----------------------------------------------------------------
     # Get the number of signals to be generated
-    nSigs = int(round(dSigConf['nSigPack']))
+    #print(dSigConf['nSigPack'])
+    #print(int(np.round(dSigConf['nSigPack'])))
+    
+    nSigs = int(np.round(dSigConf['nSigPack']))
 
     # -----------------------------------------------------------------
     # Mute the output parameters:
@@ -435,12 +442,21 @@ def _getConf(dSigConf):
         iMaxPhs = 90
 
     # -----------------------------------------------------------------
+    # Get the minimum frequency of additional tones
+    # If it is not given, it is equal to the signal spectrum resolution fRes 
+    if 'fMin' in dSigConf:
+        fMin = dSigConf['fMin']
+    else:
+	fMin = fRes
+	
+    # -----------------------------------------------------------------
     return (nSigs,            # the number of signals
             bMute,            # mute the conole output flag
             tS,               # time of the signal
             fR,               # signal representation sampling frequency
             iSNR,             # signal-to-noise-ratio
             iP,               # power of the signal
+            fMin,             # minimum frequncy of tones in he spectrum
             fMax,             # maximum frequency
             fRes,             # signal resolution frequency
             vFrqs,            # vector with specified freqs
@@ -453,7 +469,7 @@ def _getConf(dSigConf):
             iMinPhs,          # minimum phase of random tones
             iGraPhs,          # gradation of phase of random tones
             iMaxPhs)          # maximum phase of random tones
-
+	    	      
 
 # =================================================================
 # Check the configuration
@@ -479,6 +495,7 @@ def _checkConf(dSigConf):
     # fR        -  signal representation sampling frequency
     # iSNR      -  signal-to-noise-ratio
     # iP        -  power of the signal
+    # fMin       - minimum frequncy of tones in he spectrum
     # fMax      -  maximum frequency
     # fRes      -  signal resolution frequency
     # vFrqs     -  vector with specified freqs
@@ -497,6 +514,7 @@ def _checkConf(dSigConf):
      fR,
      iSNR,
      iP,
+     fMin,                 
      fMax,
      fRes,
      vFrqs,
@@ -517,6 +535,24 @@ def _checkConf(dSigConf):
         raise ValueError(strErr)
 
     #----------------------------------------------------------------------
+    # Check the lowest possible frequency in the signal vs spectrum
+    # resolution
+    strErr = 'The lowest possible frequency in the signal is not a multiple '
+    strErr = strErr + 'of the signal spectrum resolution'
+    if (round(fMin/fRes) - fMin/fRes) > 1e-15:
+        raise ValueError(strErr)
+
+    strErr = 'The lowest possible frequency in the signal must be higher '
+    strErr = strErr + 'than zero'
+    if fMin <= 0:
+        raise ValueError(strErr)
+
+    strErr = 'The lowest possible frequency in the signal must not be higher '
+    strErr = strErr + 'than the highest frequency in the signal'
+    if fMin > fMax:
+        raise ValueError(strErr)
+      
+    #----------------------------------------------------------------------
     # Check the highest possible frequency in the signal vs spectrum
     # resolution
     strErr = 'The highest possible frequency in the signal is not a multiple '
@@ -528,7 +564,8 @@ def _checkConf(dSigConf):
     # Check if there is a space for all the frequencies requested in
     # the signal
     nFG = vFrqs.size   # the number of given frequencies
-    nSpectTones = int(fMax/fRes)  # number of tones in max possible spectrum
+    nSpectTones = int(fMax/fRes) - int(fMin/fRes) + 1 # number of tones in 
+                                                      # max possible spectrum
     nSigTones = nFG + nTones  # the total number of tones
 
     strErr = 'The signal spectrum consists of %d tones. ' % (nSpectTones)
@@ -579,6 +616,12 @@ def _checkConf(dSigConf):
             if vFrqs[inxFreq] <= 0:
                 strErr = ('Frequencies in the vFrqs must be higher than 0!')
                 raise ValueError(strErr)
+	      
+	# 5. min frequency:
+        if min(vFrqs) < fMin:
+            strErr = ('The lowest frequency in vFrqs vector is lower than ')
+            strErr = strErr + ('the lowest possible in the signal spectrum!')
+            raise ValueError(strErr)	
 
     # Check the vector with given frequencies is equal to
     # the vector with given amplitudes
@@ -720,6 +763,7 @@ def _printParam(dSigConf):
     # fR        -  signal representation sampling frequency
     # iSNR      -  signal-to-noise-ratio
     # iP        -  power of the signal
+    # fMin      -  minimum frequncy of tones in he spectrum    
     # fMax      -  maximum frequency
     # fRes      -  signal resolution frequency
     # vFrqs     -  vector with specified freqs
@@ -738,6 +782,7 @@ def _printParam(dSigConf):
      fR,
      iSNR,
      iP,
+     fMin,
      fMax,
      fRes,
      vFrqs,
@@ -779,13 +824,15 @@ def _printParam(dSigConf):
         nSigTones = nFG + nTones
 
         # The number of tones in the maximum possible signal spectrum
-        nSpectTones = int(fMax/fRes)
+        nSpectTones = int(fMax/fRes) - int(fMin/fRes) + 1
 
         # Calculate the signal sparsity
         iSpar = 1 - nSigTones / nSpectTones
 
         rxcs.console.bullet_param('the highest possible freq. in the signal',
                                   fMax, '-k', 'Hz')
+	if fMin != fRes:
+	    rxcs.console.param('the lowest possible freq. in the signal', fMin, 'k', 'Hz')	  
         rxcs.console.param('signal spectrum resolution', fRes, 'k', 'Hz')
         rxcs.console.param('the number of tones in the max possible spectrum',
                            nSpectTones, '-', '')
@@ -846,7 +893,7 @@ def _printParam(dSigConf):
 # =================================================================
 # Draw frequencies of the signals
 # =================================================================
-def _drawFreq(vFrqs, nTones, fMax, nSigs, fRes):
+def _drawFreq(vFrqs, nTones, fMin, fMax, nSigs, fRes):
     """
     This function draws frequencies of tones for all the signals
     according to the rules specified by users,
@@ -854,6 +901,7 @@ def _drawFreq(vFrqs, nTones, fMax, nSigs, fRes):
     Args:
         vFrqs (vector):  vector with specified frequencies
         nTones (int):    the number of additional tones
+        fMin (int):      the min allowed frequency in the signal spectrum
         fMax (int):      the max allowed frequency in the signal spectrum
         nSigs (int):     the number of signals to be generated
         fRes (int):      signal spectrum resolution
@@ -868,7 +916,7 @@ def _drawFreq(vFrqs, nTones, fMax, nSigs, fRes):
     """
 
     # The number of tones in the maximum possible signal spectrum
-    nSpectTones = int(fMax/fRes)
+    nSpectTones = int(fMax/fRes) - int(fMin/fRes) + 1
 
     #----------------------------------------------------------------------
     # Recalculate frequencies to indices of tones in the spectrum
@@ -884,11 +932,17 @@ def _drawFreq(vFrqs, nTones, fMax, nSigs, fRes):
     #----------------------------------------------------------------------
     # Create the vector with indices of avaialble frequencies in the spectrum
 
-    # Create a vector with inidces of all the tones in the spectrum
-    vSpecInx = np.arange(1, nSpectTones + 1)
+    # Create a vector with indices of all the available tones in the spectrum
+    vSpecInx = np.arange(1, int(fMax/fRes) + 1)
 
     # Boolean vector which indicates if the frequency is free
-    vFreqIsFree = np.ones(nSpectTones).astype(bool)
+    vFreqIsFree = np.ones(int(fMax/fRes)).astype(bool)
+    
+    # Mark all the frequencies below min frequency as unavailable 
+    for inxF in np.arange(int(fMin/fRes)-1):
+	vFreqIsFree[inxF] = 0
+
+    # Mark the frequencies taken by vFreq vector as unavailable
     vFreqIsFree[vFrqsInx_ - 1] = 0
 
     # Create the vector with indices of available frequencies
