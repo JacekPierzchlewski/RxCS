@@ -139,6 +139,7 @@ def main(dCSConf):
     # Return the matrix with signal coefficients
     return mCoef
 
+
 # =================================================================
 # Print the configuration of the module to the console
 # =================================================================
