@@ -43,12 +43,12 @@ def _L1_recon_ex2():
     # Generate the signal
     # -----------------------------------------------------------------
     dSigConf = {}
-    dSigConf['tS'] = iT       # Time of the signal
-    dSigConf['fR'] = fRS      # The signal representation sampling frequency
-    dSigConf['fMax'] = fD*Nt  # The highest possible frequency in the signal
-    dSigConf['fRes'] = fD     # The signal spectrum resolution is 1 kHz
-    dSigConf['nTones'] = 3    # The number of tones in the signal
-    dSigConf['nSigPack'] = 1  # The number of signals to be generated
+    dSigConf['tS'] = iT        # Time of the signal
+    dSigConf['fR'] = fRS       # The signal representation sampling frequency
+    dSigConf['fMax'] = fD*Nt   # The highest possible frequency in the signal
+    dSigConf['fRes'] = fD      # The signal spectrum resolution is 1 kHz
+    dSigConf['nTones'] = 3     # The number of tones in the signal
+    dSigConf['nSigPack'] = 1   # The number of signals to be generated
     dSig = rxcs.sig.sigRandMult.main(dSigConf)
 
     # -----------------------------------------------------------------
@@ -58,9 +58,13 @@ def _L1_recon_ex2():
     # Generate settings for the sampler
     dAcqConf = {}
     dAcqConf['Tg'] = 1e-6       # The sampling grid period
-    dAcqConf['fSamp'] = 120e3   # The average sampling frequency
+    dAcqConf['fSamp'] = 100e3   # The average sampling frequency
     dObSig = rxcs.acq.nonuniANGIE.main(dAcqConf, dSig)
 
+    # Take the observed signal and the observation matrix
+    vObSig = dObSig['mObSig'][0,:]
+    mPhi = dObSig['m3Phi'][0,:,:]
+    
     # -----------------------------------------------------------------
     # Reconstruct the signal
     # -----------------------------------------------------------------
@@ -68,18 +72,21 @@ def _L1_recon_ex2():
     # Generate the IDFT dictionary
     dCSConf = {}
     dCSConf['tS'] = iT            # Time of the dictionary
-    dCSConf['fR'] = iT * iTSamp   # The signal representation sampling freq.
-    dCSConf['fDelta'] = fSep      # The frequency separation between tones
+    dCSConf['fR'] = fRS           # The signal representation sampling freq.
+    dCSConf['fDelta'] = fD        # The frequency separation between tones
     dCSConf['nTones'] = Nt        # The number of tones in the dictionary
-    (mDict, dDict) = rxcs.cs.dict.IDFToNoDC.main(dCSConf)
-
-    # Construct the theta matrix
+    (mDict, _) = rxcs.cs.dict.IDFToNoDC.main(dCSConf)
+    
+    # Cut down the dictionary matrix - take only first 20 rows
+    mDict = mDict[np.arange(int(Nt)),:]    
+    
+    # Compute the Theta matrix
     mTheta = np.dot(mPhi, mDict.T)
 
     # Run the L1 minimization - generate signal coefficients
     dCS = {}                  # Initialize the dictionary
     dCS['m3Theta'] = mTheta   # Add the Theta matrix
-    dCS['iK'] = 0.1           # Add the 'k' parameter
+    dCS['iK'] = 0.01          # Add the 'k' parameter
     dCS['mObSig'] = vObSig    # Add observed signal
     dCS['bComplex'] = 1       # Add info that the problem contains complex
                               # numbers
@@ -91,6 +98,21 @@ def _L1_recon_ex2():
     vSigRecon = np.dot(mDict.T, vCoeff)
     vSigRecon = vSigRecon.real
 
+    # -----------------------------------------------------------------
+    # Measure the SNR of the reconstruction
+    # -----------------------------------------------------------------
+     
+    # Put the reconstructed signal into a 2D matrix, and put the matrix into
+    # a dictionary
+    vSigRecon.shape = (vSigRecon.size, 1)
+    dSigRecon = {}
+    dSigRecon['mSig'] = vSigRecon.T 
+     
+    # Create a dictionary with configuration for the system analysis
+    dAnaConf = {}
+    dAnaConf['iSNRSuccess'] = 15  # SNR of the recon > 15dB == success
+    dAna = rxcs.ana.SNR.main(dSig, dSigRecon, {}, dAnaConf)
+
     # ---------------------------------------------------------------------
     # Plot the original signal, reconstructed signal and signal samples
     # ---------------------------------------------------------------------
@@ -100,7 +122,7 @@ def _L1_recon_ex2():
     vSig = mSig[0, :]
 
     # Get the signal time vector from the dictionary data
-    vTs = dDict['vT']
+    vTs = dSig['vTSig']
 
     # Plot the figure
     hFig1 = plt.figure(1)
