@@ -64,7 +64,7 @@ def _printConf(dCSConf):
     # fR        -  signal representation sampling frequency
     # fDelta    -  frequency distance between tones
     # nTones    -  the number of tones
-    (bMute, tS, tStart, fR, fDelta, nTones) = _getConf(dCSConf)
+    (bMute, tS, tStart, fR, _, fDelta, nTones) = _getConf(dCSConf)
 
     # -----------------------------------------------------------------
     # Compute the parameters of the dictionary
@@ -75,10 +75,12 @@ def _printConf(dCSConf):
     # tEnd         - signal time end represented by the dictionary
     # nSamp        - the number of signal samples represented by the dict.
     # fLow         - the negative frequency limit of the dictionary
+    # fFirstLow,   - the negative low frequency limit of the dictionary
+    # fFirstHigh,  - the positive high frequency limit of the dictionary
     # fHigh        - the positive frequency limit of the dictionary
     (Tg,
      tStart_real, tS_real, tEnd, nSamp,
-     fLow, fHigh) = _computeParam(dCSConf)
+     fLow, fFirstLow, fFirstHigh, fHigh) = _computeParam(dCSConf)
 
     #----------------------------------------------------------------------
     # Print the configuration if the 'mute' flag is not set
@@ -93,7 +95,7 @@ def _printConf(dCSConf):
         _printConfT(Tg, tS, tStart, tStart_real, tS_real, tEnd, nSamp)
 
         # Print the frequency parameters
-        _printConfF(fDelta, nTones, fHigh)
+        _printConfF(fDelta, nTones, fFirstHigh, fHigh)
 
         # Check for Nyquist and print a warning if needed
         _checkNyquist(fR, fHigh)
@@ -154,9 +156,12 @@ def _printConfT(Tg, tS, tStart, tStart_real, tS_real, tEnd, nSamp):
 # =================================================================
 # Print the frequency parameters of the dictionary
 # =================================================================
-def _printConfF(fDelta, nTones, fHigh):
+def _printConfF(fDelta, nTones, fFirstHigh, fHigh):
 
-    rxcs.console.bullet_param('the number of tones in the dictionary',
+    rxcs.console.bullet_param('the first frequency in the dictionary',
+                              fFirstHigh, '-', 'Hz')
+
+    rxcs.console.param('the number of tones in the dictionary',
                               nTones, '-', '')
 
     rxcs.console.param('frequency separation between the tones',
@@ -234,6 +239,13 @@ def _getConf(dCSConf):
         fDelta = dCSConf['fDelta']
 
     # -----------------------------------------------------------------
+    # Get the first frequency in the spectrum
+    if not 'fFirst' in dCSConf:
+	fFirst = fDelta
+    else:
+        fFirst = dCSConf['fFirst']
+
+    # -----------------------------------------------------------------
     # Get the number of tones
     if not 'nTones' in dCSConf:
         strError = ('The number of tones (nTones) is not given ')
@@ -247,6 +259,7 @@ def _getConf(dCSConf):
             tS,        # time length covered by the dictionary
             tStart,    # optional time shift
             fR,        # signal representation sampling frequency
+            fFirst,    # first frequency in the spectrum
             fDelta,    # frequency distance between tones
             nTones)    # the number of tones
 
@@ -262,9 +275,10 @@ def _computeParam(dCSConf):
     # tS        -  time length covered by the dictionary
     # tStart    -  optional time shift
     # fR        -  signal representation sampling frequency
+    # fFirst    -  first frequency in the spectrum
     # fDelta    -  frequency distance between tones
     # nTones    -  the number of tones
-    (_, tS, tStart, fR, fDelta, nTones) = _getConf(dCSConf)
+    (_, tS, tStart, fR, fFirst, fDelta, nTones) = _getConf(dCSConf)
 
     # -----------------------------------------------------------------
     # Compute the time parameters of the dictionary
@@ -272,7 +286,7 @@ def _computeParam(dCSConf):
 
     # -----------------------------------------------------------------
     # Compute the negative and positive frequency limits of the dictionary
-    (fLow, fHigh) = _computeParamF(fDelta, nTones)
+    (fLow, fFirstLow, fFirstHigh, fHigh) = _computeParamF(fFirst, fDelta, nTones)
 
     # -----------------------------------------------------------------
     return (Tg,           # the signal representation period
@@ -281,6 +295,8 @@ def _computeParam(dCSConf):
             tEnd,         # signal time end represented by the dictionary
             nSamp,        # the numb. of signal samples represented by the dict.
             fLow,         # the negative frequency limit of the dictionary
+            fFirstLow,    # the negative low frequency limit of the dictionary
+            fFirstHigh,   # the positive high frequency limit of the dictionary
             fHigh)        # the positive frequency limit of the dictionary
 
 
@@ -311,16 +327,22 @@ def _computeParamT(tS, fR, tS_shift):
 # =================================================================
 # Compute the negative and positive frequency limits of the dict.
 # =================================================================
-def _computeParamF(fDelta, nTones):
+def _computeParamF(fFirst, fDelta, nTones):
+
+    # The positive low frequency limit of the dictionary
+    fFirstHigh = np.floor(fFirst/fDelta) * fDelta
+
+    # The positive high frequency limit of the dictionary
+    fHigh = fFirstHigh + fDelta * (nTones - 1)
+
+    # The negative low frequency limit of the dictionary
+    fFirstLow = -fFirstHigh
 
     # The negative frequency limit of the dictionary
-    fLow = -fDelta * nTones
-
-    # The positive frequency limit of the dictionary
-    fHigh = fDelta * nTones
+    fLow = -fHigh
 
     # -------------------------------------------------------------
-    return (fLow, fHigh)
+    return (fLow, fFirstLow, fFirstHigh, fHigh)
 
 
 # =================================================================
@@ -333,9 +355,10 @@ def _checkConf(dCSConf):
 
     # tS        -  time length covered by the dictionary
     # fR        -  signal representation sampling frequency
+    # fFirst    -  first frequency in the spectrum    
     # fDelta    -  frequency separation between tones
     # nTones    -  the number of tones
-    (_, tS, _, fR, fDelta, nTones) = _getConf(dCSConf)
+    (_, tS, _, fR, fFirst, fDelta, nTones) = _getConf(dCSConf)
 
     if not tS > 0:
         strErr = ('The time covered by the dictionary (tS) ')
@@ -344,6 +367,11 @@ def _checkConf(dCSConf):
 
     if not fR > 0:
         strErr = ('The signal representation sampling frequency (fR) ')
+        strErr = strErr + ('must be higher than zero')
+        raise ValueError(strErr)
+
+    if not fFirst > 0:
+        strErr = ('The first frequency in the spectrum (fFirst) ')
         strErr = strErr + ('must be higher than zero')
         raise ValueError(strErr)
 
@@ -361,7 +389,7 @@ def _checkConf(dCSConf):
     # Check the signal time covered by the dictionary after correction
 
     # tS_real      - correct signal time length represented by the dict.
-    (_, _, tS_real, _, _, _, _) = _computeParam(dCSConf)
+    (_, _, tS_real, _, _, _, _, _, _) = _computeParam(dCSConf)
 
     if not tS_real > 0:
         strErr = ('The time covered by the dictionary ')
@@ -410,14 +438,18 @@ def _generateIDFToNoDC(dCSConf):
     # -----------------------------------------------------------------
     # Check and get the configuration from the configuration dictionary
 
+    # fFirst    -  first frequency in the spectrum
     # fDelta    -  frequency distance between tones
     # nTones    -  the number of tones
-    (_, _, _, _, fDelta, nTones) = _getConf(dCSConf)
+    (_, _, _, _, fFirst, fDelta, nTones) = _getConf(dCSConf)
 
     # Tg           - the signal representation period
     # tStart_real  - signal time start represented by the dictionary
     # nSamp        - the number of signal samples represented by the dict.
-    (Tg, tStart_real, _, _, nSamp, _, _) = _computeParam(dCSConf)
+    # fFirstHigh   - the positive high frequency limit of the dictionary
+    # fHigh        - the positive frequency limit of the dictionary
+
+    (Tg, tStart_real, _, _, nSamp, _, _, fFirstHigh, fHigh) = _computeParam(dCSConf)
 
     # -----------------------------------------------------------------
     # Generate the time vector
@@ -426,8 +458,8 @@ def _generateIDFToNoDC(dCSConf):
 
     # -----------------------------------------------------------------
     # Generate the frequency vector
-    vF_pos = np.arange(1,nTones+1)
-    vF_neg = -1 * np.arange(1,nTones+1)
+    vF_pos = np.arange((fFirstHigh/fDelta), (fHigh/fDelta)+1)  # positive freqs
+    vF_neg = -1 * vF_pos                                       # negative freqs
     vF_neg.sort()
     vF = fDelta * np.concatenate( (vF_pos, vF_neg) )
     vF.shape = (vF.size, 1)
@@ -451,9 +483,10 @@ def _generateOutput(dCSConf, mDict, vF, vT):
     # -----------------------------------------------------------------
     # Get the frequency configuration from the configuration dictionary
 
+    # fFirst    -  first frequency in the spectrum
     # fDelta    -  frequency separation between tones
     # nTones    -  the number of tones
-    (_, _, _, _, fDelta, nTones) = _getConf(dCSConf)
+    (_, _, _, _, fFirst, fDelta, nTones) = _getConf(dCSConf)
 
     # -----------------------------------------------------------------
     # Compute the parameters of the dictionary
@@ -464,10 +497,12 @@ def _generateOutput(dCSConf, mDict, vF, vT):
     # tEnd         - signal time end represented by the dictionary
     # nSamp        - the number of signal samples represented by the dict.
     # fLow         - the negative frequency limit of the dictionary
+    # fFirstLow    - the negative low frequency limit of the dictionary
+    # fFirstHigh   - the positive high frequency limit of the dictionary
     # fHigh        - the positive frequency limit of the dictionary
     (Tg,
      tStart_real, tS_real, tEnd, nSamp,
-     fLow, fHigh) = _computeParam(dCSConf)
+     fLow, fFirstLow, fFirstHigh, fHigh) = _computeParam(dCSConf)
 
     # -----------------------------------------------------------------
     # Initialize the output dictionary
@@ -503,6 +538,12 @@ def _generateOutput(dCSConf, mDict, vF, vT):
     dDict['nTones'] = nTones   # <- the number of tones in the dictionary
 
     dDict['fLow'] = fLow   # <- the negative frequency limit of the dictionary
+
+    dDict['fFirstLow'] = fFirstLow   # <- the negative low frequency limit of 
+                                     # the dictionary
+    
+    dDict['fFirstHigh'] = fFirstHigh   # <- the positive low frequency limit of 
+                                       # the dictionary
 
     dDict['fHigh'] = fHigh   # <- the positive frequency limit of the
                              #    dict,
