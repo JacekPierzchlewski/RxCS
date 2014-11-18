@@ -396,7 +396,7 @@ def _checkConf(dAcqConf, dConf):
     # -----------------------------------------------------------------
     # Check if the observation matrix sampling period is compatible
     # with the sampling period
-    if np.round((Tg /TgOb)) != (Tg / TgOb):
+    if np.abs(np.round((Tg /TgOb)) - (Tg / TgOb)) > (1e-9*(Tg / TgOb)):
         strError = ('The sampling grid period of patterns is incompatible with')
         strError = strError + (' the observation matrix sampling period')
         raise ValueError(strError)
