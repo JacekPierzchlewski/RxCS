@@ -363,7 +363,7 @@ def _checkConf(dAcqConf, dSig, dConf):
     # -----------------------------------------------------------------
     # Check if the signal representation sampling frequency is compatible
     # with the sampling period
-    if np.round(Tg * fR) != (Tg * fR):
+    if np.abs(np.round(Tg * fR) - (Tg * fR)) > (1e-9*(Tg * fR)):
         strError = ('The sampling grid period of pattern is incompatible with')
         strError = strError + (' the signals representation sampling ')
         strError = strError + ('frequency')
