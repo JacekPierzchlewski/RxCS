@@ -1,0 +1,10 @@
+RXCS toolbox, L1\ - directory with L1-based reconstruction modules
+
+contents:
+
+    1. CONTENTS.txt   - the current file
+
+    2. Makefile       - local Makefile
+
+    3. cvxoptL1.py    - module with L1-based signal reconstruction (regularized
+                        regression), the optimization uses cvxopt
