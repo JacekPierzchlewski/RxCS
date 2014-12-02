@@ -10,10 +10,12 @@ contents:
 
     4. sig\           - directory with signal generators modules
 
-    5. CONTENTS.txt   - the current file
+    5. auxiliary\     - directory with auxiliary modules
 
-    6. Makefile       - local Makefile
+    6. CONTENTS.txt   - the current file
 
-    7. __init__.py    - module initialization file
+    7. Makefile       - local Makefile
 
-    8. console.py     - RxCS console printing module
+    8. __init__.py    - module initialization file
+
+    9. console.py     - RxCS console printing module

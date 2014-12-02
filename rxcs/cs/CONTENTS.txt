@@ -6,13 +6,11 @@ contents:
 
     2. L1\            - directory with L1-based reconstruction modules 
 
-    3. auxiliary      - directory with auxiliary modules
+    3. CONTENTS.txt   - the current file
 
-    4. CONTENTS.txt   - the current file
+    4. Makefile       - local Makefile
 
-    5. Makefile       - local Makefile
+    5. __init__.py    - module initialization file
 
-    6. __init__.py    - module initialization file
-
-    7. @cvxoptL1.py   - link to module with L1-based signal reconstruction (regularized
+    6. @cvxoptL1.py   - link to module with L1-based signal reconstruction (regularized
                         regression), the optimization uses cvxopt

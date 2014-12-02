@@ -1,7 +1,0 @@
-RXCS toolbox, auxiliary\ - directory with auxiliary modules
-
-contents:
-
-    1. CONTENTS.txt   - the current file
-
-    2. Makefile       - local Makefile
