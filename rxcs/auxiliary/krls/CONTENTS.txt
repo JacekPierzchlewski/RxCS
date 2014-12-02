@@ -1,0 +1,11 @@
+RXCS toolbox, krls\ - directory with kernel recursive least squares methods
+
+contents:
+
+    1. CONTENTS.txt       - the current file
+
+    2. Makefile           - local Makefile
+
+    3. __init__.py        - module initialization file 
+
+    4. aldkrls_linker.py  - Kernel Recursive Least Squares algorithm (linear kernel only) with Approximate Linear Dependency criterion

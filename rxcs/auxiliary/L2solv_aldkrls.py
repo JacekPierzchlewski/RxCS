@@ -17,7 +17,7 @@ Take a look on  'L2solve_aldkrls_ex0.py' in *examples* directory for examples of
 
 from __future__ import division
 import numpy as np
-import aldkrls_linker
+import krls.aldkrls_linker
 
 # =====================================================================
 # For a given A and y, find x which minimizes ||y - Ax||_2
@@ -36,13 +36,13 @@ def main(mA, vY):
 
     """
 
-    dAldKRLS = aldkrls_linker.init()  # Construct a 'aldKRLSL2' object
+    dAldKRLS = krls.aldkrls_linker.init()  # Construct a 'aldKRLSL2' object
 
-    (iR, _) = mA.shape                # Get the number of rows in the matrix A
+    (iR, _) = mA.shape                     # Get the number of rows in the matrix A
 
     # Training loop (loop over all rows in the matrix A)
     for i in np.arange(iR):
-        dAldKRLS = aldkrls_linker.train(dAldKRLS , mA[i,:], vY[i])
+        dAldKRLS = krls.aldkrls_linker.train(dAldKRLS , mA[i,:], vY[i])
 
-    vX_KRLS = aldkrls_linker.evaluate(dAldKRLS)
+    vX_KRLS = krls.aldkrls_linker.evaluate(dAldKRLS)
     return vX_KRLS

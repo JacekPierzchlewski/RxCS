@@ -2,6 +2,12 @@ RXCS toolbox, auxiliary\ - directory with auxiliary modules
 
 contents:
 
-    1. CONTENTS.txt   - the current file
+    1. krls\              - directory with kernel recursive least squares modules
 
-    2. Makefile       - local Makefile
+    2. CONTENTS.txt       - the current file
+
+    3. Makefile           - local Makefile
+
+    4. __init__.py        - module initialization file 
+
+    5. L2Solv_aldkrls.py  - L2 solver which uses KRLS algorithm
