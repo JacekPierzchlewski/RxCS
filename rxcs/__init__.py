@@ -14,6 +14,8 @@ import ana
 # Import console printing function
 import console
 
+# Import auxiliary modules
+import auxiliary
 
 
 
