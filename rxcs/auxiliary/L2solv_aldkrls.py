@@ -9,6 +9,8 @@ Take a look on  'L2solve_aldkrls_ex0.py' in *examples* directory for examples of
 
 *Version*:
     1.0  | 2-DEC-2014 : * Initial version. |br|
+    1.2  | 4-DEC-2014 : * KRLS with linear kernel in integrated into the module. |br|
+
 
 *License*:
     BSD 2-Clause
