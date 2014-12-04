@@ -2,7 +2,7 @@
 Module contains a solver which finds x which minimizes ||y - Ax||_2 for a given A and y.
 The solver uses Kernel Recurive Least Squares algorithm with linear kenrel. |br|
 
-Take a look on  'L2solve_aldkrls_ex0.py' in *examples* directory for examples of using the module.
+Take a look on  'L2solve_aldkrls_ex0.py' in 'examples/auxiliary' directory for examples of using the module.
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
