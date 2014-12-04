@@ -1,5 +1,5 @@
 """
-This module contains implementation of Kernel Recurive Least Squares algorithm with
+This module contains implementation of Kernel Recursive Least Squares algorithm with
 Approximate Linear Dependency criterion. |br|
 
 Take a look on  'aldkrls_ex0.py'  in  'examples/auxiliary'  for examples of using the module.
