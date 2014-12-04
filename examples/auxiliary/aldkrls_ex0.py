@@ -4,14 +4,19 @@ This script is an example of how to use the Kernel Recursive Least Squares algor
 In this example the algorithm approximates a noisy sinc function. |br|
 
 *Author*:
+
+This example is based on Matlab example in 'Kafbox' by Steven Van Vaerenbergh.
+
+    2012 - 2014 Steven Van Vaerenbergh (Matlab version: http://sourceforge.net/projects/kafbox/)
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 2-DEC-2014 : * Version 1.0 released. |br|
+    1.0  | 4-DEC-2014 : * Version 1.0 released. |br|
 
 *License*:
     BSD 2-Clause
 """
+
 from __future__ import division
 import numpy as np
 import rxcs.auxiliary.krls as krls
