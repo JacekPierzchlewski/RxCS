@@ -1,5 +1,5 @@
 """
-This script is an example of how to use the Kernel Recursive Least Squares algorithms. |br|
+This script is an example of how to use the Kernel Recursive Least Squares algorithm. |br|
 
 In this example the algorithm approximates a noisy sinc function. |br|
 
