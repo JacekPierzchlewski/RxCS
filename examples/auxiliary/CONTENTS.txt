@@ -1,0 +1,14 @@
+RXCS toolbox, examples\auxiliary\ - directory with examples on how to use
+                                    the auxiliary modules
+
+contents:
+
+    1. rxcs~                   - soft link to the directory with all the RxCS modules
+
+    2. CONTENTS.txt            - this file
+
+    3. Makefile                - local Makefile
+
+    4. L2solv_aldkrls_ex0.py   - example of how to use the L2 solver
+
+    5. aldkrls_ex0.py          - an example of how to use the Kernel Recursive Least Squares algorithm
