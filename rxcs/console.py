@@ -206,6 +206,7 @@ def module_progress_done(tStart):
 
     return
 
+
 # =====================================================================
 # Finish the module progress print + print the time of execution
 # (with 1 newline instead of 3)
@@ -245,6 +246,7 @@ def module_progress_doneNoNew(tStart):
     sys.stdout.flush()
 
     return
+
 
 # =====================================================================
 # Print a warning
