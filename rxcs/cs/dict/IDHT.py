@@ -19,14 +19,14 @@ import numpy as np
 
 def main(dCSConf):
     """
-    Main function of the module.    
-    
+    Main function of the module.
+
     Args:
         dCSConf (dictionary): Dictionary with configuration for the module
 
     Returns:
         mDict (time) : Time stamp of the module start
-        dDict (dictionary):  Dictionary with auxiliary data for the module 
+        dDict (dictionary):  Dictionary with auxiliary data for the module
 
     """
     # =================================================================
@@ -137,9 +137,9 @@ def _printConf(dCSConf):
 # =================================================================
 def _getConf(dCSConf):
     """
-    This function gets module settings from the configuration dictionary 
+    This function gets module settings from the configuration dictionary
     and checks if all the needed settings are in place.
-        
+
     Args:
         dCSConf (dictionary): Dictionary with configuration for the module
 
@@ -150,7 +150,7 @@ def _getConf(dCSConf):
         fR      (number)   signal representation sampling frequency
         fFirst  (number)   first frequency in the spectrum
         fDelta  (number)   frequency distance between tones
-        nTones  (number)   the number of tones    
+        nTones  (number)   the number of tones
     """
 
     # -----------------------------------------------------------------
@@ -227,13 +227,13 @@ def _computeParam(dCSConf):
     """
     This function computes the parameters of the dictionary based on the
     given settings.
-        
+
     Args:
         dCSConf (dictionary): Dictionary with configuration for the module
 
     Returns:
         Tg           (number)  the signal representation period
-        tStart_real  (number)  the signal representation period  
+        tStart_real  (number)  the signal representation period
         tS_real      (number)  correct signal time length represented by the dict.
         tEnd         (number)  signal time end represented by the dictionary
         nSamp        (number)  the numb. of signal samples represented by the dict.
@@ -274,7 +274,7 @@ def _computeParamT(tS, fR, tS_shift):
     This function computes the time parameters of the dictionary based on the
     given settings.
     """
-    
+
     # Compute the signal representation period
     Tg = 1/fR
 
@@ -295,13 +295,22 @@ def _computeParamT(tS, fR, tS_shift):
 
 
 # =================================================================
-# Compute the negative and positive frequency limits of the dict.
+# Compute the frequency limit of the dict.
 # =================================================================
 def _computeParamF(fFirst, fDelta, nTones):
     """
-    This function computes the frequency parameters of the dictionary based 
+    This function computes the frequency limit of the dictionary based
     on the given settings.
     """
+
+    # The positive low frequency limit of the dictionary
+    fFirstHigh = np.floor(fFirst/fDelta) * fDelta
+
+    # The positive high frequency limit of the dictionary
+    fHigh = fFirstHigh + fDelta * (nTones - 1)
+
+    # -------------------------------------------------------------
+    return (fHigh)
 
 
 # =================================================================
@@ -535,7 +544,7 @@ def _generateOutput(dCSConf, mDict, vF, vT):
     This function generates auxiliary dictionary with all the paramters
     of a generated IDHT matrix. This dictionary is returned by the main
     function as a second argument.
-    
+
     """
 
     # -----------------------------------------------------------------
