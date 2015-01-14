@@ -1,13 +1,14 @@
 """
-This module generates Inverse Discrete Hartley Transform. |br|
+This module generates Inverse Discrete Hartley Transform matrix. |br|
 
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 13-JAN-2015 : * Initial version. |br|
-
+    1.0    | 13-JAN-2015 : * Initial version. |br|
+    1.0r1  | 14-JAN2015 :  * Serious bug fix |br|
+     
 *License*:
     BSD 2-Clause
 
