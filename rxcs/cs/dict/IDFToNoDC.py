@@ -1,3 +1,39 @@
+"""
+This module generates Inverse Discrete Fourier Transform matrix. |br|
+
+Frequencies represented by the rows of the matrix:
+
+
+  freq.
+    ^        /
+    |       /
+    |      /   
+    |     /
+    |    / 
+    |   /
+    |  /
+    | /
+    |----------------------->  indices of columns
+    |                 /
+    |                /
+    |               /
+    |              /
+    |             / 
+    |            /
+    |           /
+                    
+
+*Author*:
+    Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
+
+*Version*:
+    1.0    |  8-SEP-2014 : * Initial version. |br|
+    1.0r1  | 15-JAN-2015 :  Improvements in code comments |br|
+
+*License*:
+    BSD 2-Clause
+
+"""
 from __future__ import division
 import time
 import rxcs

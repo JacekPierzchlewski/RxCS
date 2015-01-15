@@ -1,14 +1,27 @@
 """
 This module generates Inverse Discrete Hartley Transform matrix. |br|
 
+Frequencies represented by the rows of generated IDHT matrix:
 
+
+  freq.     (cos)     (sin) 
+    ^        /         /
+    |       /         /
+    |      /         /
+    |     /         /
+    |    /         /
+    |   /         /
+    |  /         /
+    | /         /
+    |----------------------->  indices of columns
+                    
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
     1.0    | 13-JAN-2015 : * Initial version. |br|
-    1.0r1  | 14-JAN2015 :  * Serious bug fix |br|
-     
+    1.0r1  | 15-JAN-2015 :  Improvements in code comments |br|
+
 *License*:
     BSD 2-Clause
 
