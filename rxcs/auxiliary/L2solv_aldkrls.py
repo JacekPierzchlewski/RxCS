@@ -10,7 +10,8 @@ Take a look on  'L2solve_aldkrls_ex0.py' in 'examples/auxiliary' directory for e
 *Version*:
     1.0  | 2-DEC-2014 : * Initial version. |br|
     1.2  | 4-DEC-2014 : * KRLS with linear kernel in integrated into the module. |br|
-
+                          This module does not use anymore 'aldkrls.py', but it uses
+                          internal functions: _krls_init, _krls_train and _krls_evaluate.
 
 *License*:
     BSD 2-Clause

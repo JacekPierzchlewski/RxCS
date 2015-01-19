@@ -1,6 +1,14 @@
 """
 This script is an example of how to use the L2 solver (krls). |br|
 
+In this example, and L2 solver searches for a vector X \in R^(iN x 1),
+which solves the problem:
+
+       min|| Y - AX  ||_2
+
+where Y is \in R^(iM x 1) and A is \in R^(iM x iN)
+  
+
 *Author*:
 
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
@@ -21,7 +29,7 @@ import matplotlib.pyplot as plt
 def _L2solv_aldkrls_ex0():
 
     # Dimensions of the system
-    iM = 20
+    iM = 20   
     iN = 11
 
     # Construct the data
