@@ -1,6 +1,8 @@
 """
 This a L1-optimization signal reconstruction module. |br|
 
+This module uses cvxopt software as L1 solver. |br|
+
 Copyright (C) <2014>  Jacek Pierzchlewski
               <2014>  Martin S. Andersen, Joachim Dahl, and Lieven Vandenberghe
 
@@ -430,7 +432,7 @@ def _recon(dCSConf):
         dCSConf (dictionary): dictionary with configuration for the module
 
     Returns:
-        mCoeff (matrix):
+        mCoeff (matrix): matrix with signal coefficients
     """
 
     # -----------------------------------------------------------------
