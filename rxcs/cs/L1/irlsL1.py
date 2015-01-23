@@ -16,7 +16,6 @@ This module uses Iterative Reweighted Least Squares method as L1 solver. |br|
 from __future__ import division
 import rxcs
 import numpy as np
-import irls
 
 def main(dCSConf):
     """
@@ -573,7 +572,7 @@ def _recon(dCSConf):
         vObSig = mObSig[:, inxSig]
 
         # Run the engine: Reconstruct the signal coefficients
-        (vCoef, _, _) = irls.L1(mTheta, vObSig, iMaxIter, iConv)
+        (vCoef, _, _) = rxcs.auxiliary.irls.L1(mTheta, vObSig, iMaxIter, iConv)
         vCoef.shape = (vCoef.size,)
         
         # Store the signal coefficients in the output matrix
