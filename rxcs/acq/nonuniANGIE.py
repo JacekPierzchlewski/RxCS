@@ -1,5 +1,5 @@
 """
-This a nonuniform sampler with ANGIE scheme. |br|
+This a nonuniform sampler with ANGIE sampling scheme. |br|
 
 The modules samples the given signals nonuniformly. |br|
 THe sampling aptterns are generated using ANGIE scheme.
