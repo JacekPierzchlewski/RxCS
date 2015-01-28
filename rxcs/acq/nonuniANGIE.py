@@ -13,6 +13,8 @@ THe sampling aptterns are generated using ANGIE scheme.
     1.0  | 27-MAY-2014 : * Version 1.0 is ready. |br|
     1.1  | 11-JUN-2014 : * Observation matrices added to the output. |br|
     1.1r1| 18-SEP-2014 : * Bug in checking time of patterns is fixed. |br|
+    1.1r2| 28-JAN-2015 : * Patterns generator adjusted to Numpy indexing. |br|
+    
 
 *License*:
     BSD 2-Clause
