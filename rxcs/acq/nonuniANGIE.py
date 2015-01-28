@@ -2,7 +2,11 @@
 This a nonuniform sampler with ANGIE sampling scheme. |br|
 
 The modules samples the given signals nonuniformly. |br|
-THe sampling aptterns are generated using ANGIE scheme.
+The sampling aptterns are generated using ANGIE scheme.
+
+The used ANGIE patterns generator is described further in
+"Generation and Analysis of Constrained Random Sampling Patterns",
+available in arXiv: http://arxiv.org/abs/1409.1002
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
@@ -15,7 +19,6 @@ THe sampling aptterns are generated using ANGIE scheme.
     1.1r1| 18-SEP-2014 : * Bug in checking time of patterns is fixed. |br|
     1.1r2| 28-JAN-2015 : * Patterns generator adjusted to Numpy indexing. |br|
     
-
 *License*:
     BSD 2-Clause
 """
@@ -31,6 +34,77 @@ import numpy as np
 def main(dAcqConf, dSig):
     """
     This the main function of the sampler. |br|
+
+    Fields in the configuration dictionary (dAcqConf):
+
+    - a. **bMute** (*int*): mute the console output from the generator
+                            NOT REQUIRED, default = 0
+
+    - b. **nPatts** (*int*): the number of patterns to be generateds 
+                             NOT REQUIRED, if not given equal to the number of signals to be sampled 
+
+    - c. **tTau** (*float*): time of patterns
+                             NOT REQUIRED, if not given equal to the time of signals to be sampled
+
+    - d. **Tg** (*float*): paterns sampling grid
+
+    - e. **fSamp** (*float*): requested sampling frequency
+
+    - f. **iSigma** (*float*): variance of Gaussian random process used by the pattern generator
+                               NOT REQUIRED, default = 1
+
+    - g. **tMin*** (*float*): minimum time between sampling points
+                               NOT REQUIRED, default = Tg
+    
+    - h. **tMax*** (*float*): maximum time between sampling points
+                               NOT REQUIRED, default = +infinity
+    
+
+    Required fields in the dictionary with signals to be sampled (dSig):
+
+    - a. **mSig** (*numpy array 2D*): 2D array with signals, one signal p. row 
+
+    - b. **fR** (*float*): signals representation sampling frequency
+
+    - c. **tS** (*float*): time of signals
+
+
+    Fields in the output dictionary (dObSig):
+             
+    - a. **mObSig** (*numpy array 2D*): 2D array with observed signals, one signal p. row 
+
+    - b. **mPatts** (*numpy array 2D*): 2D array with sampling patterns, represented as indices of sampling grid points 
+                                        one signal pattern p. row 
+
+    - c. **mPattsT** (*numpy array 2D*): 2D array with sampling patterns, represented as time moments
+                                         one signal pattern p. row 
+
+    - d. **mPattsRep** (*numpy array 2D*): 2D array with sampling patterns, represented as indices of signal representation points
+                                           one signal pattern p. row 
+
+    - e. **m3Phi** (*numpy array 3D*): 3D array with observation matrices, one matrix p. page 
+
+    - f. **Tg** (*float*): the grid period of sampling patterns
+
+    - g. **nK_g** (*int*): the number of grid points in a sampling pattern  
+
+    - h. **tTau_real** (*float*): the real time of sampling patterns 
+
+    - i. **nK_s** (*int*): the number of sampling points in a pattern 
+
+    - j. **f_s** (*float*): the expected average sampling frequency
+
+    - k. **nT** (*int*): the expected average sampling period (represented as the number sampling grid points)
+
+    - l. **tT_s** (*float*): the expected average sampling period
+
+    - m. **tMin_real** (*float*): the real minimum time between sampling points
+
+    - n. **tMax_real** (*float*): the real maximum time between sampling points 
+
+    - o. **nK_min** (*int*): minimum time between sampling poinrs (represented as the number sampling grid points)
+
+    - p. **nK_max** (*int*): maximum time between sampling points (represented as the number sampling grid points)
 
     Args:
         dAcqConf (dictionary): dictionary with configuration for the sampler
