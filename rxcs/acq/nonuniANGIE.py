@@ -732,33 +732,29 @@ def _generate_patterns(dAcqConf, dSig):
         # Store the generated pattern
         mPatts[inxP, :] = vPattern
 
+    # The patterns engine generates patterns in range  <1 ; N>, where
+    # N is the number of possible positions of a sampling points.
+    # Because Numpy indexes arrays from 0, the patterns should be represented 
+    # in range from <0 ; N-1>
+    mPatts = mPatts - 1
+
     # --------------------------------------------------------------
     # Recalculate the patterns to the signal representation frequency
 
     # Compute the number of signal representation points which equals
     # one grid point
     iGridvsRep = int(np.round((Tg * fR)))
+    mPattsRep = iGridvsRep * mPatts
+
+    # --------------------------------------------------------------
+    # Recalculate the patterns to the time moments
 
     # Get the time vector of the original signal (if it is given)
-    # and the first sample
     if 'vTSig' in dSig:
         vTSig = dSig['vTSig']
     else:
         vTSig = (1 / fR) * np.arange(int(np.round(tTau_real*fR)))
-    iT1 = vTSig[0]
-
-    if iT1 == 0:  # <- If the time stamp of the first sample is zero,
-                  #    then ANGIE should count the grid indices from zero.
-                  #    By default the grid indices counts from 1, so there is
-                  #    a need to decrease the gird indices by 1
-        mPatts = mPatts - 1
-        mPattsRep = iGridvsRep * mPatts
-    else:
-        mPattsRep = iGridvsRep * mPatts
-        mPattsRep = mPattsRep - 1
-
-    # --------------------------------------------------------------
-    # Recalculate the patterns to the time moments
+        
     mPattsT = vTSig[mPattsRep]
 
     # --------------------------------------------------------------
