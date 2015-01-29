@@ -1,4 +1,7 @@
 
+# Import uniform sampler
+import uniform
+
 # Import nonuniform sampler with ARS scheme
 import nonuniARS
 
