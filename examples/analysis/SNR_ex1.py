@@ -32,7 +32,6 @@ together with the average success ratio and success threshold.
 from __future__ import division
 import rxcs
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 def _SNR_ex1():
