@@ -1,3 +1,26 @@
+"""
+This script is an example on how to use the Inverse Discrete Fourier Transform
+(IDFT) Dictionary module. |br|
+
+In this example a IDFT dictionary is generated. There is a time shift in time
+represented by the dictionary.
+Then, a signal with 1 tone is generated using the dictionary. |br|
+
+After the generation, the signal is plotted in the time domain.
+
+
+*Author*:
+    Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
+
+*Version*:
+    1.0      | 30-MAY-2014 : * Version 1.0 released. |br|
+    1.0-r1   | 23-FEB-2015 : * Header is added
+
+*License*:
+    BSD 2-Clause
+"""
+
+
 from __future__ import division
 import rxcs
 import numpy as np
