@@ -9,6 +9,12 @@ contents:
 
     3. Makefile                - local Makefile
 
-    4. L2solv_aldkrls_ex0.py   - example of how to use the L2 solver
 
-    5. aldkrls_ex0.py          - an example of how to use the Kernel Recursive Least Squares algorithm
+    4. L2solv_aldkrls_ex0.py   - example #0 on how to use the L2 solver which is based on aldkrls algorithm
+                                 (aldkrls - Kernel Recursive Least Squares with Approximate Linear Dependency)
+
+    5. aldkrls_ex0.py          - example #0 on how to use the aldkrls algorithm
+                                 (aldkrls - Kernel Recursive Least Squares with Approximate Linear Dependency)
+
+    6. irls_ex0.py             - example #0 on how to use the L1 norm minimizer implemented with IRLS algorithm
+                                 (IRLS - Iterative Least Squares Algorithm)

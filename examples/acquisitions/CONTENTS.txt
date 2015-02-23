@@ -10,6 +10,16 @@ contents:
     3. Makefile                 - local Makefile
 
 
-    # ANGIE nonuniform sampler examples:
+    # Nonuniform sampler examples:
 
-    4. samp_RMSG_ANGIE_ex0.py   - example #0 on how to use the ANGIE sampler
+    4. samp_RMSG_ANGIE_ex0.py   - example #0 on how to use the ANGIE sampler - the simplest example
+
+    5. samp_RMSG_ARS_ex0.py     - example #0 on how to use the ARS sampler - the simplest example
+
+    6. samp_RMSG_JS_ex0.py      - example #0 on how to use the JS sampler - the simplest
+
+
+    # Uniform sampler examples:
+
+    7. samp_RMSG_uniform_ex0.py - example #0 on how to use the uniform sampler - the simplest example
+

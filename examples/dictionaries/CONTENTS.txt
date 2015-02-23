@@ -10,8 +10,15 @@ contents:
     3. Makefile               - local Makefile
 
 
-    # IFFT dictionary examples:
+    # IDFT dictionary examples:   (IDFT - Inverse Discrete Fourier Transform)
 
-    4. dict_IDFT_ex0.py       - example #0 on how to use the IDFT dictionary
+    4. dict_IDFT_ex0.py       - example #0 on how to use the IDFT dictionary - the simplest example
 
-    5. dict_IDFT_ex0.py       - example #1 on how to use the IDFT dictionary
+    5. dict_IDFT_ex1.py       - example #1 on how to use the IDFT dictionary - time shift in time represented by dictionary
+
+    6. dict_IDFT_ex2.py       - example #2 on how to use the IDFT dictionary - the lowest frequency is 100kHz, not 0
+
+
+    # IDHT dictionary examples:    (IDHT - Inverse Discrete Hartley Transform)
+
+    7. dict_IDFT_ex0.py       - example #0 on how to use the IDHT dictionary

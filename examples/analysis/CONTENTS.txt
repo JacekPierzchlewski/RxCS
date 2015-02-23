@@ -10,3 +10,8 @@ contents:
     3. Makefile               - local Makefile
 
 
+    # Signal-to-noise ratio examples:
+
+    4. SNR_ex0.py             - example #0 on how to use signal-to-noise ratio analyzer
+
+    5. SNR_ex1.py             - example #1 on how to use signal-to-noise ratio analyzer
