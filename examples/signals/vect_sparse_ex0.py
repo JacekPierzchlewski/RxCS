@@ -1,5 +1,5 @@
 """
-This script is an example of how to use the random sparse vector 
+This script is an example of how to use the random sparse vector
 generator module. |br|
 
 In this example 5 random sparse vectors are generated. |br|
@@ -11,7 +11,7 @@ After the generation, the generated sparse vectors are plotted. |br|
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 22-MAY-2014 : * Version 1.0 released. |br|
+    1.0  | 22-JAN-2015 : * Version 1.0 released. |br|
 
 *License*:
     BSD 2-Clause
