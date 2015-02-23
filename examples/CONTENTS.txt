@@ -9,17 +9,18 @@ contents:
 
     # Directories with examples:
 
-    4. acquisitions\    - directory with examples on how to use the acquisition
+    3. acquisitions\    - directory with examples on how to use the acquisition
                           systems
 
-    5. analysis\        - directory with examples on how to use the system
+    4. analysis\        - directory with examples on how to use the system
                           analysis modules
 
-    6. dictionaries\    - directory with examples on how to use the dictionaries
+    5. dictionaries\    - directory with examples on how to use the dictionaries
 
-    7. reconstruction\  - directory with examples on how to use the reconstruction
+    6. reconstruction\  - directory with examples on how to use the reconstruction
                           modules
 
-    8. signals\         - directory with examples on how to use the signal generators
+    7. signals\         - directory with examples on how to use the signal generators
 
+    8. auxiliary\       - directory with examples on how to use the auxiliary modules
 
