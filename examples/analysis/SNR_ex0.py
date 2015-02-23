@@ -8,7 +8,7 @@ The signal contains 2 random tones, the highest possible frequency in the
 signal is 40 kHz.
 
 The signal is nonuniformly sampled with the average sampling frequency
-equal to 40 kHz. The sampling gird is 1 ms. A sampling patterns is generated
+equal to 40 kHz. The sampling gird is 1 ms. A sampling pattern is generated
 using ANGIE scheme.
 
 The original signal is then reconstructed from the observed signal using
