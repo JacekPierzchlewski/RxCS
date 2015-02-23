@@ -24,8 +24,6 @@ def _SNR_ex1():
 
     # Run the multtone signal generator
     dSig = rxcs.sig.sigRandMult.main(dSigConf)
-    vSig = dSig['mSig'][0, :]
-    vT = dSig['vTSig']
 
     # -----------------------------------------------------------------
     # Sample the generated signals
@@ -36,7 +34,6 @@ def _SNR_ex1():
 
     # Run the sampler
     dObSig = rxcs.acq.nonuniANGIE.main(dAcqConf, dSig)
-    vObSig = dObSig['mObSig'][0,:]
 
     # - - - - - - - -
     # Compute the oversampling ratio
