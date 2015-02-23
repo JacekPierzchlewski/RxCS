@@ -1,3 +1,37 @@
+"""
+This script is an example of how to use the reconstruction perfromance analyzer
+which measures signal-to-noise ratio. |br|
+
+In this example a single random multitone signal is generated and sampled |br|
+
+The signal contains 2 random tones, the highest possible frequency in the
+signal is 40 kHz.
+
+The signal is nonuniformly sampled with the average sampling frequency
+equal to 40 kHz. The sampling gird is 1 ms. A sampling patterns is generated
+using ANGIE scheme.
+
+The original signal is then reconstructed from the observed signal using
+L1 reconstruction (reg. regreesion).
+
+Finally, performance of the reconstruction is analyzed by measuring signal-to-noise
+ratio in the reconstructed signal. The average SNR of the reconstruction is printed to the console,
+together with the success ratio and success threshold.
+
+The original and the reconstructed signal are plotted in the time domain, together
+with the sampling points.
+
+*Author*:
+    Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
+
+*Version*:
+    1.0      | 12-JUN-2014 : * Version 1.0 released. |br|
+    1.0-r1   | 23-FEB-2015 : * Header is added
+
+*License*:
+    BSD 2-Clause
+"""
+
 from __future__ import division
 import rxcs
 import numpy as np
