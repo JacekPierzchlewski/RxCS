@@ -1,5 +1,5 @@
 """
-This module contains implementation of kernels used by Kernel Recurive Least Squares algorithms. |br|
+This module contains implementation of kernels used by Kernel Recursive Least Squares algorithms. |br|
 
 Implemented kernels:
 
