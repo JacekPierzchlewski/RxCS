@@ -1,17 +1,19 @@
 """
-This a nonuniform sampler with externally acquired sampling scheme. |br|
+This a nonuniform dummy sampler with externally acquired sampling scheme. |br|
 
-The modules samples the given signals nonuniformly. |br|
+The module pretend to sample the given signals nonuniformly. |br|
 The sampling patterns are taken from a file with sampling patterns
 or from a dictionary given to the sampler. In particular the sampling
 pattern may be uniform.
+
+The given signals are not sampled - only the observation matrix is generated.
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
     0.1  | 1-SEP-2014 : * Initial version. |br|
-    1.0  | 12-SEP-2014 : * Initial version. |br|
+    1.0  | 12-SEP-2014 : * Version 1.0 is ready. |br|
 
 *License*:
     BSD 2-Clause

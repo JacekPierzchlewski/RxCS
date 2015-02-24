@@ -1,7 +1,7 @@
 """
 This a nonuniform sampler with externally acquired sampling scheme. |br|
 
-The modules samples the given signals nonuniformly. |br|
+The module samples the given signals nonuniformly. |br|
 The sampling patterns are taken from a file with sampling patterns
 or from a dictionary given to the sampler. In particular the sampling
 pattern may be uniform.
@@ -11,7 +11,7 @@ pattern may be uniform.
 
 *Version*:
     0.1  | 1-SEP-2014 : * Initial version. |br|
-    1.0  | 12-SEP-2014 : * Initial version. |br|
+    1.0  | 12-SEP-2014 : * Version 1.0 is ready. |br|
 
 *License*:
     BSD 2-Clause
