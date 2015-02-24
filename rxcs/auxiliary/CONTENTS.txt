@@ -4,10 +4,14 @@ contents:
 
     1. krls\              - directory with kernel recursive least squares modules
 
+
     2. CONTENTS.txt       - the current file
 
     3. Makefile           - local Makefile
 
-    4. __init__.py        - module initialization file 
+    4. __init__.py        - module initialization file
+
 
     5. L2Solv_aldkrls.py  - L2 solver which uses KRLS algorithm
+
+    6. irls.py            - module with Iterative Reweighted Least Squares Algorithms

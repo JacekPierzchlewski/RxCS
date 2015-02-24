@@ -8,6 +8,25 @@ contents:
 
     3. __init__.py      - module initialization file
 
-    4. nonuniANGIE.py   - a nonuniform sampler with an ANGIE sampling scheme
 
-    5. nonuniExtern.py  - a nonuniform sampler with an external sampling scheme
+    # Nonuniform samplers:
+
+    4. nonuniANGIE.py        - a nonuniform sampler with ANGIE sampling scheme
+
+    5. nonuniExtern.py       - a nonuniform sampler with an external sampling scheme
+
+    6. nonuniExternDummy.py  - a dummy nonuniform sampler with an external sampling scheme
+                               The sampler is 'dummy', because it does not sample the signal,
+                               it only generates the observation matrix.
+
+    7. nonuniARS.py          - a nonuniform sampler with ARS sampling scheme
+
+    8. nonuniJS.py           - a nonuniform sampler with JS sampling scheme
+
+
+    # Uniform samplers:
+
+    9. uniform.py      - a uniform sampler
+
+
+

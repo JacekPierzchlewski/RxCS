@@ -8,4 +8,8 @@ contents:
 
     3. __init__.py    - module initialization file
 
+
     4. sigRandMult.py - Random Multitone Signal Generator
+
+    5. sigRandMult.py - Random Sparse Vector Generator
+

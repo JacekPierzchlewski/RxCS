@@ -6,5 +6,9 @@ contents:
 
     2. Makefile       - local Makefile
 
+
     3. cvxoptL1.py    - module with L1-based signal reconstruction (regularized
                         regression), the optimization uses cvxopt
+
+    4. irlsL1.py      - module with L1-based signal reconstruction (basis pursuit),
+                        the optimization uses irls algorithm

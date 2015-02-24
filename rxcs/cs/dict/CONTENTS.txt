@@ -1,0 +1,12 @@
+RXCS toolbox, dict\ - directory with dictionaries
+
+contents:
+
+    1. CONTENTS.txt   - the current file
+
+    2. Makefile       - local Makefile
+
+
+    3. IDFToNoDC.py    - module generates Inverse Discrete Fourier Transform matrix
+
+    4. IDHT.py         - module generates Inverse Discrete Hartley Transform matrix
