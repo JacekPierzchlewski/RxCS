@@ -7,7 +7,7 @@ The signal contains 3 random tones, the highest possible frequency in the
 signal is 10 kHz.
 
 The signal is uniformly sampled with the average sampling frequency
-equal to 8 kHz. The sampling gird is 1 us. 
+equal to 8 kHz. The sampling gird is 1 us.
 
 After the signal generation and sampling, the original signal and the observed
 signal is plotted in the time domain. Additionally, the sampling pattern is
@@ -51,7 +51,7 @@ def _samp_RMSG_uniform_ex0():
     dAcqConf = {}
     dAcqConf['Tg'] = 1e-6      # The sampling grid period
     dAcqConf['fSamp'] = 8e3    # The average sampling frequency
-    dAcqConf['iAlpha'] = 0.5   # The average sampling frequency
+    dAcqConf['iAlpha'] = 0.5   # The alpha parameter (position of the first sample as a fraction of samp. period)
 
     # -----------------------------------------------------------------
     # Run the multitone signal generator and the sampler
