@@ -34,7 +34,7 @@ def _samp_RMSG_uniform_ex0():
     # -----------------------------------------------------------------
     # Generate settings for the generator
 
-    dSigConf = {}    # Start the dictionary with signal generator configuration
+    dSigConf = {}
     dSigConf['tS'] = 1e-3     # Time of the signal is 1 ms
     dSigConf['fR'] = 1e6      # The signal representation sampling frequency is 1 MHz
     dSigConf['fMax'] = 10e3   # The highest possible frequency in the signal is 10 kHz
@@ -47,7 +47,6 @@ def _samp_RMSG_uniform_ex0():
     # -----------------------------------------------------------------
     # Generate settings for the sampler
 
-    # Start the dictionary with signal acquisition configuration
     dAcqConf = {}
     dAcqConf['Tg'] = 1e-6      # The sampling grid period
     dAcqConf['fSamp'] = 8e3    # The average sampling frequency
