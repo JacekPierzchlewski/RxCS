@@ -16,3 +16,7 @@ import nonuniExtern
 
 # Import dummy nonuniform sampler with external scheme
 import nonuniExternDummy
+
+# Import saturation block
+import satur
+

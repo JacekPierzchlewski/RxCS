@@ -29,4 +29,8 @@ contents:
     9. uniform.py      - a uniform sampler
 
 
+    # Additional modules:
+
+    9. satur.py      - saturation block
+
 
