@@ -16,10 +16,18 @@ contents:
 
     5. samp_RMSG_ARS_ex0.py     - example #0 on how to use the ARS sampler - the simplest example
 
-    6. samp_RMSG_JS_ex0.py      - example #0 on how to use the JS sampler - the simplest
+    6. samp_RMSG_JS_ex0.py      - example #0 on how to use the JS sampler - the simplest example
 
 
     # Uniform sampler examples:
 
     7. samp_RMSG_uniform_ex0.py - example #0 on how to use the uniform sampler - the simplest example
+
+
+    # Saturation block examples:
+
+    8. saturation_ex0.py        - example #0 on how to use the saturation block - the simplest example
+
+    9. saturation_ex1.py        - example #1 on how to use the saturation block - the signal is uniformly sampled and
+                                  then pushed through the saturation block
 
