@@ -163,7 +163,7 @@ def _printConf(dCSConf):
     # bMute    -  mute the conole output flag
     # iK       -  the K parameter
     # mObSig   -  matrix with the observed signals
-    (bMute, iK,_, mObSig, _) = _getData(dCSConf)
+    (bMute, iK, _, mObSig,  _) = _getData(dCSConf)
 
     #----------------------------------------------------------------------
     # Print the configuration if the 'mute' flag is not set
@@ -211,7 +211,7 @@ def _getData(dCSConf):
     Returns:
         bMute (float):     mute the conole output flag
         iK (float):        the K parameter
-        m3Theta (matrix)   the Theta matrices
+        lTheta (list)      list with theta matrices
         mObSig (matrix)    matrix with the observed signals
         bComplex (float)   complex optinmization flag
 
@@ -234,12 +234,25 @@ def _getData(dCSConf):
 
     # -----------------------------------------------------------------
     # Get the Theta matrices
-    if not 'm3Theta' in dCSConf:
-        strError = ('The Theta matrices (m3Theta) are missing ')
+    if 'lTheta' in dCSConf:
+       lTheta = dCSConf['lTheta']
+    elif 'm3Theta' in dCSConf:
+        m3Theta = dCSConf['m3Theta']
+
+        # Put the 3d matrix into the list
+        lTheta = []    # Start the list with observation matrices
+
+        # Get the number of pages in the 3D matrix
+        if (m3Theta.ndim == 3):
+            (nPages, _, _) = m3Theta.shape
+            for inxPage in np.arange(nPages):
+                lTheta.append(m3Theta[inxPage, : ,:])
+        else:
+            lTheta.append(m3Theta)
+    else:
+        strError = ('The Theta matrices (lTheta or m3Theta) are missing ')
         strError = strError + ('in the input dictionary')
         raise NameError(strError)
-    else:
-        m3Theta = dCSConf['m3Theta']
 
     # -----------------------------------------------------------------
     # Get the matrix with the observed signals
@@ -281,7 +294,7 @@ def _getData(dCSConf):
     # -----------------------------------------------------------------
     return (bMute,     # mute the conole output flag
             iK,        # K parameter
-            m3Theta,   # Theta matrices
+            lTheta,    # List with Theta matrices
             mObSig,    # Observed signals
             bComplex)  # The complex optimization flag
 
@@ -438,12 +451,12 @@ def _recon(dCSConf):
     # -----------------------------------------------------------------
     # Get the input data
     # iK       -  the K parameter
-    # m3Theta  -  3D matrix with the Theta matrices
+    # lTheta   -  list with the Theta matrices
     # mObSig   -  matrix with the observed signals
     # bComplex -  complex optmization flag
     (_,
      iK,
-     m3Theta,
+     lTheta,
      mObSig,
      bComplex) = _getData(dCSConf)
 
@@ -452,10 +465,10 @@ def _recon(dCSConf):
 
     # If the optimization problems are complex, make them real
     if bComplex == 1:
-        m3Theta = _makeRealProblem(m3Theta)
+        lTheta = _makeRealProblem(lTheta)
 
     # Get the number of columns in the Theta matrix,
-    (_ , _, nCols) = m3Theta.shape
+    (_, nCols) = lTheta[0].shape
 
     # Allocate the output matrix with signal coefficients
     mCoeff = np.zeros((nCols, nObSig))
@@ -465,7 +478,7 @@ def _recon(dCSConf):
     for inxSig in np.arange(nObSig):
 
         # Get the current Theta matrix and make a cvxopt matrix
-        mmTheta = matrix(m3Theta[inxSig, :, :])
+        mmTheta = matrix(lTheta[inxSig])
 
         # Get the current observation signal
         vvObSig = matrix(mObSig[:, inxSig])
@@ -492,7 +505,7 @@ def _recon(dCSConf):
 # =================================================================
 # Make real-only Theta matrices, if it is needed
 # =================================================================
-def _makeRealProblem(m3Theta):
+def _makeRealProblem(lTheta):
     """
     This function makes a real only Theta matrix from a complex
     Theta matrix.
@@ -522,21 +535,26 @@ def _makeRealProblem(m3Theta):
 
 
     Args:
-        m3Theta (matrix): The Theta matrix with complex values
+        lTheta (list): The Theta matrix with complex values
 
     Returns:
-        m3ThetaR (matrix): The Theta matrix with a real only values
+        lThetaR (list): The Theta matrix with a real only values
     """
 
     # Get the size of the 3d matrix with Theta matricess
-    (nTheta, nRows, nCols) = m3Theta.shape
+    nTheta = len(lTheta)                # Get the number of Theta matrices
+    (nRows, nCols) = lTheta[0].shape    # Get the number of rows/cols in a signle Theta matrix
 
     # Creatwe the real-only Theta matrix
-    m3ThetaR = np.zeros((nTheta, nRows, 2*nCols))
-    m3ThetaR[:, :, np.arange(nCols)] = m3Theta.real
-    m3ThetaR[:, :, np.arange(nCols, 2*nCols)] = m3Theta.imag
+    lThetaR = []
 
-    return m3ThetaR
+    for inxPage in np.arange(nTheta):
+        mThetaR = np.zeros((nRows, 2*nCols))
+        mThetaR[:, np.arange(nCols)] = lTheta[inxPage].real
+        mThetaR[:, np.arange(nCols, 2*nCols)] = lTheta[inxPage].imag
+        lThetaR.append(mThetaR.copy())
+
+    return lThetaR
 
 
 # =================================================================
