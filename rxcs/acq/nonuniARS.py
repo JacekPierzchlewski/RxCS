@@ -13,7 +13,7 @@ available in arXiv: http://arxiv.org/abs/1409.1002
 
 *Version*:
     1.0  | 29-JAN-2015 : * Initial version. |br|
-    1.1  | 9-MAR-2015 :  * Observation matrices are grouped in a list, not is a 3D Numpy array |br|
+    1.1  | 9-MAR-2015 :  * Observation matrices are grouped in a list, not in a 3D Numpy array |br|
 
 *License*:
     BSD 2-Clause
