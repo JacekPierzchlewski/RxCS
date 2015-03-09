@@ -20,6 +20,8 @@ plotted.
 
 *Version*:
     1.0  | 28-JAN-2015 : * Version 1.0 released. |br|
+    1.1  | 9-MAR-2015 :  * Adjusted to the new format of observation matrices from JS sampler |br|
+
 
 *License*:
     BSD 2-Clause
@@ -46,7 +48,7 @@ def _samp_RMSG_JS_ex0():
     dSigConf['nSigPack'] = 1  # The number of signals to be generated
 
     # -----------------------------------------------------------------
-    # Generate settings for the sampler 
+    # Generate settings for the sampler
 
     dAcqConf = {}               # Start the dictionary with signal acquisition configuration
     dAcqConf['Tg'] = 1e-6       # The sampling grid period
@@ -69,10 +71,10 @@ def _samp_RMSG_JS_ex0():
     # Get the observed signal and sampling moments
     mObSig = dObSig['mObSig']  # the observed signal
     vObSig = mObSig[0, :]
-    
-    #  If the JS is the sampler, there may be a different number of samples for 
+
+    #  If the JS is the sampler, there may be a different number of samples for
     #  every signal. Therefore some observation matrices have NaN-filled rows,
-    #  which generate NaN samples in observation signals, which should be 
+    #  which generate NaN samples in observation signals, which should be
     #  removed.
     vObSig = vObSig[np.invert(np.isnan(vObSig))]
 
@@ -81,9 +83,9 @@ def _samp_RMSG_JS_ex0():
     mPattsT = dObSig['mPattsT']  # the sampling moments
     vPattsT = mPattsT[0, :]
 
-    #  If the JS is the sampler, there may be a different number of samples for 
+    #  If the JS is the sampler, there may be a different number of samples for
     #  every signal. Therefore some observation matrices have NaN-filled rows,
-    #  which generate NaN samples in observation signals, which should be 
+    #  which generate NaN samples in observation signals, which should be
     #  removed.
     vPattsT = vPattsT[np.invert(np.isnan(vPattsT))]
 
@@ -119,20 +121,20 @@ def _samp_RMSG_JS_ex0():
     # (for example in compressed sensing systems)
 
     # Get a 3D matrix with observation matrices
-    m3Phi = dObSig['m3Phi']
+    lPhi = dObSig['lPhi']
 
     # Get the first observation matrix (1st page of the m3Phi matrix)
-    mPhi = m3Phi[0, : ,:]
-   
+    mPhi = lPhi[0]
+
     # Sample the signal using the observation matrix
     vObSigPhi = np.dot(mPhi, vSig)
-    
-    #  If the JS is the sampler, there may be a different number of samples for 
+
+    #  If the JS is the sampler, there may be a different number of samples for
     #  every signal. Therefore some observation matrices have NaN-filled rows,
-    #  which generate NaN samples in observation signals, which should be 
+    #  which generate NaN samples in observation signals, which should be
     #  removed.
     vObSigPhi = vObSigPhi[np.invert(np.isnan(vObSigPhi))]
-    
+
     # Plot the signal and the observed sampling points
     hFig2 = plt.figure(2)
     hSubPlot1 = hFig2.add_subplot(111)

@@ -13,6 +13,7 @@ available in arXiv: http://arxiv.org/abs/1409.1002
 
 *Version*:
     1.0  | 29-JAN-2015 : * Initial version. |br|
+    1.1  | 9-MAR-2015 :  * Observation matrices are grouped in a list, not in a 3D Numpy array |br|
 
 *License*:
     BSD 2-Clause
@@ -33,8 +34,8 @@ def main(dAcqConf, dSig):
     - a. **bMute** (*int*): mute the console output from the generator
                             NOT REQUIRED, default = 0
 
-    - b. **nPatts** (*int*): the number of patterns to be generateds 
-                             NOT REQUIRED, if not given equal to the number of signals to be sampled 
+    - b. **nPatts** (*int*): the number of patterns to be generateds
+                             NOT REQUIRED, if not given equal to the number of signals to be sampled
 
     - c. **tTau** (*float*): time of patterns
                              NOT REQUIRED, if not given equal to the time of signals to be sampled
@@ -49,7 +50,7 @@ def main(dAcqConf, dSig):
 
     Required fields in the dictionary with signals to be sampled (dSig):
 
-    - a. **mSig** (*numpy array 2D*): 2D array with signals, one signal p. row 
+    - a. **mSig** (*numpy array 2D*): 2D array with signals, one signal p. row
 
     - b. **fR** (*float*): signals representation sampling frequency
 
@@ -62,26 +63,26 @@ def main(dAcqConf, dSig):
              the matrices mObSig, mPatts, mPattsT and mPattsRep may contain NaN entries, which
              should be ignored.
 
-    - a. **mObSig** (*numpy array 2D*): 2D array with observed signals, one signal p. row 
+    - a. **mObSig** (*numpy array 2D*): 2D array with observed signals, one signal p. row
 
-    - b. **mPatts** (*numpy array 2D*): 2D array with sampling patterns, represented as indices of sampling grid points 
-                                        one signal pattern p. row 
+    - b. **mPatts** (*numpy array 2D*): 2D array with sampling patterns, represented as indices of sampling grid points
+                                        one signal pattern p. row
 
     - c. **mPattsT** (*numpy array 2D*): 2D array with sampling patterns, represented as time moments
-                                         one signal pattern p. row 
+                                         one signal pattern p. row
 
     - d. **mPattsRep** (*numpy array 2D*): 2D array with sampling patterns, represented as indices of signal representation points
-                                           one signal pattern p. row 
+                                           one signal pattern p. row
 
-    - e. **m3Phi** (*numpy array 3D*): 3D array with observation matrices, one matrix p. page 
+    - e. **lPhi** (*list*): list with observation matrices
 
     - f. **Tg** (*float*): the grid period of sampling patterns
 
-    - g. **nK_g** (*int*): the number of grid points in a sampling pattern  
+    - g. **nK_g** (*int*): the number of grid points in a sampling pattern
 
-    - h. **tTau_real** (*float*): the real time of sampling patterns 
+    - h. **tTau_real** (*float*): the real time of sampling patterns
 
-    - i. **nK_s** (*int*): the expected number of sampling points in a pattern 
+    - i. **nK_s** (*int*): the expected number of sampling points in a pattern
 
     - j. **f_s** (*float*): the expected average sampling frequency
 
@@ -125,7 +126,7 @@ def main(dAcqConf, dSig):
     # =================================================================
     # Generate the observation matrices
     # =================================================================
-    m3Phi = _generObser(mPattsRep, dAcqConf, dSig)
+    lPhi = _generObser(mPattsRep, dAcqConf, dSig)
 
     # =================================================================
     # Generate the output dictionary
@@ -133,7 +134,7 @@ def main(dAcqConf, dSig):
     dObSig = _generateOutput(dAcqConf, dSig,
                              mObSig,
                              mPatts, mPattsRep, mPattsT,
-                             m3Phi)
+                             lPhi)
 
     # =================================================================
     # Signal sampling is done!
@@ -667,15 +668,15 @@ def _generate_patterns(dAcqConf, dSig):
         # Adjust the sampling pattern or a matrix with patterns
         (iS_v,) = vPattern.shape             # Get the size of the generated pattern
         iSMaxPatt = max((iS_v, iSMaxPatt))   # Update the max size of a pattern
-        (iR_m, iC_m) = mPatts.shape          # Get the number of rows and columns in the matrix with patterns 
+        (iR_m, iC_m) = mPatts.shape          # Get the number of rows and columns in the matrix with patterns
 
         # Check the inequalities between matrix with vectors and the current vector with a pattern
         if iS_v < iC_m:     # <- the size of a generated pattern is lower than the
                             #    number of columns in the storage matrix
 
             iEmpty = iC_m - iS_v  # Calculate the size of empty space in the pattern
-            
-            vPatch = np.nan*np.ones(iEmpty)   # Update the pattern (fill up the empty spaces with a patch of -1)     
+
+            vPatch = np.nan*np.ones(iEmpty)   # Update the pattern (fill up the empty spaces with a patch of -1)
             vPattern = np.hstack((vPattern, vPatch))   #
 
         elif iS_v > iC_m:   # <- the size of a generated pattern is higher than the number of columns in the storage matrix
@@ -689,10 +690,10 @@ def _generate_patterns(dAcqConf, dSig):
 
     vInx = range(0, iSMaxPatt)    # Clip the matrix with patterns
     mPatts = mPatts[:, vInx]      # ^
-   
+
     # The patterns engine generates patterns in range  <1 ; N>, where
     # N is the number of possible positions of a sampling points.
-    # Because Numpy indexes arrays from 0, the patterns should be represented 
+    # Because Numpy indexes arrays from 0, the patterns should be represented
     # in range from <0 ; N-1>
     mPatts = mPatts - 1
 
@@ -718,11 +719,11 @@ def _generate_patterns(dAcqConf, dSig):
 
     # Generate matrix with patterns where NaN is change to inxex of NaN in vTSig
     mPattsRep_ = mPattsRep.copy()
-    (iTPoints, ) = vTSig.shape                        # Get the number of points in the time vector            
+    (iTPoints, ) = vTSig.shape                        # Get the number of points in the time vector
     mPattsRep_[np.isnan(mPattsRep)] = iTPoints - 1    # Change nan into pointer to nan
- 
+
     # Generate patterns as time moments
-    mPattsT = vTSig[mPattsRep_.astype(int)]                      
+    mPattsT = vTSig[mPattsRep_.astype(int)]
 
     # --------------------------------------------------------------
     return (mPatts, mPattsRep, mPattsT)
@@ -736,14 +737,14 @@ def _js_engine(nK_s, nT, K_g, sigma):
     # Allocate the vector for the sampling points
     vPattern = np.nan*np.zeros(2*nK_s)
 
-    hatk = 0     # Reset the index of stored sampling time point                                               
+    hatk = 0     # Reset the index of stored sampling time point
     n_hatk = 0   # Reset the current index of the grid
 
     # -----------------------------------------------------------------
     # Draw all time points
     for inxSmp in range(1, nK_s+1):
 
-        # Draw the current time point                       
+        # Draw the current time point
         x_k = np.random.randn()
         nstar_hatk = round(inxSmp*nT + np.sqrt(sigma) * x_k * nT)
 
@@ -796,7 +797,7 @@ def _sample(mPattsRep, dSig):
     # -----------------------------------------------------------------
     # Get the signals to be sampled and the number of signals to be sampled
     (mSig, nSigs, _, _) = _getSigs(dSig)
-    
+
     # -----------------------------------------------------------------
     # Sample the signals
     mSig_ = np.hstack((mSig, np.nan*np.zeros((nSigs,1))))   # Add nan to the end of signals
@@ -808,7 +809,7 @@ def _sample(mPattsRep, dSig):
 
     mObSig = (mSig_[np.arange(nSigs), mPattsRep_.T.astype(int)]).T  # Generate correct observation signals
     # -----------------------------------------------------------------
-    
+
     return mObSig
 
 
@@ -825,7 +826,7 @@ def _generObser(mPattsRep, dAcqConf, dSig):
         dSig (dictionary): dictionary with the signals to be sampled
 
     Returns:
-        m3Phi (3D matrix): observation matrices
+        lPhi (list): list with observation matrices
     """
 
     (_, nMaxSamp) = mPattsRep.shape   # Get the maximum number of samples in all the sampling patterns
@@ -851,34 +852,32 @@ def _generObser(mPattsRep, dAcqConf, dSig):
      _) = _computeRealParam(dAcqConf, dSig)
 
     # -----------------------------------------------------------------
-
-    # Allocate the observation matrices
-    m3Phi = np.zeros((nPatts, nMaxSamp, nSmp))
+    lPhi = []    # Start the list with the observation matrices
 
     # Generate the observation matrices
     for inxPat in np.arange(nPatts):  # <- loop over all observation matrices
 
         # Get the current pattern
         vPatts = mPattsRep[inxPat, :]
+        vPatts = vPatts[np.invert(np.isnan(vPatts))]   # Clean the pattern
+        nPatSiz  = vPatts.size          # Size of the pattern
 
         # Generate the observation matrix for the current sampling pattern
-        inxRow = 0
-        for inxCol in vPatts:    # <- loop over all samling points in pattern
-
-            if np.isnan(inxCol):
-                m3Phi[inxPat, inxRow, :] = np.nan*np.zeros((1,nSmp))                
-            else:
-                m3Phi[inxPat, inxRow, int(inxCol)] = 1
+        mPhi = np.zeros((nPatSiz, nSmp))  # Allocat the observation matrix
+        inxRow = 0                        # Reset index of a row
+        for inxCol in vPatts:   # <- loop over all sampling points in a pattern
+            mPhi[inxRow, int(inxCol)] = 1
             inxRow = inxRow + 1
-                                
-    # -----------------------------------------------------------------
+        lPhi.append(mPhi.copy())   # Add the matrix to the list
 
-    return m3Phi
+    # -----------------------------------------------------------------
+    return lPhi
+
 
 # =================================================================
 # Generate the output dictionary
 # =================================================================
-def _generateOutput(dAcqConf, dSig, mObSig, mPatts, mPattsRep, mPattsT, m3Phi):
+def _generateOutput(dAcqConf, dSig, mObSig, mPatts, mPattsRep, mPattsT, lPhi):
     """
     This function generates the output dictionary.
 
@@ -889,7 +888,7 @@ def _generateOutput(dAcqConf, dSig, mObSig, mPatts, mPattsRep, mPattsT, m3Phi):
         mPatts (matrix): the sampling patterns (grid indices)
         mPattsRep (matrix): the sampling patterns (signal rep. sampling points)
         mPattsT (matrix): the sampling patterns (time moments)
-        m3Phi (3D matrix): observation matrices
+        lPhi (list): list with observation matrices
 
     Returns:
         dObSig (dictionary): the observed signals and paramters of sampling
@@ -940,7 +939,7 @@ def _generateOutput(dAcqConf, dSig, mObSig, mPatts, mPattsRep, mPattsT, m3Phi):
 
     # - - - - - - - - - - - - - - - - - -
 
-    dObSig['m3Phi'] = m3Phi           # The observation matrices
+    dObSig['lPhi'] = lPhi           # The observation matrices
 
     # - - - - - - - - - - - - - - - - - -
 
