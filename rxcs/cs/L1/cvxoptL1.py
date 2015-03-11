@@ -67,6 +67,7 @@ def main(dCSConf):
     - c. **iK** (*float*): k parameter
 
     - d. **mObSig** (*matrix*): matrix with observed signals
+                                one observed signal p. column
 
     - e. **bComplex** (*float*): 'complex data' flag
 
@@ -277,19 +278,14 @@ def _getData(dCSConf):
     mObSig = _make2Dmatrix(mObSig)
 
     # -----------------------------------------------------------------
-    # Check if the Theta matrix is 2D.
-    # If it is, then make it a 3D with one page
-    m3Theta = _make3Dmatrix(m3Theta, bComplex)
-
-    # -----------------------------------------------------------------
     # Check it the number of the observed signals is equal to the number
     # of the Theta matrices
-    _checkNObs(m3Theta, mObSig)
+    _checkNObs(lTheta, mObSig)
 
     # -----------------------------------------------------------------
     # Check it the number of rows in the Theta matrices is equal to the
     # size of the observed signals
-    _checkThetaRows(m3Theta, mObSig)
+    _checkThetaRows(lTheta, mObSig)
 
     # -----------------------------------------------------------------
     return (bMute,     # mute the conole output flag
@@ -363,7 +359,7 @@ def _make3Dmatrix(m3Theta, bComplex):
 # Check if the number of observed signals is equal to the number
 # of Theta matrices
 # =================================================================
-def _checkNObs(m3Theta, mObSig):
+def _checkNObs(lTheta, mObSig):
     """
     This function checks if the number of observed signals equals
     the number of Theta matrices.
@@ -375,7 +371,7 @@ def _checkNObs(m3Theta, mObSig):
     the 'mObSig' matrix.
 
     Args:
-        m3Theta (3D matrix): 3D matrix with Theta matrices
+        lTheta (3D matrix): list with Theta matrices
         mObSig (matrix): matrix with observed signals
 
     Returns:
@@ -386,8 +382,7 @@ def _checkNObs(m3Theta, mObSig):
     (_ , nObSig) = mObSig.shape
 
     # Get the number of Theta matrices
-    (nTheta , _, _) = m3Theta.shape
-
+    nTheta = len(lTheta)
     # -----------------------------------------------------------------
 
     # Main check starts here
@@ -403,32 +398,39 @@ def _checkNObs(m3Theta, mObSig):
 # Check it the number of rows in the Theta matrices is equal to the
 # size of the observed signals
 # =================================================================
-def _checkThetaRows(m3Theta, mObSig):
+def _checkThetaRows(lTheta, mObSig):
     """
     This function checks if the number of rows in the Theta matrices
     equals the size of the observed signals.
 
     Args:
-        m3Theta (3D matrix): 3D matrix with Theta matrices
+        lTheta (list): list with Theta matrices
         mObSig (matrix): matrix with observed signals
 
     Returns:
         nothing
     """
 
-    # Get the number of rows in the theta matrix
-    (_, nRows, _) = m3Theta.shape
+    nTheta = len(lTheta)  # Get the number of the Theta matrices
 
-    # Get the size of the observed signals
-    (nObSiz, _) = mObSig.shape
+    # -----------------------------------------------------------------
+    # Loop over all the Theta matrices
+    for inxTheta in np.arange(nTheta):
+
+        (nRows, _) = lTheta[inxTheta].shape     # Get the number of rows in the current Theta matrix
+
+        # Get the size of the current observed signal
+        vObSig = mObSig[:, inxTheta]
+        vObSig = vObSig[np.invert(np.isnan(vObSig))]
+        nObSiz = vObSig.size
+
+        if nRows != nObSiz:
+            strError = ('The number of rows (%d) in the Theta matrix #%d is not equal ') % (nRows, inxTheta)
+            strError = strError + ('to the size (%d) of the observed signal #%d') % (nObSiz, inxTheta)
+            raise ValueError(strError)
 
     # -----------------------------------------------------------------
 
-    # Main check starts here
-    if nRows != nObSiz:
-        strError = ('The number of rows in the Theta matrices is not equal ')
-        strError = strError + ('to the size of the observed signals')
-        raise ValueError(strError)
 
     return
 
@@ -543,13 +545,13 @@ def _makeRealProblem(lTheta):
 
     # Get the size of the 3d matrix with Theta matricess
     nTheta = len(lTheta)                # Get the number of Theta matrices
-    (nRows, nCols) = lTheta[0].shape    # Get the number of rows/cols in a signle Theta matrix
 
-    # Creatwe the real-only Theta matrix
+    # Create the real-only Theta matrix
     lThetaR = []
 
     for inxPage in np.arange(nTheta):
-        mThetaR = np.zeros((nRows, 2*nCols))
+        (nRows, nCols) = lTheta[inxPage].shape    # Get the number of rows/cols in the current Theta matrix
+        mThetaR = np.zeros((nRows, 2*nCols))      # Construct a new empty real-only Theta matrix
         mThetaR[:, np.arange(nCols)] = lTheta[inxPage].real
         mThetaR[:, np.arange(nCols, 2*nCols)] = lTheta[inxPage].imag
         lThetaR.append(mThetaR.copy())
