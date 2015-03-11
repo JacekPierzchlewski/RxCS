@@ -17,6 +17,7 @@ import rxcs
 import numpy as np
 import sys
 
+
 def main(dAcqConf, dSig):
     """
     This the main function of the saturation block. |br|
