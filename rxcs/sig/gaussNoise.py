@@ -18,27 +18,28 @@ class gaussNoise(rxcs._RxCSobject):
         if len(args) > 0:
             self.run(*args)
 
+
     # Define parameters
     def __parametersDefine(self):
 
         # Representation sampling frequency
         self.paramAddMan('fs', 'Representation sampling frequency', unit='Hz')
-        self.paramType('fs',(float, int))     
+        self.paramType('fs', (int, float))
         self.paramH('fs', 0)                  # Rep. samp. freq. must be higher than zero
         self.paramL('fs', np.inf)             # ...and lower than infinity
 
         # Time of signal
         self.paramAddMan('tS', 'Signal time', unit='s')
-        self.paramType('tS',(float, int))
+        self.paramType('tS', (float, int))
         self.paramH('tS', 0)            # Time must be higher than zero
         self.paramL('tS', np.inf)       # ...and lower than infinity
 
         # Baseband
         self.paramAddOpt('fB', 'Baseband', unit='Hz') 
-        self.paramType('fB',(float, int))       
+        self.paramType('fB', (float, int))       
         self.paramHE('fB', 0)                           # Signal baseband must be higher or equal to zero
                                                         # (if it is equal to zero, the baseband is defined by fs)
-        self.paramL('fB', np.inf)                       # ...and lower than infinity        
+        self.paramL('fB', np.inf)                       # ...and lower than infinity
         self.paramLE('fB', 'fs', mul=0.5)               # Signal baseband must be lower or equal to half the rep. sampling
                                                         # frequency
         # Power of a signal
@@ -103,10 +104,10 @@ class gaussNoise(rxcs._RxCSobject):
         if (self.fB > 0):
             
             # Design a iir low pass filter
-            iCFP = self.fB/(0.5*self.fs)   # Compute the critical filter parameter 
+            iCFP = self.fB/(0.5*self.fs)   # Compute the filter parameter 
             (vN, vD) = scsig.iirfilter(self.nFiltOrd, iCFP, btype='lowpass', ftype=self.strFilt, 
                                        rs=self.iRs, rp=self.iRp)  
-            # Apply the filter            
+            # Apply the filter
             self.vSig = scsig.lfilter(vN, vD, self.vSig)   
             
         self.engineStopsInfo()   # Info that the engine ends

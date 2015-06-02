@@ -1,0 +1,48 @@
+
+
+
+
+        self.paramAddMan('vSigIn', 'Input signal')
+        self.paramType('vSigIn', np.ndarray)                #
+        self.paramTypeEl('vSigIn', (float, int))            #
+        
+        # 
+        self.paramL('vSigIn',  np.inf)                      #
+        self.paramH('vSigIn', -np.inf)                      
+
+
+        # Size:        
+        self.paramSizEq('vSigIn', 'fs', mul=0.5, add=1)     # Size equal. Only for numpy, list, tuple, string.  Second element must be either: 1) int, float - equal to the number,   
+                                                            #                                                                                  2) list, tuple, ndarray - equal to the size
+                                                            #                                                                                  3) string - equal to something hidden in the string
+
+
+        self.paramSizH('vSigIn', 'fs',  mul=0.5, add=1)     # Size higher than. Only for numpy, list, tuple, string. Ref. must be either:    1) int, float - equal to the number,   
+                                                            #                                                                                2) list, tuple, ndarray - equal to the size
+                                                            #                                                                                3) string - equal to something hidden in the string
+
+        self.paramSizL('vSigIn', 'fs',  mul=0.5, add=1)     # Size lower than. Only for numpy, list, tuple, string  second element must be either:  1) int, float - equal to the number,   
+                                                            #                                                                                 2) list, tuple, ndarray - equal to the size
+                                                            #                                                                                 3) string - equal to something hidden in the string
+        
+        # The number of dimensions:        
+        
+        self.paramDimEq('vSigIn', 'fs',  mul=0.5, add=1)    # The number of dimensions (equal). Only for numpy, second element must be either 1) int, float - equal to the number,   
+                                                            #                                                                                 2) list, tuple, ndarray - equal to the size
+                                                            #                                                                                 3) string - equal to something hidden in the string
+
+        self.paramDimH('vSigIn', 'fs',  mul=0.5, add=1)     # The number of dimensions (higher). Only for numpy, second element must be either:   1) int, float - equal to the number,   
+                                                            #                                                                                     2) list, tuple, ndarray - equal to the size
+                                                            #                                                                                     3) string - equal to something hidden in the string
+        
+
+        self.paramDimL('vSigIn', 'fs',  mul=0.5, add=1)     # The number of dimensions (lower). Only for numpy, second element must be either:    1) int, float - equal to the number,   
+                                                            #                                                                                     2) list, tuple, ndarray - equal to the size
+                                                            #                                                                                     3) string - equal to something hidden in the string
+        
+
+        # Shape:
+        self.paramShapeEq('vSigIn', 'fs')                   # Shape equal. Only for numpy, second element must be either:    1) int, float - equal to the number,   
+                                                            #                                                                                     2) list, tuple, ndarray - equal to the size
+                                                            #                                                                                     3) string - equal to something hidden in the string
+        

@@ -12,37 +12,47 @@ class LNA(rxcs._RxCSobject):
         self.strRxCSgroup = 'Signal generator'          # Name of group of RxCS modules
         self.strModuleName = 'Nonlinear low-noise amp'  # Module name        
 
-        self.__inputDefine()          # Define the input signals
+        self.__inputDefine()           # Define the input signals
         self.__parametersDefine()      # Define the parameters
 
         # If there are arguments given when the object was created, then run the engine  
         if len(args) > 0:
             self.run(*args)
 
+
     # Define input signals
     def __inputDefine(self):
 
         # Input signal
-        self.paramAddMan('vCoef', 'Input signal')
-        self.paramType('vCoef','numpy array float')    # Must be of a numpy array with float number
-        self.paramL('fs', np.inf)                      # Must be lower than +infinity...
-        self.paramH('fs', -np.inf)                     # ...and higher than -infinity
+        self.paramAddMan('vSigIn', 'Input signal')
+        self.paramType('vSigIn', np.ndarray)                # Must be of a numpy array with float number
+        self.paramTypeEl('vSigIn', (float, int))            # ...with float/int elements
+        self.paramLE('vSigIn',  np.array([3, 10, 20]))      # Must be lower than +infinity...
 
- 
+        self.paramH('vSigIn', -5)                      # ...and higher than -infinity
+
+        #self.paramSiz('vSigIn', ( ))
+
+
     # Define parameters
     def __parametersDefine(self):
 
         # Amplifier coefficients
-        self.paramAddMan('vCoef', 'Amplifier coefficients', noprint=0)
-        self.paramType('vCoef','numpy array float')    # Must be of a numpy array with float number
-        self.paramL('fs', np.inf)                      # Must be lower than +infinity...
-        self.paramH('fs', -np.inf)                     # ...and higher than -infinity
+        #self.paramAddMan('vCoef', 'Amplifier coefficients', noprint=0)
+        #self.paramType('vCoef', (np.ndarray, list))    # Must be of a numpy array...
+        #self.paramTypeEl('vCoef',(int, float))         # ...with float/int elements
+        #self.paramSizEq('vCoef',10)                    # Size must be equal to 10
+        #self.paramSizL('vCoef',20)                     # Size must be lower than 20
+        #self.paramSizH('vCoef',2)                      # Size must be higher than 2
+        
+        #self.paramL('vCoef', np.inf)                   # Elements must be lower than +infinity...
+        #self.paramH('vCoef', -np.inf)                  # ...and higher than -infinity
 
         # --------------------------------------------------------------------
 
         # Mute the output flag
         self.paramAddOpt('bMute', 'Mute the output', noprint=1)  
-        self.paramType('bMute','int')          # Must be of int type
+        self.paramType('bMute', int)           # Must be of int type
         self.paramAllowed('bMute',[0, 1])      # It can be either 1 or 0
 
 
@@ -61,6 +71,4 @@ class LNA(rxcs._RxCSobject):
     def __engine(self):
         
         self.engineStartsInfo()  # Info that the engine starts
-
-
         self.engineStopsInfo()   # Info that the engine ends

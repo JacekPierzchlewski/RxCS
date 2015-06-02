@@ -12,6 +12,7 @@ class _RxCSobject:
         self.iManParam = 0       # The number of mandatory parameters
         self.iOptParam = 0       # The number of optional parameters
 
+
     def paramAddMan(self, strName, strDesc, unit='', noprint=0, unitprefix='-'):
         """
             Add a mandatory parameter to the object.
@@ -27,7 +28,7 @@ class _RxCSobject:
                                         (optional, default is - = CPU decides,
                                         allowed values = f:femto, p:pico, n:nano, u:micro, m:mili,
                                         ' ':one, k:kilo, M:mega, G:giga, T:tera)
-                                              
+
             Output:
                     none
                     
@@ -36,7 +37,7 @@ class _RxCSobject:
             
             Last modification:
                     29 may 2015                
-        """    
+        """
         # Error checks -------------------------------------------------------
         if (self.iOptParam > 0):
             raise RuntimeError('Mandatory parameter cannot be defined after optional!')
@@ -112,7 +113,7 @@ class _RxCSobject:
             Last modification:
                     29 may 2015                
         """    
-        
+
         # Error checks -------------------------------------------------------      
         if not isinstance(strName, str):        
             raise ValueError('Name of a parameter must be a string!')
@@ -210,19 +211,22 @@ class _RxCSobject:
                     Jacek Pierzchlewski jap@es.aau.dk
             
             Last modification:
-                    1 june 2015                
+                    2 june 2015                
         
         """
 
-        # Error checks -------------------------------------------------------      
-        if not isinstance(strName, str):     
+        # Error checks -------------------------------------------------------
+
+        # Check the given parameter
+        if not isinstance(strName, str):
             raise ValueError('Name of a parameter must be a string!')
-        
-        # HERE
+
         (bDefined, inxParam) = self.__parameterWasDefined(strName)
         if not bDefined:
             strError = ('Parameter %s was not yet defined!') % strName
             raise RuntimeError(strError)
+
+        # Check the given types        
         if isinstance(types, type):
             types = [types]
         elif(isinstance(types, list)):
@@ -244,6 +248,7 @@ class _RxCSobject:
         #---------------------------------------------------------------------
         self.lParameters[inxParam]['lTypes'] = types
         return
+
 
     def paramTypeEl(self, strName, types):
         """
@@ -267,19 +272,22 @@ class _RxCSobject:
                     Jacek Pierzchlewski jap@es.aau.dk
             
             Last modification:
-                    1 june 2015                
+                    2 june 2015                
         
         """
 
-        # Error checks -------------------------------------------------------      
-        if not isinstance(strName, str):     
+        # Error checks -------------------------------------------------------
+
+        # Check the given parameter
+        if not isinstance(strName, str):
             raise ValueError('Name of a parameter must be a string!')
-        
-        # HERE
+
         (bDefined, inxParam) = self.__parameterWasDefined(strName)
         if not bDefined:
             strError = ('Parameter %s was not yet defined!') % strName
             raise RuntimeError(strError)
+
+        # Check the given types        
         if isinstance(types, type):
             types = [types]
         elif(isinstance(types, list)):
@@ -288,23 +296,22 @@ class _RxCSobject:
             strWasGiven = 'tuple'
             types = list(types)
         else:
-            raise ValueError('Allowed types of elements of a parameter must be a type, a tuple of types, or a list of types!')
+            raise ValueError('Allowed types of elements of parameter must be a type, a tuple of types, or a list of types!')
         
         # Check the list with allowed types
         for inxType in range(len(types)):
             if (not isinstance(types[inxType], type)):
-                strErr = 'Allowed types of a parameter must be a type or a list of types!'
+                strErr = 'Allowed types of a elements of parameter must be a type, a tuple of types, or a list of types!'
                 strErr = strErr + '\n            Element #%d of the given %s of types is: %s' % \
                     (inxType, strWasGiven, type(types[inxType]))
                 raise ValueError(strErr)
-
         #---------------------------------------------------------------------
         self.lParameters[inxParam]['lTypesEl'] = types
         return
 
 
-    #-------------------------------------------------------------------------
     def paramAllowed(self, strName, lAllowed, errnote=''):
+
         # Error checks -------------------------------------------------------
         
         # Parameter to be checked        
@@ -425,11 +432,11 @@ class _RxCSobject:
 
     def __paramAddRelRestriction(self, strResCode, strName, reference, iMul, iAdd, strErrNote):
         """
-            Assign relational restriction to a parameter - internal engine 
+            Assign relational restriction to a parameter
                                             
             Arguments:
                     
-                    strResCode:   [string]       code of the restriction
+                    strResCode:   [string]          code of the restriction
                     strName:      [string]          name of the parameter
                     reference:    [string/number]   reference, it can be a number or a name of another parameter
                     iMul:         [number]          multiply coefficient, reference will be multipled by this 
@@ -474,8 +481,8 @@ class _RxCSobject:
             raise ValueError('Error note must be a string ')
 
         # Reference          
-        if not isinstance(reference, (str, int, float)):
-            raise ValueError('Reference must be a string or a real number!')
+        if not isinstance(reference, (str, int, float, tuple, np.ndarray, list)):
+            raise ValueError('Reference must be a string, a real number, a tuple, a list or a numpy array!')
         if isinstance(reference, float) :
             if np.isnan(reference): 
                 raise ValueError('Reference must not be nan!')
@@ -611,9 +618,9 @@ class _RxCSobject:
         """
         self.__parametersCheckMandatory()     # Check if all the mandatory parameters are given 
         self.__parametersCheckType()          # Check types of all the parameters
-        self.__parametersCheckRestrictions()  # Check restrictions on the parameters 
+        self.__parametersCheckRestrictions()  # Check restrictions on the parameters
 
- 
+
     def __parametersCheckMandatory(self):
         """
             Function checks if all the mandatory parameters are given.
@@ -632,10 +639,10 @@ class _RxCSobject:
         # Loop over all parameters 
         for inxMan in range(self.iManParam):
             strParName = self.lParameters[inxMan]['strName']
-                if isinstance(self.__dict__[strParName],float):
-                    if np.isnan(self.__dict__[strParName]):
-                        strError = ('Mandatory parameter >%s< is not given!') % strParName
-                        raise ValueError(strError)
+            if isinstance(self.__dict__[strParName], float):
+                if np.isnan(self.__dict__[strParName]):
+                    strError = ('Mandatory parameter >%s< is not given!') % strParName
+                    raise ValueError(strError)
 
 
     def __parametersCheckType(self):
@@ -660,14 +667,38 @@ class _RxCSobject:
             # If type is not give, continue to the next parameter            
             if not 'lTypes' in self.lParameters[inxPar]:
                 continue
-            
-            strParName = self.lParameters[inxPar]['strName']   # Name of the current parameter
-            lTypes = self.lParameters[inxPar]['lTypes']      # Allowed types of the parameter
-            parameter = self.__dict__[strParName]   # Get the parameter
 
+            # Get the name of the parameter, allowed types and the parameter itself
+            strParName = self.lParameters[inxPar]['strName']   # Name of the current parameter
+            lTypes = self.lParameters[inxPar]['lTypes']        # Allowed types of the current parameter
+            parameter = self.__dict__[strParName]              # Get the parameter
+
+            # Check the type
             if not (isinstance(parameter,tuple(lTypes))):
                 strError = ('Type %s is incorrect for parameter >%s< !') % (type(parameter), strParName)
                 raise ValueError(strError)
+            
+            # Check types of elements, if needed
+            if isinstance(parameter, (np.ndarray, list, tuple)):
+                if not 'lTypesEl' in self.lParameters[inxPar]:
+                    continue
+                lTypesEl = self.lParameters[inxPar]['lTypesEl']   # Allowed types of elements of the current parameter
+
+                # Service for numpy array
+                if isinstance(parameter, np.ndarray):
+                    if (parameter.size > 0):
+                        if not (isinstance(parameter[0], tuple(lTypesEl))):
+                            strError = ('Parameter >%s< contains elements of an illegal type (%s)!') \
+                                % (strParName, type(parameter[0]))
+                            raise ValueError(strError)
+                    return
+
+                # Service for a tuple or a list
+                for inxEl in range(len(parameter)):       # Loop over all elements of the current parameter
+                    if not (isinstance(parameter[inxEl], tuple(lTypesEl))):
+                        strError = ('Parameter >%s< on position %d contains an element of an illegal type (%s)!') \
+                            % (strParName, inxEl, type(parameter[inxEl]))
+                        raise ValueError(strError)
         return
 
 
@@ -708,17 +739,16 @@ class _RxCSobject:
             Last modification:
                     29 may 2015
         """
-
-        strParName = dParam['strName']     # Name of the parameter
-        strDesc = dParam['strDesc']        # Description of the parameter 
-        iPar = self.__dict__[strParName]   # The parameter itself
+        strParName = dParam['strName']      # Name of the parameter
+        strDesc = dParam['strDesc']         # Description of the parameter 
+        parVal = self.__dict__[strParName]  # The parameter itself
 
         # Loop over all restrictions
         for inxRes in range(len(dParam['lRes'])):
-            
+
             # Get the restriction code, error note, reference and coefficients
             strRes = dParam['lRes'][inxRes]               # Restriction                 
-            lCoef = dParam['lResData'][inxRes]            # Coefficients
+            lResData = dParam['lResData'][inxRes]         # Data associated with the restriction
             reference = dParam['lResReference'][inxRes]   # Reference
             strErrNote = dParam['lResErrNote'][inxRes]    # Error note
 
@@ -730,42 +760,50 @@ class _RxCSobject:
                     if not bDefinedRef:
                         strError = ('Reference > %s < was not yet defined!') % reference
                         raise RuntimeError(strError)
-                    iRef = self.__dict__[reference]           # value
-                    strReference = '> %s <' % (reference)     # string with name
+                    refVal = self.__dict__[reference]       # value
+                    strRefName = '> %s <' % (reference)     # string with name
                 else:
-                    # If reference is an amepty string it means we do not need it
+                    # If reference is an empty string it means we do not need it
                     pass
             else:
-                iRef=reference                            # value
+                refVal=reference                        # value
+                
+                # string with name of the reference
                 if isinstance(reference, float):         
-                    strReference = ('%f') % (reference)   # string with name 
-                else:
-                    strReference = ('%d') % (reference)   # string with name
-    
+                    strRefName = ('%f') % (reference)   # float
+                elif isinstance (reference, int):
+                    strRefName = ('%d') % (reference)   # int
+                elif isinstance (reference, tuple):     
+                    strRefName = 'the given tuple'          # tuple
+                elif isinstance (reference, list):     
+                    strRefName = 'the given list'           # list
+                elif isinstance (reference, np.ndarray):     
+                    strRefName = 'the given numpy array'    # numpy array
+
             # Run the correct parameter restriction check function
             if (strRes == 'paramAllowed'):
-                self.__parameterRestrictionAllowed(strParName, strDesc, iPar, lCoef, strErrNote)                
+                self.__parameterRestrictionAllowed(strParName, strDesc, parVal, lResData, strErrNote)                
             elif (strRes == 'paramH'):
-                self.__parameterRestrictionH(strParName, strDesc, iPar, strReference, iRef, lCoef, strErrNote)
+                self.__parameterRestrictionH_HE_L_LE(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'higher than')
             elif (strRes == 'paramHE'):
-                self.__parameterRestrictionHE(strParName, strDesc, iPar, strReference, iRef, lCoef, strErrNote)
+                self.__parameterRestrictionH_HE_L_LE(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'higher or equal to')
             elif (strRes == 'paramL'):
-                self.__parameterRestrictionL(strParName, strDesc, iPar, strReference, iRef, lCoef, strErrNote)
+                self.__parameterRestrictionH_HE_L_LE(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'lower than')
             elif (strRes == 'paramLE'):
-                self.__parameterRestrictionLE(strParName, strDesc, iPar, strReference, iRef, lCoef,strErrNote)
+                self.__parameterRestrictionH_HE_L_LE(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'lower or equal to')
             else:
                 raise RuntimeError('Something went seriously wrong...[internal RxCSobject error]')
 
 
-    def __parameterRestrictionAllowed(self, strParName, strDesc, iPar, lCoef, strErrNote):
+    def __parameterRestrictionAllowed(self, strParName, strDesc, parVal, lAllVal, strErrNote):
         """
             Function checks the 'allowed values' restriction of a parameter.
 
             Arguments:
                     strParName: [string]        name of a parameter
                     strDesc:    [string]        description of a parameter
-                    iPar:       [number]        parameter to be checked
-                    lCoef       [list]          list with allowed values 
+                    parVal:                     value of the parameter to be checked
+                    lAllVal     [list]          list with allowed values 
                     strErrNote  [string]        error note to be displayed if the restriction is broken
                                                 (might be empty, then a default note is generated)
             Output:
@@ -777,33 +815,36 @@ class _RxCSobject:
             Last modification:
                     29 may 2015
         """
-        for iAllVal in lCoef:
-            if (iPar == iAllVal): 
+        for iAllVal in lAllVal:
+            if (parVal == iAllVal): 
                 return
 
-        if (strErrNote == ''):
-            
-            if isinstance(iPar, (int, float)):
-                strErrNote = ('%s is an incorrect value for parameter >%s< (\'%s\')') % (self.__n2s(iPar), strParName, strDesc)
-            elif isinstance(iPar, (str)):
-                strErrNote = ('%s is an incorrect value for parameter >%s< (\'%s\')') % (iPar, strParName, strDesc)
-                
+        if (strErrNote == ''):            
+            if isinstance(parVal, (int, float)):
+                strErrNote = ('%s is an incorrect value for parameter >%s< (\'%s\')') % (self.__n2s(parVal), strParName, strDesc)
+            elif isinstance(parVal, (str)):
+                strErrNote = ('%s is an incorrect value for parameter >%s< (\'%s\')') % (parVal, strParName, strDesc)
+
         raise ValueError(strErrNote)
 
-        
-    def __parameterRestrictionH(self, strParName, strDesc, iPar, strReference, iRef, lCoef, strErrNote):
+
+    def __parameterRestrictionH_HE_L_LE(self, strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation):
         """
-            Function checks the 'higher than' relative restriction of a parameter.
+            Function checks the 'higher than', 'higher or equal to', 'lower than', 'lower or equal to' 
+            relative restriction of a parameter.
 
             Arguments:                    
-                    strParName: [string]        name of a parameter
-                    strDesc:    [string]        description of a parameter
-                    iPar:       [number]        parameter to be checked
-                    strRefence  [string]        name of a reference        
-                    iRef        [number]        reference
-                    lCoef       [list]          list with 'mul' and 'add' coefficients 
-                    strErrNote  [string]        error note to be displayed if the restriction is broken
-                                                (might be empty, then a default note is generated)
+                    strParName:   [string]        name of a parameter
+                    strDesc:      [string]        description of a parameter
+                    parVal:                       parameter to be checked
+                    strRefence    [string]        name of a reference
+                    refVal                        reference
+                    lCoef         [list]          list with 'mul' and 'add' coefficients 
+                    strErrNote    [string]        error note to be displayed if the restriction is broken
+                                                  (might be empty, then a default note is generated)
+                    strRelation   [string]        relation, allowed values: 
+                                                  'higher than', 'higher or equal to', 'lower than', 'lower or equal to'
+                                        
             Output:
                     none
 
@@ -811,182 +852,182 @@ class _RxCSobject:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    29 may 2015
+                    2 june 2015
         """
-
         # -------------------------------------------------------------------
         # Error check
-        if not isinstance(iPar, (float, int)):
-            strError = 'Only numbers can be restricted \'higher than....\'! '
-            strError = strError+'(>%s< is of type: %s)' % (strParName, type(iPar))
+        if not isinstance(parVal, (float, int, tuple, list, np.ndarray)):
+            strError = 'Only numbers, lists, tuples and numpy arrays can be restricted \'%s...\'! '  % (strRelation)
+            strError = strError+'(>%s< is of type: %s)' % (strParName, type(parVal))
             raise ValueError(strError)
 
-        if not isinstance(iRef, (float, int)):
-            strError = 'Only numbers can be a reference for a restriction \'higher than....\'.! '
-            strError = strError+'(>%s< is of type: %s)' % (strReference, type(iRef))
-            raise ValueError(strError)
+        # -------------------------------------------------------------------
 
-        # -------------------------------------------------------------------        
+        # Switch to correct function dependently on type of the parameter:
+        if isinstance(parVal, (float, int)):
+            self.__parameterRestrictionH_HE_L_LE_num(strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation)
+        else:
+            self.__parameterRestrictionH_HE_L_LE_tup(strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation)
         
-        iMul = lCoef[0]
-        iAdd = lCoef[1]
-        if not (iPar > iRef*iMul + iAdd):
-            self.__relationalErrNote('higher than',strErrNote, strDesc, strParName, strReference, iMul, iAdd)
+        return
+
+        # -------------------------------------------------------------------
+
+
+    def __parameterRestrictionH_HE_L_LE_num(self, strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation):
+
+        # -------------------------------------------------------------------
+        # Error check    
+        if not isinstance(refVal, (float, int)):
+            strError = 'Only numbers can be a reference for restriction \'%s...\' for numbers!\n' % (strRelation)
+            strError = strError+'                 (>%s< is of type: %s)' % (strReference, type(refVal))
+            raise ValueError(strError)
+
+        # -------------------------------------------------------------------
+
+        iMul = lCoef[0]     # Take the linear coefficients
+        iAdd = lCoef[1]     # Take the linear coefficients 
+
+        # Check the restriction
+        bError = 0
+        if (strRelation == 'higher than'):
+            if not (parVal > refVal*iMul + iAdd):
+                bError = 1
+        elif (strRelation == 'higher or equal to'):
+            if not (parVal >= refVal*iMul + iAdd):
+                bError = 1
+        elif (strRelation == 'lower than'):
+            if not (parVal < refVal*iMul + iAdd):
+                bError = 1
+        elif (strRelation == 'lower or equal to'):
+            if not (parVal <= refVal*iMul + iAdd):
+                bError = 1
+        else:
+            strError = '%s is an unknown type of a relation!' % strRelation
+            raise RuntimeError(strError)
+
+        # Throw the error, if needed
+        if (bError == 1):
+            if strErrNote == '':
+                if (iMul == 1):
+                    strMul = ''
+                else:
+                    strMul = '%s *' % self.__n2s(iMul)
+                if (iAdd == 0):
+                    strAdd = ''
+                else:
+                    strAdd = '+ %s' % self.__n2s(iAdd)
+           
+                strErrNote = '%s > %s < must be %s %s %s %s!' \
+                    % (strDesc, strParName, strRelation, strMul, strReference, strAdd)
+            raise ValueError(strErrNote)
+
         return
 
 
-    # Parameter must be lower than...    
-    def __parameterRestrictionL(self, strParName, strDesc, iPar, strReference, iRef, lCoef, strErrNote):
-        """
-            Function checks the 'lower than' relative restriction of a parameter.
-
-            Arguments:                    
-                    strParName: [string]        name of a parameter
-                    strDesc:    [string]        description of a parameter
-                    iPar:       [number]        parameter to be checked
-                    strRefence  [string]        name of a reference        
-                    iRef        [number]        reference
-                    lCoef       [list]          list with 'mul' and 'add' coefficients 
-                    strErrNote  [string]        error note to be displayed if the restriction is broken
-                                                (might be empty, then a default note is generated)
-            Output:
-                    none
-
-            Author:
-                    Jacek Pierzchlewski jap@es.aau.dk
-
-            Last modification:
-                    29 may 2015
-        """
-
-        # Error check
-        if not isinstance(iPar, (float, int)):
-            strError = 'Only numbers can be restricted \'higher than....\'! '
-            strError = strError+'(>%s< is of type: %s)' % (strParName, type(iPar))
-            raise ValueError(strError)
-
-        if not isinstance(iRef, (float, int)):
-            strError = 'Only numbers can be a reference for a restriction \'higher than....\'.! '
-            strError = strError+'(>%s< is of type: %s)' % (strReference, type(iRef))
-            raise ValueError(strError)
-
-        # -------------------------------------------------------------------        
-        iMul = lCoef[0]
-        iAdd = lCoef[1]
-        if not (iPar < iRef*iMul + iAdd):
-            self.__relationalErrNote('lower than',strErrNote, strDesc, strParName, strReference, iMul, iAdd)
-        return
-
-    
-    def __parameterRestrictionHE(self, strParName, strDesc, iPar, strReference, iRef, lCoef, strErrNote):
-        """
-            Function checks the 'higher or equal to' relative restriction of a parameter.
-
-            Arguments:                    
-                    strParName: [string]        name of a parameter
-                    strDesc:    [string]        description of a parameter
-                    iPar:       [number]        parameter to be checked
-                    strRefence  [string]        name of a reference        
-                    iRef        [number]        reference
-                    lCoef       [list]          list with 'mul' and 'add' coefficients 
-                    strErrNote  [string]        error note to be displayed if the restriction is broken
-                                                (might be empty, then a default note is generated)
-            Output:
-                    none
-
-            Author:
-                    Jacek Pierzchlewski jap@es.aau.dk
-
-            Last modification:
-                    29 may 2015
-        """
+    def __parameterRestrictionH_HE_L_LE_tup(self, strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation):
         
-        # Error check
-        if not isinstance(iPar, (float, int)):
-            strError = 'Only numbers can be restricted \'higher than....\'! '
-            strError = strError+'(>%s< is of type: %s)' % (strParName, type(iPar))
-            raise ValueError(strError)
-
-        if not isinstance(iRef, (float, int)):
-            strError = 'Only numbers can be a reference for a restriction \'higher than....\'.! '
-            strError = strError+'(>%s< is of type: %s)' % (strReference, type(iRef))
-            raise ValueError(strError)
-
-        # -------------------------------------------------------------------        
-        iMul = lCoef[0]
-        iAdd = lCoef[1]
-        if not (iPar >= iRef*iMul + iAdd):
-            self.__relationalErrNote('higher or equal to',strErrNote, strDesc, strParName, strReference, iMul, iAdd)
-        return
-
-
-    def __parameterRestrictionLE(self, strParName, strDesc, iPar, strReference, iRef, lCoef, strErrNote):
-        """
-            Function checks the 'lower or equal to' relative restriction of a parameter.
-
-            Arguments:                    
-                    strParName: [string]        name of a parameter
-                    strDesc:    [string]        description of a parameter
-                    iPar:       [number]        parameter to be checked
-                    strRefence  [string]        name of a reference        
-                    iRef        [number]        reference
-                    lCoef       [list]          list with 'mul' and 'add' coefficients 
-                    strErrNote  [string]        error note to be displayed if the restriction is broken
-                                                (might be empty, then a default note is generated)
-            Output:
-                    none
-
-            Author:
-                    Jacek Pierzchlewski jap@es.aau.dk
-
-            Last modification:
-                    29 may 2015
-        """
+        # -------------------------------------------------------------------
+        # Error check        
         
-        # Error check
-        if not isinstance(iPar, (float, int)):
-            strError = 'Only numbers can be restricted \'higher than....\'! '
-            strError = strError+'(>%s< is of type: %s)' % (strParName, type(iPar))
+        # Take the lenght of the checked parameter        
+        if isinstance(parVal, np.ndarray):
+            iLen = parVal.size
+        else:
+            iLen = len(parVal)
+            
+        # Compare the lenghts with the lenght of the reference
+        if isinstance(refVal, (tuple, list)):
+            if not (iLen == len(refVal)):
+                strError = 'Tuple or list reference must be of equal size to the restricted parameter!' % (strRelation)
+
+        elif isinstance(refVal, np.ndarray):
+            if not (iLen == refVal.size):
+                strError = 'Numpy array reference must be of equal size to the restricted parameter!' % (strRelation)
+
+        elif isinstance(refVal, (int, float)):
+            pass
+
+        else:
+            strError = 'Only numbers, lists, tuples and numpy arrays can be a reference for restriction \'%s...\'!' % (strRelation)
+            strError = strError+'(>%s< is of type: %s)' % (strReference, type(refVal))
             raise ValueError(strError)
+        # -------------------------------------------------------------------
 
-        if not isinstance(iRef, (float, int)):
-            strError = 'Only numbers can be a reference for a restriction \'higher than....\'.! '
-            strError = strError+'(>%s< is of type: %s)' % (strReference, type(iRef))
-            raise ValueError(strError)
+        iMul = lCoef[0]     # Take the linear coefficients
+        iAdd = lCoef[1]     # Take the linear coefficients 
+        
+        # Check the restriction
+        bError = 0               # Error flag
+        inxElErr = -1            # Index of an element with error
 
-        # -------------------------------------------------------------------        
-        iMul = lCoef[0]
-        iAdd = lCoef[1]
-        if not (iPar <= iRef*iMul + iAdd):
-            self.__relationalErrNote('lower of equal to',strErrNote, strDesc, strParName, strReference, iMul, iAdd)
-        return
+        if (strRelation == 'higher than'):
+            if isinstance(refVal, (int, float)):
+                for inxEl in range(len(parVal)):
+                    if not (parVal[inxEl] > refVal*iMul + iAdd):
+                        bError = 1
+                        inxElErr = inxEl                        
+                        break
+            else:
+                for inxEl in range(len(parVal)):
+                    if not (parVal[inxEl] > refVal[inxEl]*iMul + iAdd):
+                        bError = 1
+                        inxElErr = inxEl               
+                        break
 
-
-    def __relationalErrNote(self, strRelation, strErrNote, strDesc, strParName, strReference, iMul, iAdd):
-        """
-            Function raises a ValueError as a result of relational error.
-            As an error text is uses strErrNote, if it is empty than it creates its own note.
-
-            Arguments:
-                    strRelation [string]        name of the relation
-                    strErrNote  [string]        error note
-                    strDesc:    [string]        description of a parameter
-                    strParName  [string]        name of the parameter            
-                    strRefence  [string]        name of a reference        
-                    iMul        [number]        'mul' coefficient
-                    iAdd        [number]        'add' coefficient 
+        elif (strRelation == 'higher or equal to'):
+            if isinstance(refVal, (int, float)):
+                for inxEl in range(len(parVal)):
+                    if not (parVal[inxEl] >= refVal*iMul + iAdd):
+                        bError = 1
+                        inxElErr = inxEl                        
+                        break
+            else:
+                for inxEl in range(len(parVal)):
+                    if not (parVal[inxEl] >= refVal[inxEl]*iMul + iAdd):
+                        bError = 1
+                        inxElErr = inxEl                        
+                        break
                     
-            Output:
-                    none
+        elif (strRelation == 'lower than'):
+            if isinstance(refVal, (int, float)):
+                for inxEl in range(len(parVal)):
+                    if not (parVal[inxEl] < refVal*iMul + iAdd):
+                        bError = 1
+                        inxElErr = inxEl                        
+                        break
+            else:
+                for inxEl in range(len(parVal)):
+                    if not (parVal[inxEl] < refVal[inxEl]*iMul + iAdd):
+                        bError = 1
+                        inxElErr = inxEl                        
+                        break
 
-            Author:
-                    Jacek Pierzchlewski jap@es.aau.dk
+        elif (strRelation == 'lower or equal to'):
+            if isinstance(refVal, (int, float)):
+                for inxEl in range(len(parVal)):
+                    if not (parVal[inxEl] <= refVal*iMul + iAdd):
+                        bError = 1
+                        inxElErr = inxEl                        
+                        break
+            else:
+                for inxEl in range(len(parVal)):
+                    if not (parVal[inxEl] <= refVal[inxEl]*iMul + iAdd):
+                        bError = 1
+                        inxElErr = inxEl                        
+                        break
+        else:
+            strError = '%s is an unknown type of a relation!' % strRelation
+            raise RuntimeError(strError)
 
-            Last modification:
-                    29 may 2015
-        """
-
-        if strErrNote == '':
+        # Throw the error, if needed
+        if (bError == 1):
+            
+            # Throw out an error, if the error note was already given            
+            if not (strErrNote == ''):
+                raise ValueError(strErrNote)
+            
+            # Construct the error note:
             if (iMul == 1):
                 strMul = ''
             else:
@@ -995,10 +1036,16 @@ class _RxCSobject:
                 strAdd = ''
             else:
                 strAdd = '+ %s' % self.__n2s(iAdd)
-           
-            strErrNote = '%s > %s < must be %s %s %s %s!' \
-                % (strDesc, strParName, strRelation, strMul, strReference, strAdd)
-        raise ValueError(strErrNote)
+
+            if isinstance(refVal, (int, float)):
+                strErrNote = 'All elements of %s > %s < must be %s %s %s %s! (error on element # %d)' \
+                    % (strDesc, strParName, strRelation, strMul, strReference, strAdd, inxElErr)
+            else:
+                print('%s.') % strRelation
+                strErrNote = 'Element #%d of > %s < (%s) must be %s %selement #%d%s of %s!' \
+                    % (inxElErr, strParName, strDesc, strRelation, strMul, inxElErr, strAdd, strReference)
+                
+            raise ValueError(strErrNote)
 
 
     def __n2s(self, iX):
