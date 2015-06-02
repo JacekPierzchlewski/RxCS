@@ -1,4 +1,7 @@
 
+# Import rxCSobject 
+from RxCSobject import _RxCSobject
+
 # Import signal generators
 import sig
 
