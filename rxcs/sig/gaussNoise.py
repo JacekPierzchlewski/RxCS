@@ -35,7 +35,7 @@ class gaussNoise(rxcs._RxCSobject):
         self.paramL('tS', np.inf)       # ...and lower than infinity
 
         # Baseband
-        self.paramAddOpt('fB', 'Baseband', unit='Hz') 
+        self.paramAddOpt('fB', 'Baseband', unit='Hz')
         self.paramType('fB', (float, int))       
         self.paramHE('fB', 0)                           # Signal baseband must be higher or equal to zero
                                                         # (if it is equal to zero, the baseband is defined by fs)
@@ -45,7 +45,7 @@ class gaussNoise(rxcs._RxCSobject):
         # Power of a signal
         self.paramAddOpt('iP', 'Signal power', unit='W', default=1)
         self.paramType('iP',(float, int))      
-        self.paramH('iP',0)             # Power of the signal must be higher than zero
+        self.paramH('iP', 0)            # Power of the signal must be higher than zero
         self.paramL('iP', np.inf)       # ...and lower than infinity
 
         # --------------------------------------------------------------------
@@ -75,8 +75,8 @@ class gaussNoise(rxcs._RxCSobject):
         # --------------------------------------------------------------------
  
         # Mute the output flag
-        self.paramAddOpt('bMute', 'Mute the output', noprint=1)  
-        self.paramType('bMute',int)          # Must be of int type
+        self.paramAddOpt('bMute', 'Mute the output', noprint=1, default=0)
+        self.paramType('bMute', int)          # Must be of int type
         self.paramAllowed('bMute',[0, 1])      # It can be either 1 or 0
  
  
@@ -96,13 +96,15 @@ class gaussNoise(rxcs._RxCSobject):
         
         self.engineStartsInfo()  # Info that the engine starts
 
+        # ---------------------------------------------------------------------
         # Generate the base signal               
         self.nSigSamp = round(self.fs * self.tS)     # The number of samples in the output signal
         self.vSig = np.random.randn(self.nSigSamp)   # Generate the noise  
-        
+
+        # ---------------------------------------------------------------------        
         # Filter the signal with a low pass filter, if it is needed 
         if (self.fB > 0):
-            
+
             # Design a iir low pass filter
             iCFP = self.fB/(0.5*self.fs)   # Compute the filter parameter 
             (vN, vD) = scsig.iirfilter(self.nFiltOrd, iCFP, btype='lowpass', ftype=self.strFilt, 

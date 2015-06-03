@@ -87,7 +87,7 @@ class _RxCSobject:
         self.iManParam = self.iManParam + 1  # The number of mandatory parameters
 
 
-    def paramAddOpt(self, strName, strDesc, unit='', noprint=0, unitprefix='-', default=0):
+    def paramAddOpt(self, strName, strDesc, unit='', noprint=0, unitprefix='-', default=np.nan):
         """
             Add an optional parameter to the object.
     
@@ -104,7 +104,7 @@ class _RxCSobject:
                                         allowed values = f:femto, p:pico, n:nano, u:micro, m:mili,
                                         ' ':one, k:kilo, M:mega, G:giga, T:tera)
                     default             default value
-                                        (optional, by default it is 0)
+                                        (optional, by default it is np.nan)
 
             Output:
                     none
@@ -518,6 +518,67 @@ class _RxCSobject:
         return
 
 
+    def paramSizH(self, strName, reference, mul=1, add=0, errnote=''):
+        self.__paramAddSizRestriction('sizH', strName, reference, mul, add, errnote)
+
+
+    def paramSizL(self, strName, reference, mul=1, add=0, errnote=''):
+        self.__paramAddSizRestriction('sizL', strName, reference, mul, add, errnote)
+
+
+    def paramSizHE(self, strName, reference, mul=1, add=0, errnote=''):
+        self.__paramAddSizRestriction('sizHE', strName, reference, mul, add, errnote)
+
+
+    def paramSizLE(self, strName, reference, mul=1, add=0, errnote=''):
+        self.__paramAddSizRestriction('sizLE', strName, reference, mul, add, errnote)
+
+
+    def __paramAddSizRestriction(self, strResCode, strName, reference, iMul, iAdd, strErrNote):
+
+        # Error checks -------------------------------------------------------
+        
+        # Parameter to be checked        
+        if not isinstance(strName, str):
+            raise ValueError('Name of a parameter must be a string!')
+
+        (bDefined, inxParam) = self.__parameterWasDefined(strName)
+        if not bDefined:
+            strError = ('Parameter > %s < was not yet defined!') % strName
+            raise RuntimeError(strError)
+            
+        # Restriction code
+        if not isinstance(strResCode, str):
+            raise ValueError('Restriction code must be a string!')
+
+        # Multiply coefficient
+        if not isinstance(iMul, (int, float)):
+            raise ValueError('> mul < parameter must be a number ')
+
+        # Add coefficient
+        if not isinstance(iAdd, (int, float)):
+            raise ValueError('> add <  parameter must be a number ')
+        
+        # Error note
+        if not isinstance(strErrNote, str):
+            raise ValueError('Error note must be a string ')
+
+        # Reference          
+        if not isinstance(reference, (str, int, float, tuple, np.ndarray, list)):
+            raise ValueError('Reference must be a string, a real number, a tuple, a list or a numpy array!')
+        if isinstance(reference, float) :
+            if np.isnan(reference): 
+                raise ValueError('Reference must not be nan!')
+
+        #---------------------------------------------------------------------
+        self.lParameters[inxParam]['lRes'].append(strResCode)
+        self.lParameters[inxParam]['lResErrNote'].append(strErrNote)
+        self.lParameters[inxParam]['lResReference'].append(reference)
+        self.lParameters[inxParam]['lResData'].append([iMul, iAdd])
+
+        return
+
+
     def __parameterWasDefined(self, strName):
         """
             Check if a parameter with a given name was already defined 
@@ -764,7 +825,7 @@ class _RxCSobject:
         strParName = dParam['strName']            # Name of the parameter
         strDesc = dParam['strDesc']               # Description of the parameter 
         bNaNAllowedEl = dParam['bNaNAllowedEl']   # NaN elements allowed flag
-        parVal = self.__dict__[strParName]      # The parameter itself
+        parVal = self.__dict__[strParName]        # The parameter itself
 
         # If the parameter is NaN than there is nothing to be checked
         if isinstance(parVal, float):
@@ -792,15 +853,16 @@ class _RxCSobject:
                     strRefName = '> %s <' % (reference)     # string with name
                 else:
                     # If reference is an empty string it means we do not need it
-                    pass
+                    refVal = np.nan
+                    strRefName = '> (empty) <'
             else:
                 refVal=reference                        # value
                 
                 # string with name of the reference
                 if isinstance(reference, float):         
-                    strRefName = ('%f') % (reference)   # float
+                    strRefName = ('%f') % (reference)       # float
                 elif isinstance (reference, int):
-                    strRefName = ('%d') % (reference)   # int
+                    strRefName = ('%d') % (reference)       # int
                 elif isinstance (reference, tuple):     
                     strRefName = 'the given tuple'          # tuple
                 elif isinstance (reference, list):     
@@ -819,6 +881,14 @@ class _RxCSobject:
                 self.__parameterRestrictionRel(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'lower than', bNaNAllowedEl)
             elif (strRes == 'paramLE'):
                 self.__parameterRestrictionRel(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'lower or equal to', bNaNAllowedEl)
+            elif (strRes == 'sizH'):
+                self.__parameterRestrictionSiz(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'size higher than', bNaNAllowedEl)
+            elif (strRes == 'sizHE'):
+                self.__parameterRestrictionSiz(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'size higher or equal to', bNaNAllowedEl)
+            elif (strRes == 'sizL'):
+                self.__parameterRestrictionSiz(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'size lower than', bNaNAllowedEl)
+            elif (strRes == 'sizLE'):
+                self.__parameterRestrictionSiz(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'size lower or equal to', bNaNAllowedEl)
             else:
                 raise RuntimeError('Something went seriously wrong...[internal RxCSobject error]')
 
@@ -990,7 +1060,7 @@ class _RxCSobject:
         # Error check
         if not isinstance(parVal, (float, int, tuple, list, np.ndarray)):
             strError = 'Only numbers, lists, tuples and numpy arrays can be restricted \'%s...\'! '  % (strRelation)
-            strError = strError+'(>%s< is of type: %s)' % (strParName, type(parVal))
+            strError = strError+'            (>%s< is of type: %s)' % (strParName, type(parVal))
             raise ValueError(strError)
 
         # -------------------------------------------------------------------
@@ -1004,6 +1074,7 @@ class _RxCSobject:
         return
 
         # -------------------------------------------------------------------
+
 
     def __parameterRestrictionRel_num(self, strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation):
 
@@ -1091,8 +1162,8 @@ class _RxCSobject:
             strDelimLast = ']'
         elif isinstance(refVal, (float, int)):
             # If reference is NaN, restriction can not be checked, it is assumed that the value is correct
-           if np.isnan(refVal):
-                return 
+            if np.isnan(refVal):
+                return
         else:
             strError = 'Only numbers, lists, tuples and numpy arrays can be a reference for restriction \'%s...\'!\n' % (strRelation)
             strError = strError+'       (>%s< is of type: %s)' % (strRefName, type(refVal))
@@ -1267,6 +1338,21 @@ class _RxCSobject:
             raise RuntimeError(strError)
 
 
+    def __parameterRestrictionSiz(self, strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, strRelation, bNaNAllowedEl):
+        
+        # Reference can not be empty
+
+        # Take the size of the parameter
+
+        # Take the reference size
+            # -
+
+        # Check the size          
+        pass
+
+
+
+
     def __n2s(self, iX):
         """
             Function changes number to a string.
@@ -1367,14 +1453,16 @@ class _RxCSobject:
                 strUnit = dParam['strUnit']                  # Unit of the parameter
                 strUnitPrefix = dParam['strUnitPrefix']      # Unit prefix
                 strParName = dParam['strName']              # Name of the parameter
-                iPar = self.__dict__[strParName]             # The parameter itself
+                par = self.__dict__[strParName]             # The parameter itself
                 
                 # Run the correct function dependently on the type of the parameter           
-                if isinstance(iPar,(int, float)):
-                    rxcs.console.bullet_param(strDesc, iPar, strUnitPrefix, strUnit)
-                elif isinstance(iPar,str):
-                    rxcs.console.bullet_info(strDesc,iPar)
-        print('')
+                if isinstance(par, (int, float)):
+                    if np.isnan(par):
+                        rxcs.console.bullet_info(strDesc, 'NaN')
+                    else:
+                        rxcs.console.bullet_param(strDesc, par, strUnitPrefix, strUnit)
+                elif isinstance(par, str):
+                    rxcs.console.bullet_info(strDesc, par)
         return
 
 
