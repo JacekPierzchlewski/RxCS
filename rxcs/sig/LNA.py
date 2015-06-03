@@ -22,14 +22,33 @@ class LNA(rxcs._RxCSobject):
 
     # Define input signals
     def __inputDefine(self):
+        dD1 = {}
+
+
+        # vector Reference to a signal
+        self.paramAddMan('vSigInRef', 'Vector reference to the input signal')
+        self.paramType('vSigInRef',(float, int, np.ndarray, tuple, list, dict))        # Must be of a numpy array with float number
+        #self.paramTypeEl('vSigInRef', (float, int, str))            # ...with float/int elements
 
         # Input signal
         self.paramAddMan('vSigIn', 'Input signal')
-        self.paramType('vSigIn', np.ndarray)                # Must be of a numpy array with float number
-        self.paramTypeEl('vSigIn', (float, int))            # ...with float/int elements
-        self.paramLE('vSigIn',  np.array([3, 10, 20]))      # Must be lower than +infinity...
+        self.paramType('vSigIn', (np.ndarray, tuple, list) )                # Must be of a numpy array with float number
+        self.paramTypeEl('vSigIn', (float, int, str))            # ...with float/int elements
+        #self.NaNAllowedEl('vSigIn')
 
-        self.paramH('vSigIn', -5)                      # ...and higher than -infinity
+        # Integer reference
+        self.paramAddOpt('iSigInRef', 'Reference to the input signal')
+        self.paramType('iSigInRef',(float, int))        # Must be of a numpy array with float number
+
+        self.paramL('vSigIn', 'iSigInRef')
+
+        #self.paramAllowed('iSigInRef', [np.nan)
+        
+        #self.paramLE('vSigIn', 'vSigInRef')      # Must be lower than +infinity...
+        
+        #self.paramLE('vSigIn', 'iSigInRef', mul=4)      # Must be lower than +infinity...
+        #self.paramLE('vSigIn', 'vSigInRef', mul=4, add=1)      # Must be lower than +infinity...
+        #self.paramH('vSigIn', -5)                      # ...and higher than -infinity
 
         #self.paramSiz('vSigIn', ( ))
 
