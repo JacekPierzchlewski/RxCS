@@ -75,6 +75,8 @@ class _RxCSobject:
         dParameter['strUnit'] = unit                # Unit
         dParameter['strUnitPrefix'] = unitprefix    # Unit prefix
         dParameter['bNoPrint'] = noprint            # NoPrint flag
+        dParameter['bNaNAllowed'] = 0               # NaN is not allowed for mandatory parameters        
+        dParameter['bNaNAllowedEl'] = 0             # By default NaN elements are not allowed
         dParameter['lRes'] = []                     # List of restriction
         dParameter['lResErrNote'] = []              # List of error notes for restrictions
         dParameter['lResReference'] = []            # List of references for restrictions
@@ -149,6 +151,8 @@ class _RxCSobject:
         dParameter['strUnitPrefix'] = unitprefix    # Unit prefix
         dParameter['bNoPrint'] = noprint            # NoPrint flag
         dParameter['lRes'] = []                     # List of restriction
+        dParameter['bNaNAllowed'] = 1               # NaN is allowed for optional arguments
+        dParameter['bNaNAllowedEl'] = 0             # By default NaN elements are not allowed
         dParameter['lResErrNote'] = []              # List of error notes for restrictions
         dParameter['lResReference'] = []            # List of references for restrictions
         dParameter['lResData'] = []                 # List of additional data for restrictions
@@ -192,6 +196,24 @@ class _RxCSobject:
             if not (chrLetter.isalpha() or chrLetter.isdigit() or (chrLetter == '_')):
                 strError = '>%s< is an incorrect name for a parameter' % (strName)
                 raise ValueError(strError)
+        return
+
+
+    def NaNAllowedEl(self, strName):
+
+        # Error checks -------------------------------------------------------
+
+        # Check the given parameter
+        if not isinstance(strName, str):
+            raise ValueError('Name of a parameter must be a string!')
+
+        (bDefined, inxParam) = self.__parameterWasDefined(strName)
+        if not bDefined:
+            strError = ('Parameter %s was not yet defined!') % strName
+            raise RuntimeError(strError)
+
+        #---------------------------------------------------------------------
+        self.lParameters[inxParam]['bNaNAllowedEl'] = 1
         return
 
 
@@ -739,18 +761,24 @@ class _RxCSobject:
             Last modification:
                     29 may 2015
         """
-        strParName = dParam['strName']      # Name of the parameter
-        strDesc = dParam['strDesc']         # Description of the parameter 
-        parVal = self.__dict__[strParName]  # The parameter itself
+        strParName = dParam['strName']            # Name of the parameter
+        strDesc = dParam['strDesc']               # Description of the parameter 
+        bNaNAllowedEl = dParam['bNaNAllowedEl']   # NaN elements allowed flag
+        parVal = self.__dict__[strParName]      # The parameter itself
+
+        # If the parameter is NaN than there is nothing to be checked
+        if isinstance(parVal, float):
+            if np.isnan(parVal):
+                return
 
         # Loop over all restrictions
         for inxRes in range(len(dParam['lRes'])):
 
             # Get the restriction code, error note, reference and coefficients
-            strRes = dParam['lRes'][inxRes]               # Restriction                 
-            lResData = dParam['lResData'][inxRes]         # Data associated with the restriction
-            reference = dParam['lResReference'][inxRes]   # Reference
-            strErrNote = dParam['lResErrNote'][inxRes]    # Error note
+            strRes = dParam['lRes'][inxRes]                # Restriction                 
+            lResData = dParam['lResData'][inxRes]          # Data associated with the restriction
+            reference = dParam['lResReference'][inxRes]    # Reference
+            strErrNote = dParam['lResErrNote'][inxRes]     # Error note
 
             # Change the reference into its value and a string with a name of the referenece
             if isinstance(reference, str):
@@ -782,20 +810,20 @@ class _RxCSobject:
 
             # Run the correct parameter restriction check function
             if (strRes == 'paramAllowed'):
-                self.__parameterRestrictionAllowed(strParName, strDesc, parVal, lResData, strErrNote)                
+                self.__parameterRestrictionAllowed(strParName, strDesc, parVal, lResData, strErrNote, bNaNAllowedEl)                
             elif (strRes == 'paramH'):
-                self.__parameterRestrictionH_HE_L_LE(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'higher than')
+                self.__parameterRestrictionRel(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'higher than', bNaNAllowedEl)
             elif (strRes == 'paramHE'):
-                self.__parameterRestrictionH_HE_L_LE(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'higher or equal to')
+                self.__parameterRestrictionRel(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'higher or equal to', bNaNAllowedEl)
             elif (strRes == 'paramL'):
-                self.__parameterRestrictionH_HE_L_LE(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'lower than')
+                self.__parameterRestrictionRel(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'lower than', bNaNAllowedEl)
             elif (strRes == 'paramLE'):
-                self.__parameterRestrictionH_HE_L_LE(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'lower or equal to')
+                self.__parameterRestrictionRel(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, 'lower or equal to', bNaNAllowedEl)
             else:
                 raise RuntimeError('Something went seriously wrong...[internal RxCSobject error]')
 
 
-    def __parameterRestrictionAllowed(self, strParName, strDesc, parVal, lAllVal, strErrNote):
+    def __parameterRestrictionAllowed(self, strParName, strDesc, parVal, lAllVal, strErrNote, bNaNAllowedEl):
         """
             Function checks the 'allowed values' restriction of a parameter.
 
@@ -815,20 +843,124 @@ class _RxCSobject:
             Last modification:
                     29 may 2015
         """
-        for iAllVal in lAllVal:
-            if (parVal == iAllVal): 
+        # -------------------------------------------------------------------
+        # Error check
+        type(parVal)
+        if not isinstance(parVal, (float, int, str, tuple, list, np.ndarray)):
+            strError = 'Only numbers, strings, tuples, lists, and numpy arrays can be restricted with allowed values!'
+            strError = strError+'(>%s< is of type: %s)' % (strParName, type(parVal))
+            raise ValueError(strError)
+        # -------------------------------------------------------------------
+
+        # Run the correct function dependently on the parameter type
+        if isinstance(parVal, (str, float, int)):
+            self.__parameterRestrictionAllowed_numstr(strParName, strDesc, parVal, lAllVal, strErrNote)
+        else:
+            self.__parameterRestrictionAllowed_atl(strParName, strDesc, parVal, lAllVal, strErrNote, bNaNAllowedEl)
+        return
+
+
+    def __parameterRestrictionAllowed_numstr(self, strParName, strDesc, parVal, lAllVal, strErrNote):
+
+        inxAl = 0  # Reset the index of elements in a list with allowed values
+
+        # Loop over all elements of a list with allowed values
+        for allVal in lAllVal:
+
+            # An allowed value must be either a string or a number            
+            if not isinstance(allVal, (str, float, int)):
+                strError = 'List of allowed values must contain only strings or numbers!\n'
+                strError = strError+'            An allowed value #%d for the parameter > %s < (\'%s\') is of type %s' \
+                    % (inxAl, strParName, strDesc, type(allVal))
+                raise ValueError(strError)
+
+            # If an allowed value is NaN, throw out an error! 
+            if isinstance(allVal, float):
+                if np.isnan(allVal):
+                    strError = 'NaN can not be an allowed value for the parameter > %s < (\'%s\')' % (strParName, strDesc)
+                    raise ValueError(strError)
+            
+            # If an allowed value was found, return from the function             
+            if (parVal == allVal):
                 return
 
+        # Allowed value was not found, throw out an error
         if (strErrNote == ''):            
             if isinstance(parVal, (int, float)):
-                strErrNote = ('%s is an incorrect value for parameter >%s< (\'%s\')') % (self.__n2s(parVal), strParName, strDesc)
+                strErrNote = ('%s is an incorrect value for parameter > %s < (\'%s\')') % (self.__n2s(parVal), strParName, strDesc)
             elif isinstance(parVal, (str)):
-                strErrNote = ('%s is an incorrect value for parameter >%s< (\'%s\')') % (parVal, strParName, strDesc)
-
+                strErrNote = ('%s is an incorrect value for parameter > %s < (\'%s\')') % (parVal, strParName, strDesc)
         raise ValueError(strErrNote)
 
 
-    def __parameterRestrictionH_HE_L_LE(self, strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation):
+    def __parameterRestrictionAllowed_atl(self, strParName, strDesc, parVal, lAllVal, strErrNote, bNaNAllowedEl):
+        
+        inxEl = 0  # Reset the index of elements in tuple, list or a numpy array              
+        
+        # Loop over all elements of the parameter
+        for par in parVal:
+            
+            # An element of the tested parameter must be either a string or a number            
+            if not isinstance(par, (str, float, int)):
+                strError = 'Only number or string elements can be restricted with allowed values!\n'
+                strError = strError+'            Element #%d of > %s < (%s) is of type %s' \
+                    % (inxEl, strParName, strDesc, type(par))
+                raise ValueError(strError)
+                raise ValueError(strErrNote)
+
+            # If an element if NaN, then decide what to do
+            if isinstance(par, float):
+                if np.isnan(par):
+                    if bNaNAllowedEl:
+                        continue
+                    else:
+                        strError = 'Element %d of > %s < (%s) is NaN, which is not allowed!' \
+                            % (inxEl, strParName, strDesc)
+                        raise ValueError(strError)
+
+            # Loop over all elements of a list with allowed values
+            inxAl = 0  # Reset the index of elements in a list with allowed values
+            bErr = 1   # Set error flag 
+            for allVal in lAllVal:       
+
+                # An allowed value must be either a string or a number            
+                if not isinstance(allVal, (str, float, int)):
+                    strError = 'List of allowed values must contain only strings or numbers!\n'
+                    strError = strError+'            An allowed value #%d for the parameter > %s < (\'%s\') is of type %s' \
+                        % (inxAl, strParName, strDesc, type(allVal))
+                    raise ValueError(strError)
+                                    
+                # If an allowed value is NaN, throw out an error!     
+                if isinstance(allVal, float):
+                    if np.isnan(allVal):
+                        strError = 'NaN can not be an allowed value for the parameter > %s < (\'%s\')' % (strParName, strDesc)
+                        raise ValueError(strError)
+                
+                # If an allowed value was found, clear the error flag, break the loop and go to the next element             
+                if (par == allVal):
+                    bErr = 0
+                    break
+
+                inxAl = inxAl + 1     # Index of an element in the list with allowed values     
+            
+            # If error flag is cleared, go to the next element of the tested parameter
+            if (bErr == 0):
+                inxEl = inxEl + 1     # Index of an element in the tested parameter 
+                continue
+            
+            # Allowed value was not found, throw out an error
+            if (strErrNote == ''):            
+                if isinstance(par, (int, float)):
+                    strErrNote = ('%s is an incorrect value for element #%d of parameter > %s < (\'%s\')') \
+                        % (self.__n2s(par), inxEl, strParName, strDesc)
+                elif isinstance(par, (str)):
+                    strErrNote = ('%s is an incorrect value for element #%d of parameter > %s < (\'%s\')') \
+                        % (par, inxEl, strParName, strDesc)
+            raise ValueError(strErrNote)
+        return
+        
+        
+    def __parameterRestrictionRel(self, strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation, bNaNAllowedEl):
         """
             Function checks the 'higher than', 'higher or equal to', 'lower than', 'lower or equal to' 
             relative restriction of a parameter.
@@ -865,16 +997,15 @@ class _RxCSobject:
 
         # Switch to correct function dependently on type of the parameter:
         if isinstance(parVal, (float, int)):
-            self.__parameterRestrictionH_HE_L_LE_num(strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation)
+            self.__parameterRestrictionRel_num(strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation)
         else:
-            self.__parameterRestrictionH_HE_L_LE_tup(strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation)
-        
+            self.__parameterRestrictionRel_atl(strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation, bNaNAllowedEl)
+
         return
 
         # -------------------------------------------------------------------
 
-
-    def __parameterRestrictionH_HE_L_LE_num(self, strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation):
+    def __parameterRestrictionRel_num(self, strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation):
 
         # -------------------------------------------------------------------
         # Error check    
@@ -884,6 +1015,11 @@ class _RxCSobject:
             raise ValueError(strError)
 
         # -------------------------------------------------------------------
+        
+        # If reference is NaN, restriction can not be checked, it is assumed that the value is correct
+        if isinstance(refVal, float):
+            if np.isnan(refVal):
+                return
 
         iMul = lCoef[0]     # Take the linear coefficients
         iAdd = lCoef[1]     # Take the linear coefficients 
@@ -925,7 +1061,7 @@ class _RxCSobject:
         return
 
 
-    def __parameterRestrictionH_HE_L_LE_tup(self, strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation):
+    def __parameterRestrictionRel_atl(self, strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRelation, bNaNAllowedEl):
         
         # -------------------------------------------------------------------
         # Error check        
@@ -936,116 +1072,199 @@ class _RxCSobject:
         else:
             iLen = len(parVal)
             
-        # Compare the lenghts with the lenght of the reference
-        if isinstance(refVal, (tuple, list)):
-            if not (iLen == len(refVal)):
-                strError = 'Tuple or list reference must be of equal size to the restricted parameter!' % (strRelation)
-
+        # Take the lenght and type of the reference
+        if isinstance(refVal, tuple):
+            iLenRef = len(refVal)
+            strRefType = 'Tuple'
+            strDelimStart = '('
+            strDelimLast = ')'
+  
+        elif isinstance(refVal, list):
+            iLenRef = len(refVal)            
+            strRefType = 'List'
+            strDelimStart = '['
+            strDelimLast = ']'
         elif isinstance(refVal, np.ndarray):
-            if not (iLen == refVal.size):
-                strError = 'Numpy array reference must be of equal size to the restricted parameter!' % (strRelation)
-
-        elif isinstance(refVal, (int, float)):
-            pass
-
+            iLenRef = refVal.size
+            strRefType = 'Numpy array'
+            strDelimStart = '['
+            strDelimLast = ']'
+        elif isinstance(refVal, (float, int)):
+            # If reference is NaN, restriction can not be checked, it is assumed that the value is correct
+           if np.isnan(refVal):
+                return 
         else:
-            strError = 'Only numbers, lists, tuples and numpy arrays can be a reference for restriction \'%s...\'!' % (strRelation)
-            strError = strError+'(>%s< is of type: %s)' % (strReference, type(refVal))
+            strError = 'Only numbers, lists, tuples and numpy arrays can be a reference for restriction \'%s...\'!\n' % (strRelation)
+            strError = strError+'       (>%s< is of type: %s)' % (strRefName, type(refVal))
             raise ValueError(strError)
+            
+        # Compare the lenghts with the lenght of the reference, if the reference is a list, a tuple or a numpy array
+        if isinstance(refVal, (list, tuple, np.ndarray)):
+            if not (iLen == iLenRef):
+                strError = '%s reference must be of equal size to the restricted parameter!\n' % strRefType
+                strError = strError+'            Parameter > %s < is of size %d, its reference (%s) is of size %d!' \
+                    % (strParName, iLen, strRefName, len(refVal))
+                raise ValueError(strError)
+                
         # -------------------------------------------------------------------
 
         iMul = lCoef[0]     # Take the linear coefficients
-        iAdd = lCoef[1]     # Take the linear coefficients 
-        
+        iAdd = lCoef[1]     # Take the linear coefficients
+
         # Check the restriction
-        bError = 0               # Error flag
+        bError = 0               # Restriction error flag
+        bParTypeError = 0        # Error of parameter element type
+        bRefTypeError = 0        # Error of reference element type        
         inxElErr = -1            # Index of an element with error
 
+        # Vectorize the parameter, if it is a numpy array
+        if isinstance(parVal, np.ndarray):
+            parVal.shape = (parVal.size, )
+
+        # Vectorize the reference, if it is a numpy array
+        if isinstance(refVal, np.ndarray):
+            refVal.shape = (refVal.size, )
+
+        # Check the restriction:
+        if isinstance(refVal, (int, float)):        # Check for number reference
+            # Loop over all elements in the checked parameter             
+            for inxEl in range(len(parVal)):
+                # Get the current element of the checked parameter and check if it is a number                                
+                parEl = parVal[inxEl]
+                if not isinstance(parEl, (float, int)):
+                    bParTypeError = 1
+                    inxElErr = inxEl    
+                    break
+
+                # Check if the current elements of the checked parameter is NaN
+                if isinstance(parEl, float):
+                    if np.isnan(parEl):
+                        if (bNaNAllowedEl == 1):
+                            continue
+                        else:
+                            strError = 'Element %d of > %s < (%s) is NaN, which is not allowed!' \
+                                % (inxEl, strParName, strDesc)
+                            raise ValueError(strError)
+                # Check the reference                
+                if not (self.__relation(parEl, refVal*iMul + iAdd, strRelation)):
+                    bError = 1
+                    inxElErr = inxEl
+                    break
+        else:              # Check for tuple, list, numpy array reference
+            # Loop over all elements in the checked parameter             
+            for inxEl in range(len(parVal)):
+                
+                # Get the current element of the checked parameter and check if it is a number                
+                parEl = parVal[inxEl]
+                if not isinstance(parEl, (float, int)):                        
+                    bParTypeError = 1
+                    inxElErr = inxEl
+                    break
+
+                # Check if the current elements of the checked parameter is NaN
+                if isinstance(parEl, float):
+                    if np.isnan(parEl):
+                        if (bNaNAllowedEl == 1):
+                            continue
+                        else:
+                            strError = 'Element %d of > %s < (%s) is NaN, which is not allowed!' \
+                                % (inxEl, strParName, strDesc)
+                            raise ValueError(strError)
+
+                # Get the current element of the reference and check if it is a number                                                
+                refEl = refVal[inxEl]
+                if not isinstance(refEl, (float, int)):                        
+                    print(inxEl)        
+                    bRefTypeError = 1
+                    inxElErr = inxEl
+                    break
+                # Check if the reference element is NaN. If it is, continue
+                if isinstance(refEl, float):
+                    if np.isnan(refEl):
+                        continue
+
+                # Check the reference                                
+                if not (self.__relation(parEl,refEl*iMul + iAdd, strRelation)):
+                    bError = 1
+                    inxElErr = inxEl               
+                    break
+
+        # Throw the error of parameter element type , if it was found above
+        if (bParTypeError == 1):
+            strError = 'Only numbers can be checked for restriction  \'%s...\'!\n'  % (strRelation)
+            strError = strError+'            Element #%d of > %s < is of type %s!' % (inxEl, strParName, type(parEl))
+            raise ValueError(strError)
+    
+        # Throw the error pf reference parameter element type , if it was found above
+        if (bRefTypeError == 1):
+            strError = 'Only numbers can be a reference for restriction  \'%s...\'!\n'  % (strRelation)
+            strError = strError+'            Element #%d of %s (reference for > %s< ) is of type %s!' \
+                % (inxEl, strRefName, strParName, type(refEl))
+            raise ValueError(strError)
+
+        # Retrun from function if the relational error was not found
+        if bError == 0:
+            return 
+            
+        # Throw out an error, if the error note was already given            
+        if not (strErrNote == ''):
+            raise ValueError(strErrNote)
+
+        # Construct the error note:
+
+        # Firstly, change linear coefficients into strings
+        if (iMul == 1):
+            strMul = ''
+        else:
+            strMul = '%s *' % self.__n2s(iMul)
+        if (iAdd == 0):
+            strAdd = ''
+        else:
+            strAdd = '+ %s' % self.__n2s(iAdd)
+        
+        # If the reference is a number it is easy to construct the error info... 
+        if isinstance(refVal, (int, float)):
+            strErrNote = 'All elements of %s > %s < must be %s %s %s %s! (error on element # %d)!' \
+                % (strDesc, strParName, strRelation, strMul, strRefName, strAdd, inxElErr)
+            raise ValueError(strErrNote)
+                
+        # If the reference is an array, a tuple or a list, it is getting complicated... 
+        if (strMul == '') and (strAdd == ''):
+            strErrNote = 'Elements of > %s < (%s) must be %s the corresponding elements of %s' \
+                % (strParName, strDesc, strRelation, strRefName)
+        else:
+            strErrNote = 'Elements of > %s < (%s) must be %s %s x %s, where x are the corresponding elements of %s' \
+                % (strParName, strDesc, strRelation, strMul, strAdd, strRefName)
+        
+        # Print the reference if its size is lower than 10
+        if (iLenRef <= 10):
+            strErrNote = strErrNote + ' %s' % strDelimStart
+            for el in refVal:
+                strErrNote = strErrNote + ' %s' % self.__n2s(el)
+            strErrNote =  strErrNote + ' %s' % strDelimLast
+            strErrNote = strErrNote + '!\n'
+            
+        # Add info about the element which brakes the restriction                  
+        strErrNote=strErrNote+'            Element #%d of > %s < is %s, element #%d of %s is %s!' \
+            % (inxEl, strParName, self.__n2s(parVal[inxEl]), inxEl, strRefName, self.__n2s(refVal[inxEl]))
+        
+        # Ok, throw out an error            
+        raise ValueError(strErrNote)
+
+
+    def __relation(self, iPar, iRef, strRelation):
+
         if (strRelation == 'higher than'):
-            if isinstance(refVal, (int, float)):
-                for inxEl in range(len(parVal)):
-                    if not (parVal[inxEl] > refVal*iMul + iAdd):
-                        bError = 1
-                        inxElErr = inxEl                        
-                        break
-            else:
-                for inxEl in range(len(parVal)):
-                    if not (parVal[inxEl] > refVal[inxEl]*iMul + iAdd):
-                        bError = 1
-                        inxElErr = inxEl               
-                        break
-
-        elif (strRelation == 'higher or equal to'):
-            if isinstance(refVal, (int, float)):
-                for inxEl in range(len(parVal)):
-                    if not (parVal[inxEl] >= refVal*iMul + iAdd):
-                        bError = 1
-                        inxElErr = inxEl                        
-                        break
-            else:
-                for inxEl in range(len(parVal)):
-                    if not (parVal[inxEl] >= refVal[inxEl]*iMul + iAdd):
-                        bError = 1
-                        inxElErr = inxEl                        
-                        break
-                    
+            return (iPar > iRef)
+        elif (strRelation == 'higher or equal to'):        
+            return (iPar >= iRef)
         elif (strRelation == 'lower than'):
-            if isinstance(refVal, (int, float)):
-                for inxEl in range(len(parVal)):
-                    if not (parVal[inxEl] < refVal*iMul + iAdd):
-                        bError = 1
-                        inxElErr = inxEl                        
-                        break
-            else:
-                for inxEl in range(len(parVal)):
-                    if not (parVal[inxEl] < refVal[inxEl]*iMul + iAdd):
-                        bError = 1
-                        inxElErr = inxEl                        
-                        break
-
+            return (iPar < iRef)
         elif (strRelation == 'lower or equal to'):
-            if isinstance(refVal, (int, float)):
-                for inxEl in range(len(parVal)):
-                    if not (parVal[inxEl] <= refVal*iMul + iAdd):
-                        bError = 1
-                        inxElErr = inxEl                        
-                        break
-            else:
-                for inxEl in range(len(parVal)):
-                    if not (parVal[inxEl] <= refVal[inxEl]*iMul + iAdd):
-                        bError = 1
-                        inxElErr = inxEl                        
-                        break
+            return (iPar <= iRef)
         else:
             strError = '%s is an unknown type of a relation!' % strRelation
             raise RuntimeError(strError)
-
-        # Throw the error, if needed
-        if (bError == 1):
-            
-            # Throw out an error, if the error note was already given            
-            if not (strErrNote == ''):
-                raise ValueError(strErrNote)
-            
-            # Construct the error note:
-            if (iMul == 1):
-                strMul = ''
-            else:
-                strMul = '%s *' % self.__n2s(iMul)
-            if (iAdd == 0):
-                strAdd = ''
-            else:
-                strAdd = '+ %s' % self.__n2s(iAdd)
-
-            if isinstance(refVal, (int, float)):
-                strErrNote = 'All elements of %s > %s < must be %s %s %s %s! (error on element # %d)' \
-                    % (strDesc, strParName, strRelation, strMul, strReference, strAdd, inxElErr)
-            else:
-                print('%s.') % strRelation
-                strErrNote = 'Element #%d of > %s < (%s) must be %s %selement #%d%s of %s!' \
-                    % (inxElErr, strParName, strDesc, strRelation, strMul, inxElErr, strAdd, strReference)
-                
-            raise ValueError(strErrNote)
 
 
     def __n2s(self, iX):
