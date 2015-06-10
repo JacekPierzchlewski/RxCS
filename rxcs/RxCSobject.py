@@ -1960,40 +1960,8 @@ class _RxCSobject:
                     2 june 2015
         """
         
-        # -------------------------------------------------------------------
-        # Error check        
-        
-        # Take the lenght of the checked parameter        
-        if isinstance(parVal, np.ndarray):
-            iLen = parVal.size
-        else:
-            iLen = len(parVal)
-            
-        # Take the lenght and type of the reference
-        if isinstance(refVal, tuple):
-            iLenRef = len(refVal)
-            strRefType = 'Tuple'
-            strDelimStart = '('
-            strDelimLast = ')'
-  
-        elif isinstance(refVal, list):
-            iLenRef = len(refVal)            
-            strRefType = 'List'
-            strDelimStart = '['
-            strDelimLast = ']'
-        elif isinstance(refVal, np.ndarray):
-            iLenRef = refVal.size
-            strRefType = 'Numpy array'
-            strDelimStart = '['
-            strDelimLast = ']'
-        elif isinstance(refVal, (float, int)):
-            # If reference is NaN, restriction can not be checked, it is assumed that the value is correct
-            if np.isnan(refVal):
-                return
-        else:
-            strError = 'Only numbers, lists, tuples and numpy arrays can be a reference for restriction \'%s...\'!\n' % (strRelation)
-            strError = strError+'       (>%s< is of type: %s)' % (strRefName, type(refVal))
-            raise ValueError(strError)
+        iLen = self.__checkRelVal_atl_parLen(self, parVal)    
+        #(iLenRef, strRefType, strDelimStart, strDelimLast) = self.__checkRelVal_atl_refTypeLen(refVal, strRefName, strRelation)    
             
         # Compare the lenghts with the lenght of the reference, if the reference is a list, a tuple or a numpy array
         if isinstance(refVal, (list, tuple, np.ndarray)):
@@ -2003,14 +1971,6 @@ class _RxCSobject:
                     % (strParName, iLen, strRefName, len(refVal))
                 raise ValueError(strError)
                 
-        # -------------------------------------------------------------------
-
-        iMul = lCoef[0]     # Take the linear coefficients
-        iAdd = lCoef[1]     # Take the linear coefficients
-
-        # Check the restriction
-        inxElErr = -1            # Index of an element with error
-
         # Vectorize the parameter, if it is a numpy array
         if isinstance(parVal, np.ndarray):
             parVal.shape = (parVal.size, )
@@ -2021,51 +1981,72 @@ class _RxCSobject:
 
         # Check the restriction:
         if isinstance(refVal, (int, float)):        # Check for number reference
-            self.__checkRelVal_atl_refNum(strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRelation, bNaNAllowedEl)
+            self.__checkRelVal_atl_refNum(strParName, strDesc, parVal, strRefName, refVal, lCoef, 
+                                          strErrNote, strRelation, bNaNAllowedEl)
 
         else:              # Check for tuple, list, numpy array reference
-            
-            # Loop over all elements in the checked parameter             
-            for inxEl in range(len(parVal)):
-                
-                # Get the current element of the checked parameter and check if it is a number                
-                parEl = parVal[inxEl]
-                if not isinstance(parEl, (float, int)):                        
-                    self.__checkRelVal_atl_PET_error(strParName, strRelation, inxEl, parEl)
-
-                # Check if the current elements of the checked parameter is NaN
-                if isinstance(parEl, float):
-                    if np.isnan(parEl):
-                        if (bNaNAllowedEl == 1):
-                            continue
-                        else:
-                            strError = 'Element %d of > %s < (%s) is NaN, which is not allowed!' \
-                                % (inxEl, strParName, strDesc)
-                            raise ValueError(strError)
-
-                # Get the current element of the reference and check if it is a number                                                
-                refEl = refVal[inxEl]
-                if not isinstance(refEl, (float, int)):                        
-                    self.__checkRelVal_atl_RET_error(strParName, strRefName, strRelation, inxEl, refEl)                
-                
-                # Check if the reference element is NaN. If it is, continue
-                if isinstance(refEl, float):
-                    if np.isnan(refEl):
-                        continue
-
-                # Check the reference                                
-                if not (self.__relation(parEl,refEl*iMul + iAdd, strRelation)):
-                    self.__checkRelVal_atl_error(strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRelation, inxElErr, strDelimStart, strDelimLast, iLenRef, inxEl)
-
+            self.__checkRelVal_atl_refAtl(strParName, strDesc, parVal, strRefName, refVal, lCoef, 
+                                          strErrNote, strRelation, bNaNAllowedEl)
         return
+
+
+    def __checkRelVal_atl_parLen(self, parVal):
+
+        # Take the lenght of the checked parameter        
+        if isinstance(parVal, np.ndarray):
+            iLen = parVal.size
+        else:
+            iLen = len(parVal)
             
+        return iLen
+
+    def __checkRelVal_atl_refLen(self, refVal, strRefName, strRelation):
+
+        # Take the lenght and type of the reference
+
+        # Reference is a tuple or a list
+        if isinstance(refVal, tuple, list):
+            iLenRef = len(refVal)
+              
+        # Reference is a Numpy array    
+        elif isinstance(refVal, np.ndarray):
+            iLenRef = refVal.size
+            strRefType = 'Numpy array'
+            strDelimStart = '['
+            strDelimLast = ']'
+            
+        # Reference is a number
+        elif isinstance(refVal, (float, int)):
+            iLenRef = 1
+            strRefType = 'Number'
+            strDelimStart = ''
+            strDelimLast = ''
+
+            # If reference is NaN, restriction can not be checked, it is assumed that the value is correct
+            if np.isnan(refVal):
+                strRefType = 'Number (NaN)'
+        
+        # Reference has illegal type
+        else:
+            strError = 'Only numbers, lists, tuples and numpy arrays can be a reference for restriction \'%s...\'!\n' \
+                % (strRelation)
+            strError = strError+'       (>%s< is of type: %s)' % (strRefName, type(refVal))
+            raise ValueError(strError)
+        
+        return (iLenRef, strRefType, strDelimStart, strDelimLast)        
+
+    def __checkRelVal_atl_refTypeDelim(self, refVal, strRefName, strRelation):
+        
         
     def __checkRelVal_atl_refNum(self, strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRelation, bNaNAllowedEl):
         
             # Loop over all elements in the checked parameter             
             for inxEl in range(len(parVal)):
-                # Get the current element of the checked parameter and check if it is a number                                
+                
+                # Get the current element of the checked parameter and                                 
                 parEl = parVal[inxEl]
+
+                # Check if an element is a number
                 if not isinstance(parEl, (float, int)):
                     self.__checkRelVal_atl_PET_error(strParName, strRelation, inxEl, parEl)
 
@@ -2078,12 +2059,59 @@ class _RxCSobject:
                             strError = 'Element %d of > %s < (%s) is NaN, which is not allowed!' \
                                 % (inxEl, strParName, strDesc)
                             raise ValueError(strError)
-                # Check the reference           HERE!     
-                if not (self.__relation(parEl, refVal*iMul + iAdd, strRelation)):
-                    self.__checkRelVal_atl_error(strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRelation, inxEl, strDelimStart, strDelimLast, iLenRef, inxEl)
+                            
+                # Check the reference
+                if not (self.__relation(parEl, refVal, lCoef, strRelation)):
+                    self.__checkRelVal_atl_error(strParName, strDesc, parVal, strRefName, refVal, lCoef, 
+                                                 strErrNote, strRelation, inxEl, strDelimStart, strDelimLast, 
+                                                 iLenRef, inxEl)
         
 
-    def __checkRelVal_atl_refNum(self, strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRelation, bNaNAllowedEl):
+    def __checkRelVal_atl_refAtl(self, strParName, strDesc, parVal, strRefName, refVal, 
+                                 lCoef, strErrNote, strRelation, bNaNAllowedEl):
+
+            # Loop over all elements in the checked parameter             
+            for inxEl in range(len(parVal)):
+
+                # ---------------------------------------------------------------------------------                
+                # Get the current element of the checked parameter and check if it is a number                
+                parEl = parVal[inxEl]
+                
+                # Check if the current element is a number
+                if not isinstance(parEl, (float, int)):                        
+                    self.__checkRelVal_atl_PET_error(strParName, strRelation, inxEl, parEl)
+
+                # Check if the current elements of the checked parameter is NaN
+                if isinstance(parEl, float):
+                    if np.isnan(parEl):
+                        if (bNaNAllowedEl == 1):
+                            continue
+                        else:
+                            strError = 'Element %d of > %s < (%s) is NaN, which is not allowed!' \
+                                % (inxEl, strParName, strDesc)
+                            raise ValueError(strError)
+                            
+                # ---------------------------------------------------------------------------------
+
+                # Get the current element of the reference                                                
+                refEl = refVal[inxEl]
+                
+                # Check if the reference is a number
+                if not isinstance(refEl, (float, int)):                        
+                    self.__checkRelVal_atl_RET_error(strParName, strRefName, strRelation, inxEl, refEl)                
+                
+                # Check if the reference element is NaN. If it is, continue
+                if isinstance(refEl, float):
+                    if np.isnan(refEl):
+                        continue
+
+                # ---------------------------------------------------------------------------------
+
+                # Check the relation between the element and the reference
+                if not (self.__relation(parEl,refEl, lCoef, strRelation)):
+                    self.__checkRelVal_atl_error(strParName, strDesc, parVal, strRefName, refVal, lCoef, 
+                                                 strErrNote, strRelation, inxElErr, strDelimStart, strDelimLast, 
+                                                 iLenRef, inxEl)
 
     
     def __checkRelVal_atl_PET_error(self, strParName, strRelation, inxEl, parEl):
