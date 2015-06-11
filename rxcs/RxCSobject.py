@@ -51,8 +51,8 @@
             paramNDimL       - the number of dimensions lower than
             paramNDimHE      - the number of dimensions higher or equal to
             paramNDimLE      - the number of dimensions lower or equal to
-            
-            
+
+
             Get and check the parameters given to the module:            
             parametersProcess   - process parameters given to a module as arguments for 'run' function
             parametersCheck     - check if all parameters of a module are correct 
@@ -393,7 +393,7 @@ class _RxCSobject:
             strWasGiven = 'tuple'
             types = list(types)
         else:
-            raise ValueError('Allowed types of elements of parameter must be a type, a tuple of types, or a list of types!')
+            raise ValueError('Allowed types of elements of a parameter must be a type, a tuple of types, or a list of types!')
         
         # Check the list with allowed types
         for inxType in range(len(types)):
@@ -453,11 +453,11 @@ class _RxCSobject:
             Assign allowed values for a parameter.
 
             Arguments:
-                    strName:  [string]   name of a parameter
-                    lAllowed: [list]     list with allowed values
-                    errnote:  [string]   error note to be printed if a parameter will not contain one of allowed values
-                                         (optional, by default it is '' (empty string), which means that an error
-                                          note will be constructed automatically)
+                    strName:  [string]         name of a parameter
+                    lAllowed: [list/tuple]     a list or a tuple with allowed values
+                    errnote:  [string]         error note to be printed if a parameter will not contain one of allowed values
+                                               (optional, by default it is '' (empty string), which means that an error
+                                               note will be constructed automatically)
 
             Output:
                     none
@@ -481,9 +481,12 @@ class _RxCSobject:
             raise RuntimeError(strError)
 
         # List of allowed values
-        if not isinstance(lAllowed, list):                       
-             raise ValueError('Allowed values must be grouped in a list!')
+        if not isinstance(lAllowed, (list, tuple)):                       
+             raise ValueError('Allowed values must be grouped in a list or in a tuple!')
              
+        if isinstance(lAllowed, tuple):
+            lAllowed = list(lAllowed)
+
         # Error note
         if not isinstance(errnote, str):
             raise ValueError('Error note must be a string!')
@@ -515,7 +518,7 @@ class _RxCSobject:
                     29 may 2015                
         
         """
-        self.__paramAddRelRestriction('paramH', strName, reference, mul, add, errnote)
+        self.__paramAddRelRestriction('higher than', strName, reference, mul, add, errnote)
 
 
     def paramL(self, strName, reference, mul=1, add=0, errnote=''):
@@ -541,7 +544,7 @@ class _RxCSobject:
                     29 may 2015                
         
         """
-        self.__paramAddRelRestriction('paramL', strName, reference, mul, add, errnote)
+        self.__paramAddRelRestriction('lower than', strName, reference, mul, add, errnote)
 
 
     def paramHE(self, strName, reference, mul=1, add=0, errnote=''):
@@ -567,7 +570,7 @@ class _RxCSobject:
                     29 may 2015                
         
         """
-        self.__paramAddRelRestriction('paramHE', strName, reference, mul, add, errnote)
+        self.__paramAddRelRestriction('higher or equal to', strName, reference, mul, add, errnote)
 
 
     def paramLE(self, strName, reference, mul=1, add=0, errnote=''):
@@ -593,7 +596,7 @@ class _RxCSobject:
                     29 may 2015                
         
         """
-        self.__paramAddRelRestriction('paramLE', strName, reference, mul, add, errnote)
+        self.__paramAddRelRestriction('lower or equal to', strName, reference, mul, add, errnote)
 
 
 
@@ -1463,7 +1466,7 @@ class _RxCSobject:
             if isinstance(self.__dict__[strParName], float):
                 if np.isnan(self.__dict__[strParName]):
                     strError = ('Mandatory parameter > %s < is not given!') % strParName
-                    raise ValueError(strError)
+                    raise ParameterMissingError(strError)
 
 
     def __parametersCheckType(self):
@@ -1490,13 +1493,14 @@ class _RxCSobject:
 
             # Get the name of the parameter, allowed types and the parameter itself
             strParName = self.lParameters[inxPar]['strName']   # Name of the current parameter
+            strDesc = self.lParameters[inxPar]['strDesc']      # Description of the currect parameter
             lTypes = self.lParameters[inxPar]['lTypes']        # Allowed types of the current parameter
             parameter = self.__dict__[strParName]              # Get the parameter
 
             # Check the type
             if not (isinstance(parameter,tuple(lTypes))):
-                strError = ('Type %s is incorrect for parameter >%s< !') % (type(parameter), strParName)
-                raise ValueError(strError)
+                strError = ('Type %s is incorrect for parameter > %s < !') % (type(parameter), strParName)
+                raise ParameterTypeError(strError)
             
             # Check types of elements, if needed
             if isinstance(parameter, (np.ndarray, list, tuple)):
@@ -1508,17 +1512,27 @@ class _RxCSobject:
                 if isinstance(parameter, np.ndarray):
                     if (parameter.size > 0):
                         if not (isinstance(parameter[0], tuple(lTypesEl))):
-                            strError = ('Parameter >%s< contains elements of an illegal type (%s)!') \
+                            strError = ('Parameter > %s < contains elements of an illegal type (%s)!') \
                                 % (strParName, type(parameter[0]))
-                            raise ValueError(strError)
+                            raise ElementTypeError(strError)
                     continue
 
                 # Service for a tuple or a list
                 for inxEl in range(len(parameter)):       # Loop over all elements of the current parameter
                     if not (isinstance(parameter[inxEl], tuple(lTypesEl))):
-                        strError = ('Parameter >%s< on position %d contains an element of an illegal type (%s)!') \
+                        strError = ('Parameter > %s < on position %d contains an element of an illegal type (%s)!') \
                             % (strParName, inxEl, type(parameter[inxEl]))
-                        raise ValueError(strError)
+                        raise ElementTypeError(strError)
+            
+            # Check if an elements type check was assigned to soemthing elese than a 
+            # tuple, a list or a Numpy array. If yes, it is an error.
+            else:
+                if 'lTypesEl' in self.lParameters[inxPar]:
+                    strError = ('Elements type check can be assigned only to tuples, lists and Numpy arrays!\n')
+                    strError = strError + ('            Parameter > %s < (%s) is of type %s') \
+                        % (strParName, strDesc, type(parameter))
+                    raise ValueError(strError)
+                
         return
 
 
@@ -1611,7 +1625,6 @@ class _RxCSobject:
                     strRefName = 'the given variable'      # everythin else
 
             # Run the correct parameter restriction check function:
-
             # allowed values
             if (strRes == 'allowed values'):
                 self.__checkAllowedVal(strParName, strDesc, parVal, lResData, strErrNote, bNaNAllowedEl)                
@@ -1620,7 +1633,7 @@ class _RxCSobject:
             elif (strRes == 'higher than' or \
                   strRes == 'higher or equal to' or \
                   strRes == 'lower than' or \
-                  strRes == 'lower or equal to'):
+                  strRes == 'lower or equal to'):    
                   self.__checkRelVal(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, strRes, bNaNAllowedEl)
 
             # size restrictions
@@ -1677,7 +1690,6 @@ class _RxCSobject:
 
         # -------------------------------------------------------------------
         # Error check
-        type(parVal)
         if not isinstance(parVal, (float, int, str, tuple, list, np.ndarray)):
             strError = 'Only numbers, strings, tuples, lists, and numpy arrays can be restricted with allowed values!'
             strError = strError+'(>%s< is of type: %s)' % (strParName, type(parVal))
@@ -1711,7 +1723,7 @@ class _RxCSobject:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    29 may 2015
+                    11 june 2015
         """
         inxAl = 0  # Reset the index of elements in a list with allowed values
 
@@ -1738,10 +1750,10 @@ class _RxCSobject:
         # Allowed value was not found, throw out an error
         if (strErrNote == ''):            
             if isinstance(parVal, (int, float)):
-                strErrNote = ('%s is an incorrect value for parameter > %s < (\'%s\')') % (self.__n2s(parVal), strParName, strDesc)
+                strErrNote = ('\'%s\' is an incorrect value for parameter > %s < (\'%s\')') % (self.__n2s(parVal), strParName, strDesc)
             elif isinstance(parVal, (str)):
-                strErrNote = ('%s is an incorrect value for parameter > %s < (\'%s\')') % (parVal, strParName, strDesc)
-        raise ValueError(strErrNote)
+                strErrNote = ('\'%s\' is an incorrect value for parameter > %s < (\'%s\')') % (parVal, strParName, strDesc)
+        raise AllowedValuesError(strErrNote)
 
 
     def __checkAllowedVal_atl(self, strParName, strDesc, parVal, lAllVal, strErrNote, bNaNAllowedEl):
@@ -1768,6 +1780,28 @@ class _RxCSobject:
         """
         
         inxEl = 0  # Reset the index of elements in tuple, list or a numpy array
+
+        # Vectorize the parameter, if it is a numpy array
+        if isinstance(parVal, np.ndarray):
+            parVal.shape = (parVal.size, )
+
+        # Check if a list of allowed values contains correct elements (string and non-NaN numbers) 
+        inxAl = 0  # Reset the index of elements in a list with allowed values
+        bErr = 1   # Set error flag 
+        for allVal in lAllVal:       # Loop over all elements of a list with allowed values
+
+            # An allowed value must be either a string or a number            
+            if not isinstance(allVal, (str, float, int)):
+                strError = 'List of allowed values must contain only strings or numbers!\n'
+                strError = strError+'            An allowed value #%d for the parameter > %s < (\'%s\') is of type %s' \
+                    % (inxAl, strParName, strDesc, type(allVal))
+                raise ValueError(strError)
+                                
+            # If an allowed value is NaN, throw out an error!     
+            if isinstance(allVal, float):
+                if np.isnan(allVal):
+                    strError = 'NaN can not be an allowed value for the parameter > %s < (\'%s\')' % (strParName, strDesc)
+                    raise ValueError(strError)
         
         # Loop over all elements of the parameter
         for par in parVal:
@@ -1778,7 +1812,6 @@ class _RxCSobject:
                 strError = strError+'            Element #%d of > %s < (%s) is of type %s' \
                     % (inxEl, strParName, strDesc, type(par))
                 raise ValueError(strError)
-                raise ValueError(strErrNote)
 
             # If an element if NaN, then decide what to do
             if isinstance(par, float):
@@ -1794,19 +1827,6 @@ class _RxCSobject:
             inxAl = 0  # Reset the index of elements in a list with allowed values
             bErr = 1   # Set error flag 
             for allVal in lAllVal:       
-
-                # An allowed value must be either a string or a number            
-                if not isinstance(allVal, (str, float, int)):
-                    strError = 'List of allowed values must contain only strings or numbers!\n'
-                    strError = strError+'            An allowed value #%d for the parameter > %s < (\'%s\') is of type %s' \
-                        % (inxAl, strParName, strDesc, type(allVal))
-                    raise ValueError(strError)
-                                    
-                # If an allowed value is NaN, throw out an error!     
-                if isinstance(allVal, float):
-                    if np.isnan(allVal):
-                        strError = 'NaN can not be an allowed value for the parameter > %s < (\'%s\')' % (strParName, strDesc)
-                        raise ValueError(strError)
                 
                 # If an allowed value was found, clear the error flag, break the loop and go to the next element             
                 if (par == allVal):
@@ -1828,7 +1848,7 @@ class _RxCSobject:
                 elif isinstance(par, (str)):
                     strErrNote = ('%s is an incorrect value for element #%d of parameter > %s < (\'%s\')') \
                         % (par, inxEl, strParName, strDesc)
-            raise ValueError(strErrNote)
+            raise AllowedValuesError(strErrNote)
         return
 
 
@@ -1905,32 +1925,27 @@ class _RxCSobject:
                     2 june 2015
         """
 
-        # -------------------------------------------------------------------
-        # Error check    
+        # Only numbers can be a reference
         if not isinstance(refVal, (float, int)):
             strError = 'Only numbers can be a reference for restriction \'%s...\' for numbers!\n' % (strRelation)
-            strError = strError+'                 (>%s< is of type: %s)' % (strReference, type(refVal))
+            strError = strError+'                 (> %s < is of type: %s)' % (strReference, type(refVal))
             raise ValueError(strError)
-
-        # -------------------------------------------------------------------
         
         # If reference is NaN, restriction can not be checked, it is assumed that the value is correct
         if isinstance(refVal, float):
             if np.isnan(refVal):
                 return
 
-        iMul = lCoef[0]     # Take the linear coefficients
-        iAdd = lCoef[1]     # Take the linear coefficients 
-
         # Check the restriction, if it is ok, return
-        if (self.__checkRelVal_engine(parVal,refVal*iMul + iAdd, strRelation)):
+        if (self.__checkRelVal_engine(parVal, refVal, lCoef, strRelation)):
             return
  
+        # Throw out an error
         if strErrNote == '':
             (strMul, strAdd) = self.__linearCoef2Strings(lCoef)       
             strErrNote = '%s > %s < must be %s %s %s %s!' \
                 % (strDesc, strParName, strRelation, strMul, strReference, strAdd)
-        raise ValueError(strErrNote)
+        raise RelationalError(strErrNote)
 
 
     def __checkRelVal_atl(self, strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRelation, bNaNAllowedEl):
@@ -1959,34 +1974,36 @@ class _RxCSobject:
             Last modification:
                     2 june 2015
         """
-        
-        iLen = self.__checkRelVal_atl_parLen(self, parVal)    
-        #(iLenRef, strRefType, strDelimStart, strDelimLast) = self.__checkRelVal_atl_refTypeLen(refVal, strRefName, strRelation)    
-            
-        # Compare the lenghts with the lenght of the reference, if the reference is a list, a tuple or a numpy array
-        if isinstance(refVal, (list, tuple, np.ndarray)):
-            if not (iLen == iLenRef):
-                strError = '%s reference must be of equal size to the restricted parameter!\n' % strRefType
-                strError = strError+'            Parameter > %s < is of size %d, its reference (%s) is of size %d!' \
-                    % (strParName, iLen, strRefName, len(refVal))
-                raise ValueError(strError)
-                
-        # Vectorize the parameter, if it is a numpy array
-        if isinstance(parVal, np.ndarray):
-            parVal.shape = (parVal.size, )
 
-        # Vectorize the reference, if it is a numpy array
-        if isinstance(refVal, np.ndarray):
-            refVal.shape = (refVal.size, )
+        # If reference is a NaN, number it can not be used as a reference, return from function
+        if isinstance(refVal, float):
+            if np.isnan(refVal):
+                return
 
+        # Take the length of the parameter
+        iLen = self.__checkRelVal_atl_parLen(self, parVal)
+
+        # Take the length of the reference
+        iLenRef = self.__checkRelVal_atl_refTypeLen(refVal, strRefName, strRelation)
+
+        # Check the lengths of the parameter and the reference.
+        # These lenghts must be the identical.
+        self.__checkRelVal_atl_lenParRef(strParName, refVal, strRefName, iLen, iLenRef)
+
+        # Vectorize the parameter and the reference
+        (parVal, refVal) = self.__checRelVal_atl_vectorize(parVal, refVal)      
+           
         # Check the restriction:
-        if isinstance(refVal, (int, float)):        # Check for number reference
+        if isinstance(refVal, (int, float)):        
+            # Check for number reference
             self.__checkRelVal_atl_refNum(strParName, strDesc, parVal, strRefName, refVal, lCoef, 
                                           strErrNote, strRelation, bNaNAllowedEl)
 
-        else:              # Check for tuple, list, numpy array reference
+        else:              
+            # Check for tuple, list, numpy array reference
             self.__checkRelVal_atl_refAtl(strParName, strDesc, parVal, strRefName, refVal, lCoef, 
                                           strErrNote, strRelation, bNaNAllowedEl)
+        
         return
 
 
@@ -1997,12 +2014,13 @@ class _RxCSobject:
             iLen = parVal.size
         else:
             iLen = len(parVal)
-            
+
         return iLen
+
 
     def __checkRelVal_atl_refLen(self, refVal, strRefName, strRelation):
 
-        # Take the lenght and type of the reference
+        # Take the lenght of the  reference
 
         # Reference is a tuple or a list
         if isinstance(refVal, tuple, list):
@@ -2011,20 +2029,10 @@ class _RxCSobject:
         # Reference is a Numpy array    
         elif isinstance(refVal, np.ndarray):
             iLenRef = refVal.size
-            strRefType = 'Numpy array'
-            strDelimStart = '['
-            strDelimLast = ']'
             
         # Reference is a number
         elif isinstance(refVal, (float, int)):
             iLenRef = 1
-            strRefType = 'Number'
-            strDelimStart = ''
-            strDelimLast = ''
-
-            # If reference is NaN, restriction can not be checked, it is assumed that the value is correct
-            if np.isnan(refVal):
-                strRefType = 'Number (NaN)'
         
         # Reference has illegal type
         else:
@@ -2033,10 +2041,21 @@ class _RxCSobject:
             strError = strError+'       (>%s< is of type: %s)' % (strRefName, type(refVal))
             raise ValueError(strError)
         
-        return (iLenRef, strRefType, strDelimStart, strDelimLast)        
+        return iLenRef
 
-    def __checkRelVal_atl_refTypeDelim(self, refVal, strRefName, strRelation):
+
+    def __checRelVal_atl_vectorize(self, parVal, refVal):
         
+        # Vectorize the parameter, if it is a numpy array
+        if isinstance(parVal, np.ndarray):
+            parVal.shape = (parVal.size, )
+
+        # Vectorize the reference, if it is a numpy array
+        if isinstance(refVal, np.ndarray):
+            refVal.shape = (refVal.size, )
+        
+        return (parVal, refVal)
+
         
     def __checkRelVal_atl_refNum(self, strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRelation, bNaNAllowedEl):
         
@@ -2061,11 +2080,10 @@ class _RxCSobject:
                             raise ValueError(strError)
                             
                 # Check the reference
-                if not (self.__relation(parEl, refVal, lCoef, strRelation)):
+                if not (self.__checkRelVal_engine(parEl, refVal, lCoef, strRelation)):
                     self.__checkRelVal_atl_error(strParName, strDesc, parVal, strRefName, refVal, lCoef, 
-                                                 strErrNote, strRelation, inxEl, strDelimStart, strDelimLast, 
-                                                 iLenRef, inxEl)
-        
+                                                 strErrNote, strRelation, inxEl)
+
 
     def __checkRelVal_atl_refAtl(self, strParName, strDesc, parVal, strRefName, refVal, 
                                  lCoef, strErrNote, strRelation, bNaNAllowedEl):
@@ -2108,10 +2126,9 @@ class _RxCSobject:
                 # ---------------------------------------------------------------------------------
 
                 # Check the relation between the element and the reference
-                if not (self.__relation(parEl,refEl, lCoef, strRelation)):
+                if not (self.__checkRelVal_engine(parEl,refEl, lCoef, strRelation)):
                     self.__checkRelVal_atl_error(strParName, strDesc, parVal, strRefName, refVal, lCoef, 
-                                                 strErrNote, strRelation, inxElErr, strDelimStart, strDelimLast, 
-                                                 iLenRef, inxEl)
+                                                 strErrNote, strRelation, inxEl)
 
     
     def __checkRelVal_atl_PET_error(self, strParName, strRelation, inxEl, parEl):
@@ -2124,18 +2141,29 @@ class _RxCSobject:
     
     def __checkRelVal_atl_RET_error(self, strParName, strRefName, strRelation, inxEl, refEl):
 
-        # Throw the error pf reference parameter element type , if it was found above
+        # Throw the error of reference parameter element type , if it was found above
         strError = 'Only numbers can be a reference for restriction  \'%s...\'!\n'  % (strRelation)
         strError = strError+'            Element #%d of %s (reference for > %s< ) is of type %s!' \
             % (inxEl, strRefName, strParName, type(refEl))
         raise ValueError(strError)
 
 
-    def __checkRelVal_atl_error(self, strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRelation, inxElErr, strDelimStart, strDelimLast, iLenRef, inxEl):
+    def __checkRelVal_atl_lenParRef(self, strParName, refVal, strRefName, iLen, iLenRef):
+
+        # Compare the lenghts with the lenght of the reference, if the reference is a list, a tuple or a numpy array
+        if isinstance(refVal, (list, tuple, np.ndarray)):
+            if not (iLen == iLenRef):
+                strError = 'Reference must be of equal size to the restricted parameter!\n'
+                strError = strError+'            Parameter > %s < is of size %d, its reference (%s) is of size %d!' \
+                    % (strParName, iLen, strRefName, len(refVal))
+                raise ValueError(strError)
+
+
+    def __checkRelVal_atl_error(self, strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRelation, inxElErr, strDelimStart, strDelimLast, inxEl):
 
         # Throw out an error, if the error note was already given            
         if not (strErrNote == ''):
-            raise ValueError(strErrNote)
+            raise RelationalError(strErrNote)
 
         # Construct the error note:
 
@@ -2146,8 +2174,8 @@ class _RxCSobject:
         if isinstance(refVal, (int, float)):
             strErrNote = 'All elements of %s > %s < must be %s %s %s %s! (error on element # %d)!' \
                 % (strDesc, strParName, strRelation, strMul, strRefName, strAdd, inxElErr)
-            raise ValueError(strErrNote)
-                
+            raise RelationalError(strErrNote)
+
         # If the reference is an array, a tuple or a list, it is getting complicated... 
         if (strMul == '') and (strAdd == ''):
             strErrNote = 'Elements of > %s < (%s) must be %s the corresponding elements of %s' \
@@ -2157,7 +2185,8 @@ class _RxCSobject:
                 % (strParName, strDesc, strRelation, strMul, strAdd, strRefName)
         
         # Print the reference if its size is lower than 10
-        if (iLenRef <= 10):
+        if (len(refVal) <= 10):
+            self.__checkRelVal_atl_refDelim(refVal)
             strErrNote = strErrNote + ' %s' % strDelimStart
             for el in refVal:
                 strErrNote = strErrNote + ' %s' % self.__n2s(el)
@@ -2168,17 +2197,38 @@ class _RxCSobject:
         strErrNote=strErrNote+'            Element #%d of > %s < is %s, element #%d of %s is %s!' \
             % (inxEl, strParName, self.__n2s(parVal[inxEl]), inxEl, strRefName, self.__n2s(refVal[inxEl]))
         
-        # Ok, throw out an error            
-        raise ValueError(strErrNote)
+        # Ok, error is ready, throw out an error            
+        raise RelationalError(strErrNote)
 
 
-    def __checkRelVal_engine(self, iPar, iRef, strRelation):
+    def __checkRelVal_atl_refDelim(self, refVal):
+ 
+        # Reference is a tuple
+        if isinstance(refVal, (tuple)):
+            strDelimStart = '('
+            strDelimLast = ')'
+
+        # Reference is a list or a Numpy array
+        elif isinstance(refVal, (list, np.ndarray)):
+            strDelimStart = '['
+            strDelimLast = ']'
+
+        # Reference is a number
+        elif isinstance(refVal, (float, int)):
+            strDelimStart = ''
+            strDelimLast = ''
+        
+        return (strDelimStart, strDelimLast)
+
+
+    def __checkRelVal_engine(self, iPar, iRef, lCoef, strRelation):
         """
             Engine of value relational restriction check.
 
             Arguments:                    
                     iPar:        [number]       tested parameter
                     iRef:        [number]       reference
+                    lCoef        [list]         list with linear coefficients
                     strRelation  [string]       relation, allowed values: 
                                                 'higher than', 'higher or equal to', 
                                                 'lower than', 'lower or equal to', 
@@ -2192,6 +2242,10 @@ class _RxCSobject:
             Last modification:
                     2 june 2015
         """
+        iMul = lCoef[0]
+        iAdd = lCoef[1]
+        iRef = iMul * iRef + iAdd
+        
         if (strRelation == 'higher than'):
             return (iPar > iRef)
         elif (strRelation == 'higher or equal to'):        
@@ -3097,4 +3151,29 @@ class _RxCSobject:
                 break
             inxN = inxN + 1
         return element
+
+
+
+
+class ErrorTemplate(Exception):
+    def __call__(self, *args):
+        return self.__class__(*(self.args + args))
+
+
+class ParameterMissingError(ErrorTemplate):
+    pass
+    
+class ParameterTypeError(ErrorTemplate):
+    pass
+    
+class ElementTypeError(ErrorTemplate):
+    pass
+
+class AllowedValuesError(ErrorTemplate):
+    pass
+
+class RelationalError(ErrorTemplate):
+    pass
+
+
 
