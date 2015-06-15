@@ -10,6 +10,7 @@ from RxCSobject import ParameterTypeError
 from RxCSobject import ElementTypeError
 from RxCSobject import AllowedValuesError
 from RxCSobject import RelationalError
+from RxCSobject import SizeError
 
 
 class RxCS_object_tester1():
@@ -49,11 +50,6 @@ class RxCS_object_tester1():
         # Restrictions on sizes of dimensions
         self.__DimSiz_restrictions()
 
-        
-    def __DimSiz_restrictions(self):    
-         print('TESTS ON DIMENSION RESTRICTIONS')
-         print('')
-    
     
     def __defined_parameters(self):
 
@@ -193,7 +189,7 @@ class RxCS_object_tester1():
          self.__size_restriction_incorrect_vector_number()
          self.__size_restriction_correct_vector_tuple()
          self.__size_restriction_incorrect_vector_tuple()
-         self.__size_restriction_correct_vector_vector)
+         self.__size_restriction_correct_vector_vector()
          self.__size_restriction_incorrect_vector_vector()
          
          self.__size_restriction_correct_matrix_number()
@@ -205,6 +201,7 @@ class RxCS_object_tester1():
          self.__size_restriction_correct_matrix_matrix()
          self.__size_restriction_incorrect_matrix_matrix()
          print('')
+
 
     def __NDim_restrictions(self):    
          print('TESTS ON RESTRICTIONS ON THE NUMBER OF DIMENSIONS:')
@@ -218,7 +215,6 @@ class RxCS_object_tester1():
     def __mandatory_after_optional(self):
         """
             Test of mandatory/optional parameter check. 
-            Mandatory parameter is defined after optional.
             Wanted output: RuntimeError
         """
     
@@ -241,7 +237,6 @@ class RxCS_object_tester1():
     def __mandatory_is_not_given(self):
         """
             Test of mandatory/optional parameter check. 
-            Mandatory parameter is not given.
             Wanted output: ParameterMissingError
         """
 
@@ -256,7 +251,6 @@ class RxCS_object_tester1():
     def __mandatory_is_given(self):
         """
             Test of mandatory/optional parameter check. 
-            Madatory parameter is given. Cool.
             Wanted output: correct
         """
     
@@ -272,7 +266,6 @@ class RxCS_object_tester1():
     def __optional_is_not_given(self):
         """
             Test of mandatory/optional parameter check. 
-            Optional parameter is not given. So what? ;-) (parameter #1).
             Wanted output: correct
         """
         
@@ -287,7 +280,6 @@ class RxCS_object_tester1():
     def __type_correct_int(self):
         """
             Test of parameter type check. 
-            Int given, int accepted (parameter #1).
             Wanted output: correct
         """
         
@@ -304,7 +296,6 @@ class RxCS_object_tester1():
     def __type_incorrect_int(self):
         """
             Test of parameter type check. 
-            Float given, only int accepted (parameter #3).
             Wanted output: ParameterTypeError
         """
         
@@ -330,7 +321,6 @@ class RxCS_object_tester1():
     def __type_correct_tuple(self):
         """
             Test of parameter type check. 
-            List given, only tuple or list accepted (parameter #2).
             Wanted output: Correct
         """
         
@@ -351,7 +341,6 @@ class RxCS_object_tester1():
     def __type_incorrect_tuple_lists(self):
         """
             Test of parameter type check. 
-            Dictionary given, only tuple or list accepted (parameter #2).
             Wanted output: ParameterTypeError
         """
 
@@ -372,7 +361,6 @@ class RxCS_object_tester1():
     def __type_of_elements_correct_floats_in_list(self):
         """
             Test of parameter elements type check. 
-            Correct float elements given in a list (parameter #3). 
             Wanted output: Correct
         """
         strTestName = 'Float elements in a list (correct)'
@@ -397,7 +385,6 @@ class RxCS_object_tester1():
     def __type_of_elements_incorrect_floats_in_tuple(self):
         """
             Test of parameter elements type check. 
-            Incorrect elements (float) given in a tuple, only tuple elements accepted (parameter #1).
             Wanted output: ElementTypeError
         """
         strTestName = 'Float elements in a list (incorrect)'
@@ -414,7 +401,6 @@ class RxCS_object_tester1():
     def __type_of_elements_incorrect_dicts_in_tuple(self):
         """
             Test of parameter elements type check.
-            Incorrect elements (dicts) given in a tuple, only int elements accepted (parameter #2).            
             Wanted output: ElementTypeError
         """
         strTestName = 'Elements (dicts) given in a tuple (incorrect)'
@@ -438,7 +424,6 @@ class RxCS_object_tester1():
     def __type_of_elements_incorrect_elem_in_dict(self):
         """
             Test of parameter elements type check.
-            Incorrect call for checking elements in a dictionary (parameter #1).
             Wanted output: ValueError
         """
         strTestName = 'Elements type check assigned to a dictionary (incorrect)'
@@ -460,7 +445,6 @@ class RxCS_object_tester1():
     def __type_of_elements_correct_long_Numpy_vector(self):
         """
             Test of parameter elements type check. 
-            Correct elements (float) given in a long Numpy array (parameter #1).
             Wanted output: Correct
         """
         strTestName = 'Int elements in a long Numpy vector (correct)'
@@ -478,7 +462,6 @@ class RxCS_object_tester1():
     def __type_of_elements_incorrect_float_in_Numpy_vector(self):
         """
             Test of parameter elements type check. 
-            Incorrect elements (float) given in a Numpy array, only int accepted.
             Wanted output: ElementTypeError
         """
         strTestName = 'Float elements in a Numpy vector (incorrect)'
@@ -501,7 +484,6 @@ class RxCS_object_tester1():
     def __type_of_elements_incorrect_dict_in_long_list(self):
         """
             Test of parameter elements type check. 
-            Incorrect element (dict) given in a long list, only strings accepted.
             Wanted output: ElementTypeError
         """
         strTestName = 'Element in a long list (incorrect)'
@@ -521,7 +503,6 @@ class RxCS_object_tester1():
     def __allowed_values_correct_string(self):
         """
             Test of allowed values of a parameter check. 
-            Correct values of a string.
             Wanted output: Correct
         """
         strTestName = 'Values of a string (correct)'
@@ -539,7 +520,6 @@ class RxCS_object_tester1():
     def __allowed_values_inccorrect_string(self):
         """
             Test of allowed values of a parameter check. 
-            Incorrect values of a string.
             Wanted output: AllowedValuesError
         """
         strTestName = 'Values of a string (incorrect)'
@@ -562,7 +542,6 @@ class RxCS_object_tester1():
     def __allowed_values_correct_number(self):
         """
             Test of allowed values of a parameter check. 
-            Correct values of a number.
             Wanted output: Correct
         """
         strTestName = 'Values of a number (correct)'
@@ -581,7 +560,6 @@ class RxCS_object_tester1():
     def __allowed_values_inccorrect_number(self):
         """
             Test of allowed values of a parameter check. 
-            Incorrect values of a number.
             Wanted output: AllowedValuesError
         """
         strTestName = 'Values of a number (incorrect)'
@@ -600,7 +578,6 @@ class RxCS_object_tester1():
     def __allowed_values_correct_tuple(self):
         """
             Test of allowed values of a parameter check. 
-            Correct values of a tuple (parameter #1).
             Wanted output: Correct
         """
         strTestName = 'Values of a tuple (correct)'
@@ -616,7 +593,6 @@ class RxCS_object_tester1():
     def __allowed_values_incorrect_list(self):
         """
             Test of allowed values of a parameter check. 
-            Incorrect values of a list (parameter #2).
             Wanted output: AllowedValuesError
         """
         strTestName = 'Values of a list (incorrect)'
@@ -635,7 +611,6 @@ class RxCS_object_tester1():
     def __allowed_values_incorrect_vector(self):
         """
             Test of allowed values of a parameter check. 
-            Incorrect values of a Numpy 1D array (parameter #1).
             Wanted output: AllowedValuesError
         """
         strTestName = 'Values of a Numpy Array 1D (incorrect)'
@@ -654,7 +629,6 @@ class RxCS_object_tester1():
     def __allowed_values_correct_matrix(self):
         """
             Test of allowed values of a parameter check. 
-            Correct values of a Numpy 2D array (parameter #1).
             Wanted output: Correct
         """
         strTestName = 'Values of a Numpy Array 2D (correct)'
@@ -670,7 +644,6 @@ class RxCS_object_tester1():
     def __allowed_values_incorrect_list_with_allowed_values(self):
         """
             Test of allowed values of a parameter check. 
-            Incorrect value NaN given in a list with allowed values (parameter #1).
             Wanted output: ValueError
         """
         strTestName = 'Value NaN given in a list with allowed values (incorrect)'
@@ -686,7 +659,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_parameter_vs_number(self):
         """
             Test of relational restriction of a parameter check. 
-            A parameter higher than a number.
             Wanted output: Correct
         """
         strTestName = 'A parameter higher than a number (correct)'
@@ -704,7 +676,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_parameter_vs_number(self):
         """
             Test of relational restriction of a parameter check. 
-            A parameter lower than a number.
             Wanted output: RelationalError
         """
         strTestName = 'A parameter lower than a number (incorrect)'
@@ -722,7 +693,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_parameter_vs_parameter(self):
         """
             Test of relational restriction of a parameter check. 
-            Parameter lower or equal to a parameter.
             Wanted output: Correct
         """
         strTestName = 'Parameter lower or equal to a parameter (correct)'
@@ -746,7 +716,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_parameter_vs_parameter(self):
         """
             Test of relational restriction of a parameter check. 
-            Parameter higher or equal to a parameter.
             Wanted output: RelationalError
         """
         strTestName = 'Parameter higher or equal to a parameter (incorrect)'
@@ -770,7 +739,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_tuple_vs_number(self):
         """
             Test of relational restriction of a parameter check. 
-            Tuple higher or equal to a number.
             Wanted output: Correct
         """
         strTestName = 'Tuple higher or equal to a number (correct)'
@@ -789,7 +757,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_tuple_vs_number(self):
         """
             Test of relational restriction of a parameter check. 
-            Tuple lower or equal to a number.
             Wanted output: RelationalError
         """
         strTestName = 'Tuple lower or equal to a number (incorrect)'
@@ -807,7 +774,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_tuple_vs_parameter(self):
         """
             Test of relational restriction of a parameter check. 
-            Tuple lower than a parameter.
             Wanted output: Correct
         """
         strTestName = 'Tuple lower than a parameter (correct)'
@@ -831,7 +797,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_tuple_vs_parameter(self):
         """
             Test of relational restriction of a parameter check. 
-            Tuple lower than a parameter.
             Wanted output: RelationalError
         """
         strTestName = 'Tuple lower than a parameter (incorrect)'
@@ -855,7 +820,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_tuple_vs_list(self):
         """
             Test of relational restriction of a parameter check. 
-            Tuple higher than a list.
             Wanted output: Correct
         """
         strTestName = 'Tuple higher than a list (correct)'
@@ -879,7 +843,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_tuple_vs_list(self):
         """
             Test of relational restriction of a parameter check. 
-            Tuple higher or equal to a list.
             Wanted output: RelationalError
         """
         strTestName = 'Tuple higher or equal to a list (incorrect)'
@@ -903,7 +866,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_list_vs_number(self):
         """
             Test of relational restriction of a parameter check. 
-            List higher or equal to a number.
             Wanted output: Correct
         """
         strTestName = 'List higher or equal to a number (correct)'
@@ -921,7 +883,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_list_vs_number(self):
         """
             Test of relational restriction of a parameter check. 
-            List lower than a number.
             Wanted output: RelationalError
         """
         strTestName = 'List lower than a number (incorrect)'
@@ -939,7 +900,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_list_vs_parameter(self):
         """
             Test of relational restriction of a parameter check. 
-            List lower than a parameter.
             Wanted output: Correct
         """
         strTestName = 'List lower than a parameter (correct)'
@@ -963,7 +923,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_list_vs_parameter(self):
         """
             Test of relational restriction of a parameter check. 
-            List lower than a parameter.
             Wanted output: RelationalError
         """
         strTestName = 'List lower than a parameter (incorrect)'
@@ -987,7 +946,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_list_vs_tuple(self):
         """
             Test of relational restriction of a parameter check. 
-            List lower or equal to a tuple.
             Wanted output: Correct
         """
         strTestName = 'List lower or equal to a tuple (correct)'
@@ -1011,7 +969,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_list_vs_tuple(self):
         """
             Test of relational restriction of a parameter check. 
-            List higher or equal to a tuple.
             Wanted output: RelationalError
         """
         strTestName = 'List higher or equal to a tuple (incorrect)'
@@ -1035,7 +992,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_list_vs_list(self):
         """
             Test of relational restriction of a parameter check. 
-            List higher than a list.
             Wanted output: Correct
         """
         strTestName = 'List higher than a list (correct)'
@@ -1059,7 +1015,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_list_vs_list(self):
         """
             Test of relational restriction of a parameter check. 
-            List lower than a list.
             Wanted output: RelationalError
         """
         strTestName = 'List lower than a list (incorrect)'
@@ -1083,7 +1038,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_list_vs_NumpyVector(self):
         """
             Test of relational restriction of a parameter check. 
-            List lower or equal to a Numpy vector.
             Wanted output: Correct
         """
         strTestName = 'List lower or equal to a Numpy vector (correct)'
@@ -1107,7 +1061,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_list_vs_NumpyVector(self):
         """
             Test of relational restriction of a parameter check. 
-            List lower or equal to a Numpy vector.
             Wanted output: RelationalError
         """
         strTestName = 'List lower or equal to a Numpy vector (incorrect)'
@@ -1131,7 +1084,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_NumpyVector_vs_number(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy vector lower or equal to a number.
             Wanted output: Correct
         """
         strTestName = 'Numpy vector lower or equal to a number (correct)'
@@ -1148,7 +1100,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_NumpyVector_vs_number(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy vector lower or equal to a number.
             Wanted output: RelationalError
         """
         strTestName = 'Numpy vector lower or equal to a number (incorrect)'
@@ -1166,7 +1117,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_NumpyVector_vs_parameter(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy vector higher than a parameter.
             Wanted output: Correct
         """
         strTestName = 'Numpy vector higher than a parameter (correct)'
@@ -1190,7 +1140,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_NumpyVector_vs_parameter(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy vector lower than a parameter.
             Wanted output: RelationalError
         """
         strTestName = 'Numpy vector lower than a parameter (incorrect)'
@@ -1214,7 +1163,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_NumpyVector_vs_tuple(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy vector lower or equal to a tuple.
             Wanted output: Correct
         """
         strTestName = 'Numpy vector lower or equal to a tuple (correct)'
@@ -1238,7 +1186,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_NumpyVector_vs_tuple(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy vector lower or equal to a tuple.
             Wanted output: RelationalError
         """
         strTestName = 'Numpy vector lower or equal to a tuple (incorrect)'
@@ -1262,7 +1209,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_NumpyVector_vs_list(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy vector higher or equal to a list.
             Wanted output: Correct
         """
         strTestName = 'Numpy vector higher or equal to a list (correct)'
@@ -1286,7 +1232,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_NumpyVector_vs_list(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy vector higher than a list.
             Wanted output: RelationalError
         """
         strTestName = 'Numpy vector higher than a list (incorrect)'
@@ -1310,7 +1255,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_NumpyVector_vs_NumpyVector(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy vector higher or equal to a Numpy vector.
             Wanted output: Correct
         """
         strTestName = 'Numpy vector higher or equal to a Numpy vector (correct)'
@@ -1334,7 +1278,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_NumpyVector_vs_NumpyVector(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy vector higher than a Numpy vector.
             Wanted output: RelationalError
         """
         strTestName = 'Numpy vector higher than a Numpy vector (incorrect)'
@@ -1358,7 +1301,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_NumpyMatrix_vs_number(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy matrix higher than a number.
             Wanted output: Correct
         """
         strTestName = 'Numpy matrix higher than a number (correct)'
@@ -1376,7 +1318,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_NumpyMatrix_vs_number(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy matrix higher than a number.
             Wanted output: RelationalError
         """
         strTestName = 'Numpy matrix higher than a number (incorrect)'
@@ -1394,7 +1335,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_NumpyMatrix_vs_parameter(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy matrix lower than a parameter.
             Wanted output: Correct
         """
         strTestName = 'Numpy matrix lower than a parameter (correct)'
@@ -1418,7 +1358,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_NumpyMatrix_vs_parameter(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy matrix lower or equal to a parameter.
             Wanted output: RelationalError
         """
         strTestName = 'Numpy matrix lower or equal to a parameter (incorrect)'
@@ -1443,7 +1382,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_NumpyMatrix_vs_tuple(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy matrix higher or equal to a tuple.
             Wanted output: Correct
         """
         strTestName = 'Numpy matrix higher or equal to a tuple (correct)'
@@ -1467,7 +1405,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_NumpyMatrix_vs_tuple(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy matrix higher than a tuple.
             Wanted output: RelationalError
         """
         strTestName = 'Numpy matrix higher than a tuple (incorrect)'
@@ -1491,7 +1428,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_NumpyMatrix_vs_list(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy matrix higher or equal to a list.
             Wanted output: Correct
         """
         strTestName = 'Numpy matrix higher or equal to a list (correct)'
@@ -1515,7 +1451,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_NumpyMatrix_vs_list(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy matrix higher or equal to a list.
             Wanted output: RelationalError
         """
         strTestName = 'Numpy matrix higher or equal to a list (incorrect)'
@@ -1539,7 +1474,6 @@ class RxCS_object_tester1():
     def __relational_restriction_correct_NumpyMatrix_vs_NumpyVector(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy matrix lower than a Numpy Vector.
             Wanted output: Correct
         """
         strTestName = 'Numpy matrix lower than a Numpy Vector (correct)'
@@ -1563,7 +1497,6 @@ class RxCS_object_tester1():
     def __relational_restriction_incorrect_NumpyMatrix_vs_NumpyVector(self):
         """
             Test of relational restriction of a parameter check. 
-            Numpy matrix lower than a Numpy Vector.
             Wanted output: RelationalError
         """
         strTestName = 'Numpy matrix lower than a Numpy Vector (incorrect)'
@@ -1582,6 +1515,249 @@ class RxCS_object_tester1():
         RxCSObject.mParameter1 = np.random.randint(1, 9, (1e3, 1e2))
 
         self.__parametersCheck_error(RxCSObject, RelationalError, strTestName)
+
+
+    def __size_restriction_correct_string_number(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_incorrect_string_number(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_correct_string_parameter(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_incorrect_string_parameter(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_correct_string_string(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_inccorrect_string_string(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_correct_string_tuple(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_inccorrect_string_tuple(self):
+        """
+            Test of parameter size restriction check. 
+            ....
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_correct_string_list(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_inccorrect_string_list(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_correct_tuple_number(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_incorrect_tuple_number(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_correct_tuple_parameter(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_incorrect_tuple_parameter(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_correct_list_number(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+
+    def __size_restriction_incorrect_list_number(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_correct_list_parameter(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_incorrect_list_parameter(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_correct_list_list(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
+
+    def __size_restriction_incorrect_list_list(self):
+        """
+            Test of parameter size restriction check. 
+            Wanted output: 
+        """
+
+        strTestName = ''
+        RxCSObject = _RxCSobject()
+
+        self.__parametersCheck_error(RxCSObject, SizeError, strTestName)
+
 
 
     def __parametersCheck_error(self, RxCSObject, error, strTestName):
