@@ -199,8 +199,14 @@ def module_progress_done(tStart):
 
     # Measure the time
     tTime = time.time() - tStart
-
-    strTime = ('done in %.2f seconds') % (tTime)
+    if (tTime < 1) and (tTime >= 1e-3):          # Miliseconds range
+        tTime = tTime * 1e3
+        strTime = ('done in %.2f ms') % (tTime)
+    elif (tTime < 1e-3) and (tTime >= 1e-6):     # Microseconds range
+        tTime = tTime * 1e6
+        strTime = ('done in %.2f us') % (tTime)
+    else:
+        strTime = ('done in %.2f s') % (tTime)
     sys.stdout.write(_colors('OK') + strTime + _colors('ENDC') + '\n\n\n')
     sys.stdout.flush()
 
