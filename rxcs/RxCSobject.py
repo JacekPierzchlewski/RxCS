@@ -1,5 +1,5 @@
 """
-            This module contains _RxCSobject class, which is the main base class for 
+            This module contains _RxCSobject class, which is the main base class for
             all modules of RxCS.
 
             License:
@@ -7,15 +7,15 @@
 
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    12 June 2015
-                    
-                    
+                    19 June 2015
+
+
             List of functions in the module:
 
 
-            Add parameters:            
+            Add parameters:
             paramAddMan    - Add a mandatory parameter to the object
             paramAddOpt    - Add an optional parameter to the object
 
@@ -35,17 +35,17 @@
             paramL       -  lower than a reference
             paramHE      -  higher or equal than a reference
             paramLE      -  lower or equal than a reference
-            
-            
+
+
             Assign restrictions on the size of a parameter:
             paramSizEq      - size equal to a reference
             paramSizH       - size higher than a reference
             paramSizL       - size lower than a reference
             paramSizHE      - size higher or equal to a reference
             paramSizLE      - size lower or equal to a reference
-            
-            
-            Assign restriction of the number of dimensions of a parameter:            
+
+
+            Assign restriction of the number of dimensions of a parameter:
             paramNDimEq      - the number of dimensions equal to a reference
             paramNDimH       - the number of dimensions higher than a reference
             paramNDimL       - the number of dimensions lower than a reference
@@ -53,7 +53,7 @@
             paramNDimLE      - the number of dimensions lower or equal to a reference
 
 
-            Assign restriction of the size of a dimension of a parameter:            
+            Assign restriction of the size of a dimension of a parameter:
             paramDimEq       - the size of a dimension equal to a reference
             paramDimH        - the size of a dimension higher than a reference
             paramDimL        - the size of a dimension lower than a reference
@@ -61,14 +61,14 @@
             paramDimLE       - the size of a dimension lower or equal to a reference
 
 
-            Get and check the parameters given to the module:            
+            Get and check the parameters given to the module:
             parametersProcess   - process parameters given to a module as arguments for 'run' function
-            parametersCheck     - check if all parameters of a module are correct 
-            
+            parametersCheck     - check if all parameters of a module are correct
+
             Paramters printing:
             parametersPrint     - print parameters of a module
             changeUnitPRefix    - change prefered unit prefix of a parameter
-            
+
             Engine start/stop information:
             engineStartsInfo    - function prints info about start of a module engine
             engineStopsInfo     - function prints info about stop of a module engine
@@ -76,15 +76,15 @@
 
 
             INTERNAL FUNCTIONS:
-                      
+
             __isParameterNameOK          -  check if a name of a parameter is correct
             __paramAddRelRestriction     -  assign relational restriction to a parameter
             __paramAddSizRestriction     -  assign size restriction to a parameter
             __paramAddNDimRestriction    -  assign restriction on the number of dimensions of a parameter
             __paramAddDimSizRestriction  -  assign restriction on the size of a dimension of a parameter
-            
+
             __parameterWasDefined         - check if a parameter with a given name was already defined
-                        
+
             __parametersGetDict            - get parameters given to a function as dictionary
             __parametersGetArgs            - get parameters given directly to a function as a list of arguments
 
@@ -96,14 +96,14 @@
 
             Control of 'allowed values' restrictions:
             __checkAllowedVal
-            __checkAllowedVal_numstr  
-            __checkAllowedVal_atl     
-            
+            __checkAllowedVal_numstr
+            __checkAllowedVal_atl
+
 
             Control of relational value restrictions:
-            __checkRelVal    
+            __checkRelVal
             __checkRelVal_num
-            __checkRelVal_atl     
+            __checkRelVal_atl
             __checkRelVal_atl_parLen
             __checkRelVal_atl_refLen
             __checkRelVal_atl_vectorize
@@ -117,57 +117,57 @@
 
 
             Control of size restrictions:
-            __checkSiz              
-            __checkSiz_sizParam      
-            __checkSiz_sizRef              
-            __checkSiz_engine       
-            __checkSiz_error        
+            __checkSiz
+            __checkSiz_sizParam
+            __checkSiz_sizRef
+            __checkSiz_engine
+            __checkSiz_error
 
 
             Control of restrictions on the number of dimensions:
-            __checkNDim                
-            __checkNDim_NDimInParam    
-            __checkNDim_NDimInRef      
-            __checkNDim_engine         
-            __checkNDim_error          
+            __checkNDim
+            __checkNDim_NDimInParam
+            __checkNDim_NDimInRef
+            __checkNDim_engine
+            __checkNDim_error
 
-            
+
             Control of restrictions on the size of dimensions:
-            __checkDimSiz                 
+            __checkDimSiz
             __checkDimSiz_dimensions
             __checkDimSiz_dimSizInParam
             __checkDimSiz_dimSizInRef
-            __checkDimSiz_engine  
-            __checkDimSiz_error    
-            
-            
+            __checkDimSiz_engine
+            __checkDimSiz_error
+            __checkDimSiz_error_restriction
+
             Auxiliary functions:
             __linearCoef2Strings - change linear coefficients to strings
-            __n2s                - change number to a string, 
+            __n2s                - change number to a string,
                                    automatically regulate the number of digits after the comma
             __NthInTuple         - takes Nth element of a tuple
-
+            __strOnlyNumb        - check if a given string contains only a number
 
 """
 from __future__ import division
 import numpy as np
 import console
 
+
 class _RxCSobject:
 
     def __init__(self):
         self.strRxCSgroup = ''   # Initilize empty name of group of RxCS modules
-        self.strModuleName = ''  # Initialize empty module name        
-        
+        self.strModuleName = ''  # Initialize empty module name
+
         self.lParameters = []    # List with parameters
         self.iManParam = 0       # The number of mandatory parameters
         self.iOptParam = 0       # The number of optional parameters
 
-
     def paramAddMan(self, strName, strDesc, unit='', noprint=0, unitprefix='-'):
         """
             Add a mandatory parameter to the object.
-    
+
             Arguments:
                     strName:   [string]     name of a parameter, will become a public class member
                     strDesc:   [string]     short description of a parameter
@@ -181,10 +181,10 @@ class _RxCSobject:
                                         ' ':one, k:kilo, M:mega, G:giga, T:tera,-:CPU decides)
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
                     29 May 2015
         """
@@ -196,23 +196,23 @@ class _RxCSobject:
             raise ValueError('Name of a parameter must be a string!')
         self.__isParameterNameOK(strName)
 
-        if not isinstance(strDesc, str):        
+        if not isinstance(strDesc, str):
             raise ValueError('Description of a parameter must be a string!')
 
-        if not isinstance(unit, str):        
+        if not isinstance(unit, str):
             raise ValueError('Unit of a parameter must be a string!')
 
-        if not isinstance(noprint, int):        
+        if not isinstance(noprint, int):
             raise ValueError('\'noprint\' parameter must be a number')
 
-        if not isinstance(unitprefix, str):        
+        if not isinstance(unitprefix, str):
             raise ValueError('Unit prefix must be a string!')
 
         (bDefined, _) = self.__parameterWasDefined(strName)
         if bDefined:
             strError = ('Parameter %s was already defined!') % strName
             raise RuntimeError(strError)
-        #---------------------------------------------------------------------
+        # ---------------------------------------------------------------------
 
         # Add parameter  to the list of names
         self.__dict__[strName] = np.nan
@@ -232,21 +232,20 @@ class _RxCSobject:
         dParameter['lResData'] = []                 # List of additional data for restrictions
 
         self.lParameters.append(dParameter)
-        
-        self.iManParam = self.iManParam + 1  # The number of mandatory parameters
 
+        self.iManParam = self.iManParam + 1  # The number of mandatory parameters
 
     def paramAddOpt(self, strName, strDesc, unit='', noprint=0, unitprefix='-', default=np.nan):
         """
             Add an optional parameter to the object.
-    
+
             Arguments:
                     strName: [string]   name of a parameter, will become public class member
                     strDesc: [string]   short description of a parameter
                     unit:    [string]   unit of a parameter
                     noprint: [number]   switch off priting a parameter to the console by 'parametersPrint' function
                                         (optional, default is 0 = print the parameter)
-                                    
+
                     unitprefix [string] prefered unit prefix of a parameter to be printed
                                         (optional, default is '-', which means that CPU chooses the unit prefix,
                                         allowed values = f:femto, p:pico, n:nano, u:micro, m:mili,
@@ -257,40 +256,40 @@ class _RxCSobject:
 
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
-            Last modification:
-                    29 May 2015                
-        """    
 
-        # Error checks -------------------------------------------------------      
-        if not isinstance(strName, str):        
+            Last modification:
+                    29 May 2015
+        """
+
+        # Error checks -------------------------------------------------------
+        if not isinstance(strName, str):
             raise ValueError('Name of a parameter must be a string!')
         self.__isParameterNameOK(strName)
 
-        if not isinstance(strDesc, str):        
+        if not isinstance(strDesc, str):
             raise ValueError('Description of a parameter must be a string!')
 
-        if not isinstance(unit, str):        
+        if not isinstance(unit, str):
             raise ValueError('Unit of a parameter must be a string!')
 
-        if not isinstance(noprint, int):        
+        if not isinstance(noprint, int):
             raise ValueError('\'noprint\' parameter must be a number')
 
-        if not isinstance(unitprefix, str):        
+        if not isinstance(unitprefix, str):
             raise ValueError('Unit prefix must be a string!')
 
         (bDefined, _) = self.__parameterWasDefined(strName)
         if bDefined:
             strError = ('Parameter %s was already defined!') % strName
             raise RuntimeError(strError)
-        #---------------------------------------------------------------------
-        
+        # ---------------------------------------------------------------------
+
         # Add parameter  to the list of names
         self.__dict__[strName] = default
-        
+
         dParameter = {}
         dParameter['strName'] = strName             # Name of a parameter
         dParameter['strDesc'] = strDesc             # Description
@@ -304,30 +303,29 @@ class _RxCSobject:
         dParameter['lResErrNote'] = []              # List of error notes for restrictions
         dParameter['lResReference'] = []            # List of references for restrictions
         dParameter['lResData'] = []                 # List of additional data for restrictions
- 
-        self.lParameters.append(dParameter)        
+
+        self.lParameters.append(dParameter)
 
         self.iOptParam = self.iOptParam + 1  # The number of optional parameters
 
-
     def paramType(self, strName, types):
         """
-            Assign allowed types to a parameter. If types are assigned, it will be 
+            Assign allowed types to a parameter. If types are assigned, it will be
             checked if a parameter is of correct type.
-                                
+
             Arguments:
                     strName: [string]           name of a parameter
                     types:   [type/tuple/list]  allowed types
-                    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    2 June 2015                
-        
+                    2 June 2015
+
         """
 
         # Error checks -------------------------------------------------------
@@ -341,7 +339,7 @@ class _RxCSobject:
             strError = ('Parameter %s was not yet defined!') % strName
             raise RuntimeError(strError)
 
-        # Check given types        
+        # Check given types
         if isinstance(types, type):
             types = [types]
         elif(isinstance(types, list)):
@@ -351,7 +349,7 @@ class _RxCSobject:
             types = list(types)
         else:
             raise ValueError('Allowed types of a parameter must be a type, a tuple of types, or a list of types!')
-        
+
         # Check the list with allowed types
         for inxType in range(len(types)):
             if (not isinstance(types[inxType], type)):
@@ -360,35 +358,34 @@ class _RxCSobject:
                     (inxType, strWasGiven, type(types[inxType]))
                 raise ValueError(strErr)
 
-        #---------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.lParameters[inxParam]['lTypes'] = types
         return
 
-
     def paramTypeEl(self, strName, types):
         """
-            Assign allowed types of elements of a parameter. 
-            If types are assigned, it will be checked if elements of a parameter 
+            Assign allowed types of elements of a parameter.
+            If types are assigned, it will be checked if elements of a parameter
             are of correct types.
             It will be checked only if a parameter is of type:
-            
+
                 - list
                 - tuple
                 - numpy array
-                                
+
             Arguments:
                     strName: [string]           name of a parameter
                     types:   [type/tuple/list]  allowed types
-                    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    2 June 2015                
-        
+                    2 June 2015
+
         """
 
         # Error checks -------------------------------------------------------
@@ -402,7 +399,7 @@ class _RxCSobject:
             strError = ('Parameter %s was not yet defined!') % strName
             raise RuntimeError(strError)
 
-        # Check given types        
+        # Check given types
         if isinstance(types, type):
             types = [types]
         elif(isinstance(types, list)):
@@ -412,7 +409,7 @@ class _RxCSobject:
             types = list(types)
         else:
             raise ValueError('Allowed types of elements of a parameter must be a type, a tuple of types, or a list of types!')
-        
+
         # Check a list with allowed types
         for inxType in range(len(types)):
             if (not isinstance(types[inxType], type)):
@@ -420,10 +417,9 @@ class _RxCSobject:
                 strErr = strErr + '\n            Element #%d of the given %s of types is: %s' % \
                     (inxType, strWasGiven, type(types[inxType]))
                 raise ValueError(strErr)
-        #---------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.lParameters[inxParam]['lTypesEl'] = types
         return
-
 
     def paramAllowed(self, strName, lAllowed, errnote=''):
         """
@@ -438,17 +434,17 @@ class _RxCSobject:
 
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
                     5 June 2015
-        """    
+        """
 
         # Error checks -------------------------------------------------------
-        
-        # Parameter to be checked        
+
+        # Parameter to be checked
         if not isinstance(strName, str):
             raise ValueError('Name of a parameter must be a string!')
 
@@ -458,9 +454,9 @@ class _RxCSobject:
             raise RuntimeError(strError)
 
         # List of allowed values
-        if not isinstance(lAllowed, (list, tuple)):                       
-             raise ValueError('Allowed values must be grouped in a list or in a tuple!')
-             
+        if not isinstance(lAllowed, (list, tuple)):
+            raise ValueError('Allowed values must be grouped in a list or in a tuple!')
+
         if isinstance(lAllowed, tuple):
             lAllowed = list(lAllowed)
 
@@ -468,21 +464,20 @@ class _RxCSobject:
         if not isinstance(errnote, str):
             raise ValueError('Error note must be a string!')
 
-        #---------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.lParameters[inxParam]['lRes'].append('allowed values')
         self.lParameters[inxParam]['lResErrNote'].append(errnote)
         self.lParameters[inxParam]['lResReference'].append('')
         self.lParameters[inxParam]['lResData'].append(lAllowed)
 
-        
     def NaNAllowedEl(self, strName):
         """
             Allow for NaN values of elements of a parameter.
             Using this function make sense only for tuples, lists and np.ndarrays,
-            in combination with relational restriction functions, which are 
+            in combination with relational restriction functions, which are
             paramH, paramL, paramHE, paramLE.
-            
-            If a parameter contains NaN elements, but no relational restriction 
+
+            If a parameter contains NaN elements, but no relational restriction
             is imposed, the parameter will be treated as correct even though
             the NaN parameters were not allowed.
 
@@ -492,13 +487,13 @@ class _RxCSobject:
 
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
                     5 June 2015
-        """    
+        """
 
         # Error checks -------------------------------------------------------
 
@@ -511,42 +506,40 @@ class _RxCSobject:
             strError = ('Parameter %s was not yet defined!') % strName
             raise RuntimeError(strError)
 
-        #---------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.lParameters[inxParam]['bNaNAllowedEl'] = 1
         return
 
-
     def paramH(self, strName, reference, mul=1, add=0, errnote=''):
         """
-            Assign relational restriction to a parameter - higher than a reference 
-                                            
+            Assign relational restriction to a parameter - higher than a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
-                    mul:       [number]          multiply coefficient, reference will be multipled by this 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    29 May 2015                
-        
+                    29 May 2015
+
         """
         self.__paramAddRelRestriction('higher than', strName, reference, mul, add, errnote)
 
-
     def paramL(self, strName, reference, mul=1, add=0, errnote=''):
         """
-            Assign relational restriction to a parameter - lower than a reference 
+            Assign relational restriction to a parameter - lower than a reference
 
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
-                    mul:       [number]          multiply coefficient, reference will be multipled by this 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
@@ -554,25 +547,24 @@ class _RxCSobject:
 
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    29 May 2015                
-        
+                    29 May 2015
+
         """
         self.__paramAddRelRestriction('lower than', strName, reference, mul, add, errnote)
 
-
     def paramHE(self, strName, reference, mul=1, add=0, errnote=''):
         """
-            Assign relational restriction to a parameter - higher or equal to a reference 
-                                            
+            Assign relational restriction to a parameter - higher or equal to a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
-                    mul:       [number]          multiply coefficient, reference will be multipled by this 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
@@ -580,25 +572,24 @@ class _RxCSobject:
 
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    29 May 2015                
-        
+                    29 May 2015
+
         """
         self.__paramAddRelRestriction('higher or equal to', strName, reference, mul, add, errnote)
 
-
     def paramLE(self, strName, reference, mul=1, add=0, errnote=''):
         """
-            Assign relational restriction to a parameter - lower or equal to a reference 
-                                            
+            Assign relational restriction to a parameter - lower or equal to a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
-                    mul:       [number]          multiply coefficient, reference will be multipled by this 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
@@ -606,26 +597,24 @@ class _RxCSobject:
 
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    29 May 2015                
-        
+                    29 May 2015
+
         """
         self.__paramAddRelRestriction('lower or equal to', strName, reference, mul, add, errnote)
 
-
-
     def paramSizEq(self, strName, reference, mul=1, add=0, errnote=''):
         """
-            Assign size restriction to a parameter - size equal to a reference 
+            Assign size restriction to a parameter - size equal to a reference
 
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
-                    mul:       [number]          multiply coefficient, reference will be multipled by this 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
@@ -633,26 +622,25 @@ class _RxCSobject:
 
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    5 June 2015                
-        
+                    5 June 2015
+
         """
 
         self.__paramAddSizRestriction('size equal to', strName, reference, mul, add, errnote)
 
-
     def paramSizH(self, strName, reference, mul=1, add=0, errnote=''):
         """
-            Assign size restriction to a parameter - size higher than a reference 
+            Assign size restriction to a parameter - size higher than a reference
 
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
-                    mul:       [number]          multiply coefficient, reference will be multipled by this 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
@@ -660,235 +648,226 @@ class _RxCSobject:
 
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    5 June 2015                
-        
+                    5 June 2015
+
         """
         self.__paramAddSizRestriction('size higher than', strName, reference, mul, add, errnote)
 
-
     def paramSizL(self, strName, reference, mul=1, add=0, errnote=''):
         """
-            Assign size restriction to a parameter - size lower than a reference 
-    
+            Assign size restriction to a parameter - size lower than a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
-                    mul:       [number]          multiply coefficient, reference will be multipled by this 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
                                                   note will be constructed automatically)
-    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    5 June 2015                
-        
+                    5 June 2015
+
         """
         self.__paramAddSizRestriction('size lower than', strName, reference, mul, add, errnote)
 
-
     def paramSizHE(self, strName, reference, mul=1, add=0, errnote=''):
         """
-            Assign size restriction to a parameter - size higher than a reference 
-    
+            Assign size restriction to a parameter - size higher than a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
-                    mul:       [number]          multiply coefficient, reference will be multipled by this 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
                                                   note will be constructed automatically)
-    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    5 June 2015                
-        
+                    5 June 2015
+
         """
         self.__paramAddSizRestriction('size higher or equal to', strName, reference, mul, add, errnote)
 
-
     def paramSizLE(self, strName, reference, mul=1, add=0, errnote=''):
         """
-            Assign size restriction to a parameter - size lower or equal to a reference 
-    
+            Assign size restriction to a parameter - size lower or equal to a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
-                    mul:       [number]          multiply coefficient, reference will be multipled by this 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
                                                   note will be constructed automatically)
-    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    5 June 2015                
-        
+                    5 June 2015
+
         """
         self.__paramAddSizRestriction('size lower or equal to', strName, reference, mul, add, errnote)
 
-
     def paramNDimEq(self, strName, reference, mul=1, add=0, errnote=''):
         """
-            Assign restriction on the number of dimensions to a parameter - 
-            the number of dimensions equal to a reference 
-    
+            Assign restriction on the number of dimensions to a parameter -
+            the number of dimensions equal to a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
-                    mul:       [number]          multiply coefficient, reference will be multipled by this 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
                                                   note will be constructed automatically)
-    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    5 June 2015                
-        
+                    5 June 2015
+
         """
         self.__paramAddNDimRestriction('number of dimensions equal to', strName, reference, mul, add, errnote)
 
-        
     def paramNDimH(self, strName, reference, mul=1, add=0, errnote=''):
         """
-            Assign restriction on the number of dimensions to a parameter - 
-            the number of dimensions higher than a reference 
-    
+            Assign restriction on the number of dimensions to a parameter -
+            the number of dimensions higher than a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
-                    mul:       [number]          multiply coefficient, reference will be multipled by this 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
                                                   note will be constructed automatically)
-    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    5 June 2015                
-        
+                    5 June 2015
+
         """
         self.__paramAddNDimRestriction('number of dimensions higher than', strName, reference, mul, add, errnote)
 
-        
     def paramNDimL(self, strName, reference, mul=1, add=0, errnote=''):
         """
-            Assign restriction on the number of dimensions to a parameter - 
-            the number of dimensions lower than a reference 
-    
+            Assign restriction on the number of dimensions to a parameter -
+            the number of dimensions lower than a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
-                    mul:       [number]          multiply coefficient, reference will be multipled by this 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
                                                   note will be constructed automatically)
-    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    5 June 2015                
-        
+                    5 June 2015
+
         """
         self.__paramAddNDimRestriction('number of dimensions lower than', strName, reference, mul, add, errnote)
 
-
     def paramNDimHE(self, strName, reference, mul=1, add=0, errnote=''):
         """
-            Assign restriction on the number of dimensions to a parameter - 
-            the number of dimensions higher or equal to a reference 
-    
+            Assign restriction on the number of dimensions to a parameter -
+            the number of dimensions higher or equal to a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
-                    mul:       [number]          multiply coefficient, reference will be multipled by this 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
                                                   note will be constructed automatically)
-    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    5 June 2015                
-        
+                    5 June 2015
+
         """
         self.__paramAddNDimRestriction('number of dimensions higher or equal to', strName, reference, mul, add, errnote)
-        
 
     def paramNDimLE(self, strName, reference, mul=1, add=0, errnote=''):
         """
-            Assign restriction on the number of dimensions to a parameter - 
-            the number of dimensions lower or equal to a reference 
-    
+            Assign restriction on the number of dimensions to a parameter -
+            the number of dimensions lower or equal to a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
-                    mul:       [number]          multiply coefficient, reference will be multipled by this 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
                                                   note will be constructed automatically)
-    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    5 June 2015                
-        
+                    5 June 2015
+
         """
         self.__paramAddNDimRestriction('number of dimensions lower or equal to', strName, reference, mul, add, errnote)
 
-
     def paramDimEq(self, strName, reference, dimension, refdim=np.nan, pedantic=0, mul=1, add=0, errnote=''):
         """
-            Assign restriction on the size of a dimension of a parameter - 
-            the size of a dimension equals to a reference 
-    
+            Assign restriction on the size of a dimension of a parameter -
+            the size of a dimension equals to a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
@@ -897,30 +876,29 @@ class _RxCSobject:
                                                  if refdim == np.nan than refdim = reference
                     pedantic   [number]          If pedantic flag is cleared, size of unexisted dimensions is treated as 1
                                                  otherwise, if unexisted dimension is being called it is an error!
-                    mul:       [number]          multiply coefficient, reference will be multipled by this [optional, default = 1] 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this [optional, default = 1]
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul [optional, default = 0]
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
                                                   note will be constructed automatically)
-    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    12 June 2015                
-        
+                    12 June 2015
+
         """
         self.__paramAddDimSizRestriction('dimension size equal to', strName, reference, pedantic, dimension, refdim, mul, add, errnote)
 
-
     def paramDimH(self, strName, reference, dimension, refdim=np.nan, pedantic=0, mul=1, add=0, errnote=''):
         """
-            Assign restriction on the size of a dimension of a parameter - 
-            the size of a dimension higher than a reference 
-    
+            Assign restriction on the size of a dimension of a parameter -
+            the size of a dimension higher than a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
@@ -929,30 +907,29 @@ class _RxCSobject:
                                                  if refdim == np.nan than refdim = reference
                     pedantic   [number]          If pedantic flag is cleared, size of unexisted dimensions is treated as 1
                                                  otherwise, if unexisted dimension is being called it is an error!
-                    mul:       [number]          multiply coefficient, reference will be multipled by this [optional, default = 1] 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this [optional, default = 1]
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul [optional, default = 0]
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
                                                   note will be constructed automatically)
-    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    12 June 2015                
-        
+                    12 June 2015
+
         """
         self.__paramAddDimSizRestriction('dimension size higher than', strName, reference, pedantic, dimension, refdim, mul, add, errnote)
 
-
     def paramDimL(self, strName, reference, dimension, refdim=np.nan, pedantic=0, mul=1, add=0, errnote=''):
         """
-            Assign restriction on the size of a dimension of a parameter - 
-            the size of a dimension lower than a reference 
-    
+            Assign restriction on the size of a dimension of a parameter -
+            the size of a dimension lower than a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
@@ -961,30 +938,29 @@ class _RxCSobject:
                                                  if refdim == np.nan than refdim = reference
                     pedantic   [number]          If pedantic flag is cleared, size of unexisted dimensions is treated as 1
                                                  otherwise, if unexisted dimension is being called it is an error!
-                    mul:       [number]          multiply coefficient, reference will be multipled by this [optional, default = 1] 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this [optional, default = 1]
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul [optional, default = 0]
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
                                                   note will be constructed automatically)
-    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    12 June 2015                
-        
+                    12 June 2015
+
         """
         self.__paramAddDimSizRestriction('dimension size lower than', strName, reference, pedantic, dimension, refdim, mul, add, errnote)
 
-
     def paramDimHE(self, strName, reference, dimension, refdim=np.nan, pedantic=0, mul=1, add=0, errnote=''):
         """
-            Assign restriction on the size of a dimension of a parameter - 
-            the size of a dimension higher or equal to a reference 
-    
+            Assign restriction on the size of a dimension of a parameter -
+            the size of a dimension higher or equal to a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
@@ -993,30 +969,29 @@ class _RxCSobject:
                                                  if refdim == np.nan than refdim = reference
                     pedantic   [number]          If pedantic flag is cleared, size of unexisted dimensions is treated as 1
                                                  otherwise, if unexisted dimension is being called it is an error!
-                    mul:       [number]          multiply coefficient, reference will be multipled by this [optional, default = 1] 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this [optional, default = 1]
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul [optional, default = 0]
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
                                                   note will be constructed automatically)
-    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
-            Last modification:
-                    12 June 2015                
-        
-        """
-        self.__paramAddDimSizRestriction('dimension size higher or equal to', strName, reference, pedantic, dimension, refdim, mul, add, errnote='')
 
+            Last modification:
+                    12 June 2015
+
+        """
+        self.__paramAddDimSizRestriction('dimension size higher or equal to', strName, reference, pedantic, dimension, refdim, mul, add, errnote)
 
     def paramDimLE(self, strName, reference, dimension, refdim=np.nan, pedantic=0, mul=1, add=0, errnote=''):
         """
-            Assign restriction on the size of a dimension of a parameter - 
-            the size of a dimension lower or equal to a reference 
-    
+            Assign restriction on the size of a dimension of a parameter -
+            the size of a dimension lower or equal to a reference
+
             Arguments:
                     strName:   [string]          name of a parameter
                     reference: [string/number]   reference, it can be a number or a name of another parameter
@@ -1025,45 +1000,44 @@ class _RxCSobject:
                                                  if refdim == np.nan than refdim = reference
                     pedantic   [number]          If pedantic flag is cleared, size of unexisted dimensions is treated as 1
                                                  otherwise, if unexisted dimension is being called it is an error!
-                    mul:       [number]          multiply coefficient, reference will be multipled by this [optional, default = 1] 
+                    mul:       [number]          multiply coefficient, reference will be multipled by this [optional, default = 1]
                     add:       [number]          add coefficient, will be added to a reference AFTER multiplication by mul [optional, default = 0]
                     errnote    [string]          optional error note, will be displayed if the restriction is broken
                                                  (optional, by default it is '' (empty string), which means that an error
                                                   note will be constructed automatically)
-    
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
-            Last modification:
-                    12 June 2015                
-        
-        """
-        self.__paramAddDimSizRestriction('dimension size lower or equal to', strName, reference, pedantic, dimension, refdim, mul, add, errnote='')
 
+            Last modification:
+                    12 June 2015
+
+        """
+        self.__paramAddDimSizRestriction('dimension size lower or equal to', strName, reference, pedantic, dimension, refdim, mul, add, errnote)
 
     def parametersProcess(self, *args):
         """
             Process parameters given to a module as arguments for 'run' function.
-                                            
-            Arguments:                    
+
+            Arguments:
                     args:   [list]    list of argments
-            
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
                     29 May 2015
         """
-        
+
         if len(args) == 0:
             return
- 
+
         firstArg = self.__NthInTuple(0, args)  # Get the first argument
         if isinstance(firstArg, dict):
             self.__parametersGetDict(firstArg)
@@ -1071,12 +1045,11 @@ class _RxCSobject:
             self.__parametersGetArgs(*args)
         return
 
-
     def parametersCheck(self):
         """
-            Function checks if all parameters of a module are correct.            
-     
-            Arguments:                    
+            Function checks if all parameters of a module are correct.
+
+            Arguments:
                     none
             Output:
                     none
@@ -1087,10 +1060,9 @@ class _RxCSobject:
             Last modification:
                     29 May 2015
         """
-        self.__parametersCheckMandatory()     # Check if all the mandatory parameters are given 
+        self.__parametersCheckMandatory()     # Check if all the mandatory parameters are given
         self.__parametersCheckType()          # Check types of all the parameters
         self.__parametersCheckRestrictions()  # Check restrictions on the parameters
-
 
     def parametersPrint(self):
         """
@@ -1109,7 +1081,7 @@ class _RxCSobject:
                     29 May 2015
         """
         if self.bMute == 0:
-    
+
             # Print out the header of the module
             console.progress(self.strRxCSgroup, self.strModuleName)
 
@@ -1118,14 +1090,14 @@ class _RxCSobject:
                 dParam = self.lParameters[inxPar]   # Dictionary of the parameter
                 if (dParam['bNoPrint'] == 1):
                     continue
-                
+
                 strDesc = dParam['strDesc']                  # Description of the parameter
                 strUnit = dParam['strUnit']                  # Unit of the parameter
                 strUnitPrefix = dParam['strUnitPrefix']      # Unit prefix
                 strParName = dParam['strName']              # Name of the parameter
                 par = self.__dict__[strParName]             # The parameter itself
-                
-                # Run the correct function dependently on the type of the parameter           
+
+                # Run the correct function dependently on the type of the parameter
                 if isinstance(par, (int, float)):
                     if np.isnan(par):
                         console.bullet_info(strDesc, 'NaN')
@@ -1135,11 +1107,10 @@ class _RxCSobject:
                     console.bullet_info(strDesc, par)
         return
 
-
     def changeUnitPRefix(self, strName, strUnitPrefix):
         """
             Function changes prefered unit prefix of a parameter
-            
+
              Arguments:
                     strName:     [string]   name of the parameter
                     unitprefix   [string]   prefered unit prefix of a parameter to be printed
@@ -1147,19 +1118,19 @@ class _RxCSobject:
                                             ' ':one, k:kilo, M:mega, G:giga, T:tera)
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
                     29 May 2015
         """
 
-        if not isinstance(strName, str):        
+        if not isinstance(strName, str):
             raise ValueError('Name of a parameter must be a string!')
         self.__isParameterNameOK(strName)
 
-        if not isinstance(strUnitPrefix, str):        
+        if not isinstance(strUnitPrefix, str):
             raise ValueError('Unit prefix must be a string!')
 
         (bDefined, inxParam) = self.__parameterWasDefined(strName)
@@ -1171,106 +1142,102 @@ class _RxCSobject:
 
         return
 
-
     def engineStartsInfo(self):
         """
             Function prints info about start of a module engine.
-            
+
             Arguments:
                     none
 
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
                     12 May 2015
         """
 
         if self.bMute == 0:
-            strName = ('%s: \'%s\' is starting') % (self.strRxCSgroup, self.strModuleName) 
+            strName = ('%s: \'%s\' is starting') % (self.strRxCSgroup, self.strModuleName)
             self.tStart = console.module_progress(strName)
-
 
     def engineStopsInfo(self):
         """
             Function prints info about stop of a module engine.
-            
+
             Arguments:
                     none
 
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
                     12 May 2015
         """
 
         if self.bMute == 0:
-            strName = ('%s: \'%s\'.............') % (self.strRxCSgroup, self.strModuleName) 
+            strName = ('%s: \'%s\'.............') % (self.strRxCSgroup, self.strModuleName)
             console.module_progress(strName)
             console.module_progress_done(self.tStart)
 
-
-    ###------------------------------------------------------------------------
-    ### INTERNAL FUNCTIONS:
-    ###------------------------------------------------------------------------
+    # ##-----------------------------------------------------------------------
+    # ## INTERNAL FUNCTIONS:
+    # ##-----------------------------------------------------------------------
 
     def __isParameterNameOK(self, strName):
         """
             Check if a name of a parameter is correct.
             It is allowed to contain only letters, numbers or '_' (underscore).
             The first letter can not be a number.
-    
+
             Arguments:
                     strName: [string]   name to be checked
             Output:
                     none, the function raises an error if the name is incorrect
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
-            
+
             Last modification:
-                    29 May 2015                
-        
+                    29 May 2015
+
         """
         if len(strName) == 0:
             raise ValueError('Name of a parameter can not be empty!')
-        
+
         # Check the first letter
         chr1 = strName[0]         # Take the first letter
-        if not chr1.isalpha():    # 
-            if not (chr1 == '_'):       
+        if not chr1.isalpha():    #
+            if not (chr1 == '_'):
                 strError = '>%s< is an incorrect name for a parameter' % (strName)
                 raise ValueError(strError)
-        
+
         # Check the rest of the letters
-        for inxChr in range(1,len(strName)):
+        for inxChr in range(1, len(strName)):
             chrLetter = strName[inxChr]         # Take a current letter
             if not (chrLetter.isalpha() or chrLetter.isdigit() or (chrLetter == '_')):
                 strError = '>%s< is an incorrect name for a parameter' % (strName)
                 raise ValueError(strError)
         return
 
-
     def __paramAddRelRestriction(self, strResCode, strName, reference, iMul, iAdd, strErrNote):
         """
             Assign relational restriction to a parameter
-                                            
+
             Arguments:
-                    
+
                     strResCode:   [string]          code of the restriction
                     strName:      [string]          name of the parameter
                     reference:    [string/number]   reference, it can be a number or a name of another parameter
-                    iMul:         [number]          multiply coefficient, reference will be multipled by this 
+                    iMul:         [number]          multiply coefficient, reference will be multipled by this
                     iAdd:         [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     strErrNote    [string]          optional error note, will be displayed if the restriction is broken
-            
+
             Output:
                     none
 
@@ -1282,8 +1249,8 @@ class _RxCSobject:
         """
 
         # Error checks -------------------------------------------------------
-        
-        # Parameter to be checked        
+
+        # Parameter to be checked
         if not isinstance(strName, str):
             raise ValueError('Name of a parameter must be a string!')
 
@@ -1291,7 +1258,7 @@ class _RxCSobject:
         if not bDefined:
             strError = ('Parameter > %s < was not yet defined!') % strName
             raise RuntimeError(strError)
-            
+
         # Restriction code
         if not isinstance(strResCode, str):
             raise ValueError('Restriction code must be a string!')
@@ -1303,20 +1270,20 @@ class _RxCSobject:
         # Add coefficient
         if not isinstance(iAdd, (int, float)):
             raise ValueError('> add <  parameter must be a number ')
-        
+
         # Error note
         if not isinstance(strErrNote, str):
             raise ValueError('Error note must be a string ')
 
-        # Reference          
+        # Reference
         if not isinstance(reference, (str, int, float, tuple, np.ndarray, list)):
             strError = 'Reference for relational restriction must be a string, a real number, a tuple, a list or a numpy array!'
             raise ValueError(strError)
-        if isinstance(reference, float) :
-            if np.isnan(reference): 
+        if isinstance(reference, float):
+            if np.isnan(reference):
                 raise ValueError('Reference must not be nan!')
 
-        #---------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.lParameters[inxParam]['lRes'].append(strResCode)
         self.lParameters[inxParam]['lResErrNote'].append(strErrNote)
         self.lParameters[inxParam]['lResReference'].append(reference)
@@ -1324,20 +1291,19 @@ class _RxCSobject:
 
         return
 
-
     def __paramAddSizRestriction(self, strResCode, strName, reference, iMul, iAdd, strErrNote):
         """
             Assign size restriction to a parameter
-                                            
+
             Arguments:
-                    
+
                     strResCode:   [string]          code of the restriction
                     strName:      [string]          name of the parameter
                     reference:    [string/number]   reference, it can be a number or a name of another parameter
-                    iMul:         [number]          multiply coefficient, reference will be multipled by this 
+                    iMul:         [number]          multiply coefficient, reference will be multipled by this
                     iAdd:         [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     strErrNote    [string]          optional error note, will be displayed if the restriction is broken
-            
+
             Output:
                     none
 
@@ -1349,8 +1315,8 @@ class _RxCSobject:
         """
 
         # Error checks -------------------------------------------------------
-        
-        # Parameter to be checked        
+
+        # Parameter to be checked
         if not isinstance(strName, str):
             raise ValueError('Name of a parameter must be a string!')
 
@@ -1358,7 +1324,7 @@ class _RxCSobject:
         if not bDefined:
             strError = ('Parameter > %s < was not yet defined!') % strName
             raise RuntimeError(strError)
-            
+
         # Restriction code
         if not isinstance(strResCode, str):
             raise ValueError('Restriction code must be a string!')
@@ -1370,25 +1336,25 @@ class _RxCSobject:
         # Add coefficient
         if not isinstance(iAdd, (int, float)):
             raise ValueError('> add <  parameter must be a number ')
-        
+
         # Error note
         if not isinstance(strErrNote, str):
             raise ValueError('Error note must be a string ')
 
-        # Reference          
+        # Reference
         if not isinstance(reference, (str, int, float, tuple, np.ndarray, list)):
             strError = 'Reference must be a string, a real number, a tuple, a list or a numpy array!\n'
             strError = strError + '            Reference for restriction \'%s\' for parameter > %s < is of type: %s!' \
                 % (strResCode, strName, type(reference))
             raise ValueError(strError)
-        if isinstance(reference, float) :
-            if np.isnan(reference): 
+        if isinstance(reference, float):
+            if np.isnan(reference):
                 strError = 'Reference must not be NaN!\n'
                 strError = strError + '            Reference for restriction \'%s\' for parameter > %s < is NaN!' \
                     % (strResCode, strName)
                 raise ValueError(strError)
 
-        #---------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.lParameters[inxParam]['lRes'].append(strResCode)
         self.lParameters[inxParam]['lResErrNote'].append(strErrNote)
         self.lParameters[inxParam]['lResReference'].append(reference)
@@ -1396,20 +1362,19 @@ class _RxCSobject:
 
         return
 
-
     def __paramAddNDimRestriction(self, strResCode, strName, reference, iMul, iAdd, strErrNote):
         """
             Assign restriction on the number of dimensions of a parameter
-                                            
+
             Arguments:
-                    
+
                     strResCode:   [string]          code of the restriction
                     strName:      [string]          name of the parameter
                     reference:    [string/number]   reference, it can be a number or a name of another parameter
-                    iMul:         [number]          multiply coefficient, reference will be multipled by this 
+                    iMul:         [number]          multiply coefficient, reference will be multipled by this
                     iAdd:         [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     strErrNote    [string]          optional error note, will be displayed if the restriction is broken
-            
+
             Output:
                     none
 
@@ -1419,10 +1384,10 @@ class _RxCSobject:
             Last modification:
                     29 May 2015
         """
-        
+
         # Error checks -------------------------------------------------------
-        
-        # Parameter to be checked        
+
+        # Parameter to be checked
         if not isinstance(strName, str):
             raise ValueError('Name of a parameter must be a string!')
 
@@ -1430,7 +1395,7 @@ class _RxCSobject:
         if not bDefined:
             strError = ('Parameter > %s < was not yet defined!') % strName
             raise RuntimeError(strError)
-            
+
         # Restriction code
         if not isinstance(strResCode, str):
             raise ValueError('Restriction code must be a string!')
@@ -1442,21 +1407,21 @@ class _RxCSobject:
         # Add coefficient
         if not isinstance(iAdd, (int, float)):
             raise ValueError('> add <  parameter must be a number ')
-        
+
         # Error note
         if not isinstance(strErrNote, str):
             raise ValueError('Error note must be a string ')
 
-        # Reference          
+        # Reference
         if not isinstance(reference, (str, int, float, tuple, np.ndarray, list)):
             strError = 'Reference for restriction of the no. of dimensions must be\n'
             strError = strError + '            a string, a real number, a tuple, a list or a numpy array!'
             raise ValueError(strError)
-        if isinstance(reference, float) :
-            if np.isnan(reference): 
+        if isinstance(reference, float):
+            if np.isnan(reference):
                 raise ValueError('Reference must not be nan!')
 
-        #---------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.lParameters[inxParam]['lRes'].append(strResCode)
         self.lParameters[inxParam]['lResErrNote'].append(strErrNote)
         self.lParameters[inxParam]['lResReference'].append(reference)
@@ -1464,13 +1429,12 @@ class _RxCSobject:
 
         return
 
-
     def __paramAddDimSizRestriction(self, strResCode, strName, reference, bPedantic, dimension, refdim, iMul, iAdd, strErrNote):
         """
             Assign restriction on the size of a dimension of a parameter
-                                            
+
             Arguments:
-                    
+
                     strResCode:   [string]          code of a restriction
                     strName:      [string]          name of a parameter
                     reference:    [string/number]   reference, it can be a number or a name of another parameter
@@ -1479,10 +1443,10 @@ class _RxCSobject:
                     dimension     [string/number]   code of a dimension or an index of a dimension
                     refdim        [string/number]   code of a reference dimension, or an index of a reference dimension, [optional, default = np.nan]
                                                     if refdim == np.nan than refdim = reference
-                    iMul:         [number]          multiply coefficient, reference will be multipled by this 
+                    iMul:         [number]          multiply coefficient, reference will be multipled by this
                     iAdd:         [number]          add coefficient, will be added to a reference AFTER multiplication by mul
                     strErrNote    [string]          optional error note, will be displayed if the restriction is broken
-            
+
             Output:
                     none
 
@@ -1494,8 +1458,8 @@ class _RxCSobject:
         """
 
         # Error checks -------------------------------------------------------
-        
-        # Parameter to be checked        
+
+        # Parameter to be checked
         if not isinstance(strName, str):
             raise ValueError('Name of a parameter must be a string!')
 
@@ -1503,22 +1467,22 @@ class _RxCSobject:
         if not bDefined:
             strError = ('Parameter > %s < was not yet defined!') % strName
             raise RuntimeError(strError)
-            
+
         # Restriction code
         if not isinstance(strResCode, str):
             raise ValueError('Restriction code must be a string!')
 
         # Dimension index
-        if not isinstance(iDim, int):
-            raise ValueError('Dimension index must be an integer number ')
+        if not isinstance(dimension, (int, str)):
+            raise ValueError('Dimension index must be an integer number or a string')
 
         # Reference dimension index
-        if not isinstance(iRefDim, int):
-            if isinstance(iRefDim, float):
-                if not np.isnan(iRefDim):
-                    raise ValueError('Dimension index of a reference must be an integer number or NaN!')
+        if not isinstance(refdim, (int, str)):
+            if isinstance(refdim, float):
+                if not np.isnan(refdim):
+                    raise ValueError('Dimension index of a reference must be a string, an integer number or NaN!')
             else:
-                    raise ValueError('Dimension index of a reference must be an integer number or NaN!')
+                    raise ValueError('Dimension index of a reference must be a string, an integer number or NaN!')
 
         # Multiply coefficient
         if not isinstance(iMul, (int, float)):
@@ -1527,45 +1491,44 @@ class _RxCSobject:
         # Add coefficient
         if not isinstance(iAdd, (int, float)):
             raise ValueError('> add <  parameter must be a number ')
-        
+
         # Error note
         if not isinstance(strErrNote, str):
             raise ValueError('Error note must be a string ')
 
-        # Reference          
+        # Reference
         if not isinstance(reference, (str, int, float, tuple, np.ndarray, list)):
             strError = 'Reference for restriction of the dimension size must be\n'
             strError = strError + '            a string, a real number, a tuple, a list or a numpy array!'
             raise ValueError(strError)
-        if isinstance(reference, float) :
-            if np.isnan(reference): 
+        if isinstance(reference, float):
+            if np.isnan(reference):
                 raise ValueError('Reference must not be nan!')
 
-        #---------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.lParameters[inxParam]['lRes'].append(strResCode)
         self.lParameters[inxParam]['lResErrNote'].append(strErrNote)
         self.lParameters[inxParam]['lResReference'].append(reference)
-        self.lParameters[inxParam]['lResData'].append([iMul, iAdd, iDim, iRefDim, bPedantic])
+        self.lParameters[inxParam]['lResData'].append([iMul, iAdd, dimension, refdim, bPedantic])
 
         return
 
-
     def __parameterWasDefined(self, strName):
         """
-            Check if a parameter with a given name was already defined 
-                                            
-            Arguments:                    
+            Check if a parameter with a given name was already defined
+
+            Arguments:
                     strName:   [string]          name of the parameter
-            
+
             Output:
-                    bDefined:  [number]     0 - was not defined, 1 - yes, it was 
+                    bDefined:  [number]     0 - was not defined, 1 - yes, it was
                     iPos:      [number]     position of a defined parameter in the parameters list
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
                     29 May 2015
-        """        
+        """
         inxParam = 0
         for dParam in self.lParameters:
             if strName == dParam['strName']:
@@ -1573,37 +1536,34 @@ class _RxCSobject:
             inxParam = inxParam + 1
         return (0, -1)
 
-
-
     def __parametersGetDict(self, dArgInput):
         """
-            Get the parameters given to a function as dictionary            
-      
-            Arguments:                    
+            Get the parameters given to a function as dictionary
+
+            Arguments:
                     dArgInput:   [dictionary]    dictionary with argments
-            
+
             Output:
                     none
-                    
+
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
                     29 May 2015
         """
-        # Loop over all defined parameters         
+        # Loop over all defined parameters
         for dParam in self.lParameters:
             strParName = dParam['strName']
             if strParName in dArgInput:
                 self.__dict__[strParName] = dArgInput[strParName]
         return
 
-
     def __parametersGetArgs(self, *args):
         """
-            Get the parameters given directly to a function as a list of arguments.            
-     
-            Arguments:                    
+            Get the parameters given directly to a function as a list of arguments.
+
+            Arguments:
                     args:   [list]    dictionary with argments
 
             Output:
@@ -1618,21 +1578,20 @@ class _RxCSobject:
 
         if len(args) > (self.iManParam + self.iOptParam):
             raise ValueError('To many arguments!')
-        
+
         # Loop over all defined parameters
-        inxArg = 0 
+        inxArg = 0
         for arg in args:
             strParName = self.lParameters[inxArg]['strName']
             self.__dict__[strParName] = arg
             inxArg = inxArg + 1
         return
 
-
     def __parametersCheckMandatory(self):
         """
             Function checks if all the mandatory parameters are given.
-     
-            Arguments:                    
+
+            Arguments:
                     none
             Output:
                     none
@@ -1643,7 +1602,7 @@ class _RxCSobject:
             Last modification:
                     29 May 2015
         """
-        # Loop over all parameters 
+        # Loop over all parameters
         for inxMan in range(self.iManParam):
             strParName = self.lParameters[inxMan]['strName']
             if isinstance(self.__dict__[strParName], float):
@@ -1651,12 +1610,11 @@ class _RxCSobject:
                     strError = ('Mandatory parameter > %s < is not given!') % strParName
                     raise ParameterMissingError(strError)
 
-
     def __parametersCheckType(self):
         """
             Function checks types of all the parameters and their elements.
-     
-            Arguments:                    
+
+            Arguments:
                     none
             Output:
                     none
@@ -1667,11 +1625,11 @@ class _RxCSobject:
             Last modification:
                     1 June 2015
         """
-        # Loop over all parameters 
+        # Loop over all parameters
         for inxPar in range(self.iManParam + self.iOptParam):
 
-            # If type is not give, continue to the next parameter            
-            if not 'lTypes' in self.lParameters[inxPar]:
+            # If type is not give, continue to the next parameter
+            if not ('lTypes' in self.lParameters[inxPar]):
                 continue
 
             # Get the name of the parameter, allowed types and the parameter itself
@@ -1681,13 +1639,13 @@ class _RxCSobject:
             parameter = self.__dict__[strParName]              # Get the parameter
 
             # Check the type
-            if not (isinstance(parameter,tuple(lTypes))):
+            if not (isinstance(parameter, tuple(lTypes))):
                 strError = ('Type %s is incorrect for parameter > %s < !') % (type(parameter), strParName)
                 raise ParameterTypeError(strError)
-            
+
             # Check types of elements, if needed
             if isinstance(parameter, (np.ndarray, list, tuple)):
-                if not 'lTypesEl' in self.lParameters[inxPar]:
+                if not ('lTypesEl' in self.lParameters[inxPar]):
                     continue
                 lTypesEl = self.lParameters[inxPar]['lTypesEl']   # Allowed types of elements of the current parameter
 
@@ -1706,8 +1664,8 @@ class _RxCSobject:
                         strError = ('Parameter > %s < on position %d contains an element of an illegal type (%s)!') \
                             % (strParName, inxEl, type(parameter[inxEl]))
                         raise ElementTypeError(strError)
-            
-            # Check if an elements type check was assigned to soemthing elese than a 
+
+            # Check if an elements type check was assigned to soemthing elese than a
             # tuple, a list or a Numpy array. If yes, it is an error.
             else:
                 if 'lTypesEl' in self.lParameters[inxPar]:
@@ -1715,15 +1673,14 @@ class _RxCSobject:
                     strError = strError + ('            Parameter > %s < (%s) is of type %s') \
                         % (strParName, strDesc, type(parameter))
                     raise ValueError(strError)
-                
-        return
 
+        return
 
     def __parametersCheckRestrictions(self):
         """
             Function checks restrictions given to all the parameters.
-     
-            Arguments:                    
+
+            Arguments:
                     none
             Output:
                     none
@@ -1734,18 +1691,17 @@ class _RxCSobject:
             Last modification:
                     29 May 2015
         """
-        
-        # Loop over all parameters 
+
+        # Loop over all parameters
         for inxPar in range(self.iManParam + self.iOptParam):
             dParam = self.lParameters[inxPar]
             self.__parameterCheckRestrictions(dParam)
-
 
     def __parameterCheckRestrictions(self, dParam):
         """
             Function checks restrictions of a single parameter.
 
-            Arguments:                    
+            Arguments:
                     dParam [dictionary]   dictionary with parameter data
             Output:
                     none
@@ -1757,7 +1713,7 @@ class _RxCSobject:
                     12 June 2015
         """
         strParName = dParam['strName']            # Name of the parameter
-        strDesc = dParam['strDesc']               # Description of the parameter 
+        strDesc = dParam['strDesc']               # Description of the parameter
         bNaNAllowedEl = dParam['bNaNAllowedEl']   # NaN elements allowed flag
         parVal = self.__dict__[strParName]        # The parameter itself
 
@@ -1770,14 +1726,14 @@ class _RxCSobject:
         for inxRes in range(len(dParam['lRes'])):
 
             # Get the restriction code, error note, reference and coefficients
-            strRes = dParam['lRes'][inxRes]                # Restriction                 
+            strRes = dParam['lRes'][inxRes]                # Restriction
             lResData = dParam['lResData'][inxRes]          # Data associated with the restriction
             reference = dParam['lResReference'][inxRes]    # Reference
             strErrNote = dParam['lResErrNote'][inxRes]     # Error note
-            
+
             # Change the reference into its value and a string with a name of the referenece
             if isinstance(reference, str):
-                
+
                 if not (reference == ''):
                     (bDefinedRef, inxRef) = self.__parameterWasDefined(reference)
                     if not bDefinedRef:
@@ -1791,18 +1747,18 @@ class _RxCSobject:
                     refVal = np.nan
                     strRefName = '> (empty) <'
             else:
-                refVal=reference                        # value
+                refVal = reference                        # value
 
                 # string with name of the reference
                 if isinstance(reference, float):
                     strRefName = ('%s') % self.__n2s(reference)   # float
-                elif isinstance (reference, int):
+                elif isinstance(reference, int):
                     strRefName = ('%s') % self.__n2s(reference)   # int
-                elif isinstance (reference, tuple):
+                elif isinstance(reference, tuple):
                     strRefName = 'the given tuple'          # tuple
-                elif isinstance (reference, list):
+                elif isinstance(reference, list):
                     strRefName = 'the given list'           # list
-                elif isinstance (reference, np.ndarray):
+                elif isinstance(reference, np.ndarray):
                     strRefName = 'the given numpy array'    # numpy array
                 else:
                     strRefName = 'the given variable'      # everythin else
@@ -1810,43 +1766,42 @@ class _RxCSobject:
             # Run the correct parameter restriction check function:
             # allowed values
             if (strRes == 'allowed values'):
-                self.__checkAllowedVal(strParName, strDesc, parVal, lResData, strErrNote, bNaNAllowedEl)                
-            
+                self.__checkAllowedVal(strParName, strDesc, parVal, lResData, strErrNote, bNaNAllowedEl)
+
             # value relational restrictions
-            elif (strRes == 'higher than' or \
-                  strRes == 'higher or equal to' or \
-                  strRes == 'lower than' or \
-                  strRes == 'lower or equal to'):    
-                  self.__checkRelVal(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, strRes, bNaNAllowedEl)
+            elif (strRes == 'higher than' or
+                    strRes == 'higher or equal to' or
+                    strRes == 'lower than' or
+                    strRes == 'lower or equal to'):
+                self.__checkRelVal(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, strRes, bNaNAllowedEl)
 
             # size restrictions
-            elif (strRes == 'size equal to' or \
-                  strRes == 'size higher than' or \
-                  strRes == 'size higher or equal to' or \
-                  strRes == 'lower than' or \
-                  strRes == 'lower or equal to'):
-                  self.__checkSiz(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, strRes)            
-            
-            # the number of dimensions 
-            elif (strRes == 'number of dimensions equal to' or \
-                  strRes == 'number of dimensions higher than' or \
-                  strRes == 'number of dimensions higher or equal to' or \
-                  strRes == 'number of dimensions lower than' or \
-                  strRes == 'number of dimensions lower or equal to'):
-                  self.__checkNDim(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, strRes)
+            elif (strRes == 'size equal to' or
+                    strRes == 'size higher than' or
+                    strRes == 'size higher or equal to' or
+                    strRes == 'size lower than' or
+                    strRes == 'size lower or equal to'):
+                self.__checkSiz(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, strRes)
+
+            # the number of dimensions
+            elif (strRes == 'number of dimensions equal to' or
+                    strRes == 'number of dimensions higher than' or
+                    strRes == 'number of dimensions higher or equal to' or
+                    strRes == 'number of dimensions lower than' or
+                    strRes == 'number of dimensions lower or equal to'):
+                self.__checkNDim(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, strRes)
 
             # size of restrictions
-            elif (strRes == 'dimension size equal to' or \
-                  strRes == 'dimension size higher than' or \
-                  strRes == 'dimension size lower than' or \
-                  strRes == 'dimension size higher or equal to' or \
-                  strRes == 'dimension size lower or equal to'):
-                  self.__checkDimSiz(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, strRes)
+            elif (strRes == 'dimension size equal to' or
+                    strRes == 'dimension size higher than' or
+                    strRes == 'dimension size lower than' or
+                    strRes == 'dimension size higher or equal to' or
+                    strRes == 'dimension size lower or equal to'):
+                self.__checkDimSiz(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, strRes)
 
-            # unknown restrictions            
+            # unknown restrictions
             else:
                 raise RuntimeError('Unknown parameter restriction. Something went seriously wrong...[internal RxCSobject error]')
-
 
     def __checkAllowedVal(self, strParName, strDesc, parVal, lAllVal, strErrNote, bNaNAllowedEl):
         """
@@ -1856,11 +1811,11 @@ class _RxCSobject:
                     strParName: [string]        name of a parameter
                     strDesc:    [string]        description of a parameter
                     parVal:                     value of the parameter to be checked
-                    lAllVal     [list]          list with allowed values 
+                    lAllVal     [list]          list with allowed values
                     strErrNote  [string]        error note to be displayed if the restriction is broken
                                                 (might be empty, then a default note is generated)
                     bNaNAllowed [number]        'NaN' elements allowed flag
-                    
+
             Output:
                     none
 
@@ -1875,7 +1830,7 @@ class _RxCSobject:
         # Error check
         if not isinstance(parVal, (float, int, str, tuple, list, np.ndarray)):
             strError = 'Only numbers, strings, tuples, lists, and numpy arrays can be restricted with allowed values!'
-            strError = strError+'(>%s< is of type: %s)' % (strParName, type(parVal))
+            strError = strError + '(>%s< is of type: %s)' % (strParName, type(parVal))
             raise ValueError(strError)
         # -------------------------------------------------------------------
 
@@ -1886,7 +1841,6 @@ class _RxCSobject:
             self.__checkAllowedVal_atl(strParName, strDesc, parVal, lAllVal, strErrNote, bNaNAllowedEl)
         return
 
-
     def __checkAllowedVal_numstr(self, strParName, strDesc, parVal, lAllVal, strErrNote):
         """
             Function checks the 'allowed values' restriction of number and string parameters.
@@ -1895,10 +1849,10 @@ class _RxCSobject:
                     strParName: [string]        name of a parameter
                     strDesc:    [string]        description of a parameter
                     parVal:                     value of the parameter to be checked
-                    lAllVal     [list]          list with allowed values 
+                    lAllVal     [list]          list with allowed values
                     strErrNote  [string]        error note to be displayed if the restriction is broken
                                                 (might be empty, then a default note is generated)
-                    
+
             Output:
                     none
 
@@ -1913,31 +1867,30 @@ class _RxCSobject:
         # Loop over all elements of a list with allowed values
         for allVal in lAllVal:
 
-            # An allowed value must be either a string or a number            
+            # An allowed value must be either a string or a number
             if not isinstance(allVal, (str, float, int)):
                 strError = 'List of allowed values must contain only strings or numbers!\n'
-                strError = strError+'            An allowed value #%d for the parameter > %s < (\'%s\') is of type %s' \
+                strError = strError + '            An allowed value #%d for the parameter > %s < (\'%s\') is of type %s' \
                     % (inxAl, strParName, strDesc, type(allVal))
                 raise ValueError(strError)
 
-            # If an allowed value is NaN, throw out an error! 
+            # If an allowed value is NaN, throw out an error!
             if isinstance(allVal, float):
                 if np.isnan(allVal):
                     strError = 'NaN can not be an allowed value for the parameter > %s < (\'%s\')' % (strParName, strDesc)
                     raise ValueError(strError)
-            
-            # If an allowed value was found, return from the function             
+
+            # If an allowed value was found, return from the function
             if (parVal == allVal):
                 return
 
         # Allowed value was not found, throw out an error
-        if (strErrNote == ''):            
+        if (strErrNote == ''):
             if isinstance(parVal, (int, float)):
                 strErrNote = ('\'%s\' is an incorrect value for parameter > %s < (\'%s\')') % (self.__n2s(parVal), strParName, strDesc)
             elif isinstance(parVal, (str)):
                 strErrNote = ('\'%s\' is an incorrect value for parameter > %s < (\'%s\')') % (parVal, strParName, strDesc)
         raise AllowedValuesError(strErrNote)
-
 
     def __checkAllowedVal_atl(self, strParName, strDesc, parVal, lAllVal, strErrNote, bNaNAllowedEl):
         """
@@ -1947,11 +1900,11 @@ class _RxCSobject:
                     strParName: [string]        name of a parameter
                     strDesc:    [string]        description of a parameter
                     parVal:                     value of the parameter to be checked
-                    lAllVal     [list]          list with allowed values 
+                    lAllVal     [list]          list with allowed values
                     strErrNote  [string]        error note to be displayed if the restriction is broken
                                                 (might be empty, then a default note is generated)
                     bNaNAllowed [number]        'NaN' elements allowed flag
-                    
+
             Output:
                     none
 
@@ -1961,38 +1914,38 @@ class _RxCSobject:
             Last modification:
                     29 May 2015
         """
-        
+
         inxEl = 0  # Reset the index of elements in tuple, list or a numpy array
 
         # Vectorize the parameter, if it is a numpy array
         if isinstance(parVal, np.ndarray):
             parVal.shape = (parVal.size, )
 
-        # Check if a list of allowed values contains correct elements (string and non-NaN numbers) 
+        # Check if a list of allowed values contains correct elements (string and non-NaN numbers)
         inxAl = 0  # Reset the index of elements in a list with allowed values
-        bErr = 1   # Set error flag 
+        bErr = 1   # Set error flag
         for allVal in lAllVal:       # Loop over all elements of a list with allowed values
 
-            # An allowed value must be either a string or a number            
+            # An allowed value must be either a string or a number
             if not isinstance(allVal, (str, float, int)):
                 strError = 'List of allowed values must contain only strings or numbers!\n'
-                strError = strError+'            An allowed value #%d for the parameter > %s < (\'%s\') is of type %s' \
+                strError = strError + '            An allowed value #%d for the parameter > %s < (\'%s\') is of type %s' \
                     % (inxAl, strParName, strDesc, type(allVal))
                 raise ValueError(strError)
-                                
-            # If an allowed value is NaN, throw out an error!     
+
+            # If an allowed value is NaN, throw out an error!
             if isinstance(allVal, float):
                 if np.isnan(allVal):
                     strError = 'NaN can not be an allowed value for the parameter > %s < (\'%s\')' % (strParName, strDesc)
                     raise ValueError(strError)
-        
+
         # Loop over all elements of the parameter
         for par in parVal:
-            
-            # An element of the tested parameter must be either a string or a number            
+
+            # An element of the tested parameter must be either a string or a number
             if not isinstance(par, (str, float, int)):
                 strError = 'Only number or string elements can be restricted with allowed values!\n'
-                strError = strError+'            Element #%d of > %s < (%s) is of type %s' \
+                strError = strError + '            Element #%d of > %s < (%s) is of type %s' \
                     % (inxEl, strParName, strDesc, type(par))
                 raise ValueError(strError)
 
@@ -2008,23 +1961,23 @@ class _RxCSobject:
 
             # Loop over all elements of a list with allowed values
             inxAl = 0  # Reset the index of elements in a list with allowed values
-            bErr = 1   # Set error flag 
-            for allVal in lAllVal:       
-                
-                # If an allowed value was found, clear the error flag, break the loop and go to the next element             
+            bErr = 1   # Set error flag
+            for allVal in lAllVal:
+
+                # If an allowed value was found, clear the error flag, break the loop and go to the next element
                 if (par == allVal):
                     bErr = 0
                     break
 
-                inxAl = inxAl + 1     # Index of an element in the list with allowed values     
-            
+                inxAl = inxAl + 1     # Index of an element in the list with allowed values
+
             # If error flag is cleared, go to the next element of the tested parameter
             if (bErr == 0):
-                inxEl = inxEl + 1     # Index of an element in the tested parameter 
+                inxEl = inxEl + 1     # Index of an element in the tested parameter
                 continue
-            
+
             # Allowed value was not found, throw out an error
-            if (strErrNote == ''):            
+            if (strErrNote == ''):
                 if isinstance(par, (int, float)):
                     strErrNote = ('%s is an incorrect value for element #%d of parameter > %s < (\'%s\')') \
                         % (self.__n2s(par), inxEl, strParName, strDesc)
@@ -2034,21 +1987,20 @@ class _RxCSobject:
             raise AllowedValuesError(strErrNote)
         return
 
-
     def __checkRelVal(self, strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation, bNaNAllowedEl):
         """
             Function checks relative value restriction of a parameter.
 
-            Arguments:                    
+            Arguments:
                     strParName:   [string]        name of a parameter
                     strDesc:      [string]        description of a parameter
                     parVal:                       parameter to be checked
                     strRefence    [string]        name of a reference
                     refVal                        reference
-                    lCoef         [list]          list with 'mul' and 'add' coefficients 
+                    lCoef         [list]          list with 'mul' and 'add' coefficients
                     strErrNote    [string]        error note to be displayed if the restriction is broken
                                                   (might be empty, then a default note is generated)
-                    strRelation   [string]        relation, allowed values: 
+                    strRelation   [string]        relation, allowed values:
                                                   'higher than', 'higher or equal to', 'lower than', 'lower or equal to'
                     bNaNAllowed [number]          'NaN' elements allowed flag
 
@@ -2065,8 +2017,8 @@ class _RxCSobject:
         # -------------------------------------------------------------------
         # Error check
         if not isinstance(parVal, (float, int, tuple, list, np.ndarray)):
-            strError = 'Only numbers, lists, tuples and numpy arrays can be restricted \'%s...\'! '  % (strRelation)
-            strError = strError+'            (>%s< is of type: %s)' % (strParName, type(parVal))
+            strError = 'Only numbers, lists, tuples and numpy arrays can be restricted \'%s...\'! ' % (strRelation)
+            strError = strError + '            (>%s< is of type: %s)' % (strParName, type(parVal))
             raise ValueError(strError)
 
         # -------------------------------------------------------------------
@@ -2081,23 +2033,22 @@ class _RxCSobject:
 
         # -------------------------------------------------------------------
 
-
     def __checkRelVal_num(self, strParName, strDesc, parVal, strReference, refVal, lCoef, strErrNote, strRelation):
         """
             Function checks relative value restriction of a number parameter.
 
-            Arguments:                    
+            Arguments:
                     strParName:   [string]        name of a parameter
                     strDesc:      [string]        description of a parameter
                     parVal:                       parameter to be checked
                     strRefence    [string]        name of a reference
                     refVal                        reference
-                    lCoef         [list]          list with 'mul' and 'add' coefficients 
+                    lCoef         [list]          list with 'mul' and 'add' coefficients
                     strErrNote    [string]        error note to be displayed if the restriction is broken
                                                   (might be empty, then a default note is generated)
-                    strRelation   [string]        relation, allowed values: 
+                    strRelation   [string]        relation, allowed values:
                                                   'higher than', 'higher or equal to', 'lower than', 'lower or equal to'
-                                        
+
             Output:
                     none
 
@@ -2111,9 +2062,9 @@ class _RxCSobject:
         # Only numbers can be a reference
         if not isinstance(refVal, (float, int)):
             strError = 'Only numbers can be a reference for restriction \'%s...\' for numbers!\n' % (strRelation)
-            strError = strError+'                 (> %s < is of type: %s)' % (strReference, type(refVal))
+            strError = strError + '                 (> %s < is of type: %s)' % (strReference, type(refVal))
             raise ValueError(strError)
-        
+
         # If reference is NaN, restriction can not be checked, it is assumed that the value is correct
         if isinstance(refVal, float):
             if np.isnan(refVal):
@@ -2122,30 +2073,29 @@ class _RxCSobject:
         # Check the restriction, if it is ok, return
         if (self.__checkRelVal_engine(parVal, refVal, lCoef, strRelation)):
             return
- 
+
         # Throw out an error
         if strErrNote == '':
-            (strMul, strAdd) = self.__linearCoef2Strings(lCoef)       
+            (strMul, strAdd) = self.__linearCoef2Strings(lCoef)
             strErrNote = '%s > %s < must be %s %s %s %s! (= %s) \n' \
-                % (strDesc, strParName, strRelation, strMul, strReference, strAdd, self.__n2s(lCoef[0]*refVal+lCoef[1]))
+                % (strDesc, strParName, strRelation, strMul, strReference, strAdd, self.__n2s(lCoef[0] * refVal + lCoef[1]))
             strErrNote = strErrNote + 17 * ' ' + 'Current value of > %s < is %s!' % (strParName, self.__n2s(parVal))
         raise RelationalError(strErrNote)
-
 
     def __checkRelVal_atl(self, strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRelation, bNaNAllowedEl):
         """
             Function checks the relative value restriction for Numpy arrays, tuples or lists.
-            
-            Arguments:                    
+
+            Arguments:
                     strParName:   [string]        name of a parameter
                     strDesc:      [string]        description of a parameter
                     parVal:                       parameter to be checked
                     strRefName    [string]        name of a reference
                     refVal                        reference
-                    lCoef         [list]          list with 'mul' and 'add' coefficients 
+                    lCoef         [list]          list with 'mul' and 'add' coefficients
                     strErrNote    [string]        error note to be displayed if the restriction is broken
                                                   (might be empty, then a default note is generated)
-                    strRelation   [string]        relation, allowed values: 
+                    strRelation   [string]        relation, allowed values:
                                                   'higher than', 'higher or equal to', 'lower than', 'lower or equal to'
                     bNaNAllowed   [number]        'NaN' elements allowed flag
 
@@ -2175,29 +2125,28 @@ class _RxCSobject:
         self.__checkRelVal_atl_lenParRef(strParName, refVal, strRefName, iLen, iLenRef)
 
         # Vectorize the parameter and the reference
-        (parVal, refVal) = self.__checkRelVal_atl_vectorize(parVal, refVal)      
-           
+        (parVal, refVal) = self.__checkRelVal_atl_vectorize(parVal, refVal)
+
         # Check the restriction:
-        if isinstance(refVal, (int, float)):        
+        if isinstance(refVal, (int, float)):
             # Check for number reference
-            self.__checkRelVal_atl_refNum(strParName, strDesc, parVal, strRefName, refVal, lCoef, 
+            self.__checkRelVal_atl_refNum(strParName, strDesc, parVal, strRefName, refVal, lCoef,
                                           strErrNote, strRelation, bNaNAllowedEl)
 
-        else:              
+        else:
             # Check for tuple, list, numpy array reference
-            self.__checkRelVal_atl_refAtl(strParName, strDesc, parVal, strRefName, refVal, lCoef, 
+            self.__checkRelVal_atl_refAtl(strParName, strDesc, parVal, strRefName, refVal, lCoef,
                                           strErrNote, strRelation, bNaNAllowedEl)
-        
-        return
 
+        return
 
     def __checkRelVal_atl_parLen(self, parVal):
         """
-            Function computes length of a checked parameter.        
-        
-            Arguments:                    
+            Function computes length of a checked parameter.
+
+            Arguments:
                     parVal:                   parameter to be checked
-        
+
             Output:
                     iLen     [number]         length of a parameter
 
@@ -2208,7 +2157,7 @@ class _RxCSobject:
                     12 June 2015
 
         """
-        # Take the lenght of the checked parameter        
+        # Take the lenght of the checked parameter
         if isinstance(parVal, np.ndarray):
             iLen = parVal.size
         else:
@@ -2216,16 +2165,15 @@ class _RxCSobject:
 
         return iLen
 
-
     def __checkRelVal_atl_refLen(self, refVal, strRefName, strRelation):
         """
             Function computes length of a reference.
-        
-            Arguments:                    
+
+            Arguments:
                     refVal                        reference
                     strRefName    [string]        name of a reference
-                    strRelation   [string]        relation, allowed values: 
-                                                  'higher than', 'higher or equal to', 'lower than', 'lower or equal to'        
+                    strRelation   [string]        relation, allowed values:
+                                                  'higher than', 'higher or equal to', 'lower than', 'lower or equal to'
             Output:
                     iLenRef       [number]        length of a reference parameter
 
@@ -2242,36 +2190,35 @@ class _RxCSobject:
         # Reference is a tuple or a list
         if isinstance(refVal, (tuple, list)):
             iLenRef = len(refVal)
-              
-        # Reference is a Numpy array    
+
+        # Reference is a Numpy array
         elif isinstance(refVal, np.ndarray):
             iLenRef = refVal.size
-            
+
         # Reference is a number
         elif isinstance(refVal, (float, int)):
             iLenRef = 1
-        
+
         # Reference has illegal type
         else:
             strError = 'Only numbers, lists, tuples and numpy arrays can be a reference for restriction \'%s...\'!\n' \
                 % (strRelation)
-            strError = strError+'       (>%s< is of type: %s)' % (strRefName, type(refVal))
+            strError = strError + '       (>%s< is of type: %s)' % (strRefName, type(refVal))
             raise ValueError(strError)
-        
-        return iLenRef
 
+        return iLenRef
 
     def __checkRelVal_atl_vectorize(self, parVal, refVal):
         """
             Function vectorizes checked parameter and a reference, if
-            these variables are Numpy arrays.  
-        
-            Arguments:                    
-                    parVal:              parameter to be checked                    
+            these variables are Numpy arrays.
+
+            Arguments:
+                    parVal:              parameter to be checked
                     refVal               reference
 
             Output:
-                    parVal:              parameter to be checked (vectorized, if it was neccessary)                    
+                    parVal:              parameter to be checked (vectorized, if it was neccessary)
                     refVal               reference (vectorized, if it was neccessary)
 
             Author:
@@ -2280,7 +2227,7 @@ class _RxCSobject:
             Last modification:
                     12 June 2015
         """
-        
+
         # Vectorize the parameter, if it is a numpy array
         if isinstance(parVal, np.ndarray):
             parVal.shape = (parVal.size, )
@@ -2288,25 +2235,24 @@ class _RxCSobject:
         # Vectorize the reference, if it is a numpy array
         if isinstance(refVal, np.ndarray):
             refVal.shape = (refVal.size, )
-        
+
         return (parVal, refVal)
 
-        
     def __checkRelVal_atl_refNum(self, strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRelation, bNaNAllowedEl):
         """
             Function checks relative value restriction for Numpy arrays, tuples or lists,
             if a reference is a single number.
-        
-            Arguments:                    
+
+            Arguments:
                     strParName:   [string]        name of a parameter
                     strDesc:      [string]        description of a parameter
                     parVal:                       parameter to be checked
                     strRefName    [string]        name of a reference
                     refVal                        reference
-                    lCoef         [list]          list with 'mul' and 'add' coefficients 
+                    lCoef         [list]          list with 'mul' and 'add' coefficients
                     strErrNote    [string]        error note to be displayed if the restriction is broken
                                                   (might be empty, then a default note is generated)
-                    strRelation   [string]        relation, allowed values: 
+                    strRelation   [string]        relation, allowed values:
                                                   'higher than', 'higher or equal to', 'lower than', 'lower or equal to'
                     bNaNAllowed   [number]        'NaN' elements allowed flag
 
@@ -2320,11 +2266,11 @@ class _RxCSobject:
             Last modification:
                     12 June 2015
         """
-        
-        # Loop over all elements in the checked parameter             
+
+        # Loop over all elements in the checked parameter
         for inxEl in range(len(parVal)):
-            
-            # Get the current element of the checked parameter and                                 
+
+            # Get the current element of the checked parameter and
             parEl = parVal[inxEl]
 
             # Check if an element is a number
@@ -2340,29 +2286,28 @@ class _RxCSobject:
                         strError = 'Element %d of > %s < (%s) is NaN, which is not allowed!' \
                             % (inxEl, strParName, strDesc)
                         raise ValueError(strError)
-                        
+
             # Check the reference
             if not (self.__checkRelVal_engine(parEl, refVal, lCoef, strRelation)):
-                self.__checkRelVal_atl_error(strParName, strDesc, parVal, strRefName, refVal, lCoef, 
+                self.__checkRelVal_atl_error(strParName, strDesc, parVal, strRefName, refVal, lCoef,
                                              strErrNote, strRelation, inxEl)
 
-
-    def __checkRelVal_atl_refAtl(self, strParName, strDesc, parVal, strRefName, refVal, 
+    def __checkRelVal_atl_refAtl(self, strParName, strDesc, parVal, strRefName, refVal,
                                  lCoef, strErrNote, strRelation, bNaNAllowedEl):
         """
             Function checks relative value restriction for Numpy arrays, tuples or lists,
             if a reference is a Numpy Array, a tuple or a list.
 
-            Arguments:                    
+            Arguments:
                     strParName:   [string]        name of a parameter
                     strDesc:      [string]        description of a parameter
                     parVal:                       parameter to be checked
                     strRefName    [string]        name of a reference
                     refVal                        reference
-                    lCoef         [list]          list with 'mul' and 'add' coefficients 
+                    lCoef         [list]          list with 'mul' and 'add' coefficients
                     strErrNote    [string]        error note to be displayed if the restriction is broken
                                                   (might be empty, then a default note is generated)
-                    strRelation   [string]        relation, allowed values: 
+                    strRelation   [string]        relation, allowed values:
                                                   'higher than', 'higher or equal to', 'lower than', 'lower or equal to'
                     bNaNAllowed   [number]        'NaN' elements allowed flag
 
@@ -2377,15 +2322,15 @@ class _RxCSobject:
                     12 June 2015
         """
 
-        # Loop over all elements in the checked parameter             
+        # Loop over all elements in the checked parameter
         for inxEl in range(len(parVal)):
 
-            # ---------------------------------------------------------------------------------                
-            # Get the current element of the checked parameter and check if it is a number                
+            # ---------------------------------------------------------------------------------
+            # Get the current element of the checked parameter and check if it is a number
             parEl = parVal[inxEl]
-            
+
             # Check if the current element is a number
-            if not isinstance(parEl, (float, int)):                        
+            if not isinstance(parEl, (float, int)):
                 self.__checkRelVal_atl_PET_error(strParName, strRelation, inxEl, parEl)
 
             # Check if the current elements of the checked parameter is NaN
@@ -2397,16 +2342,16 @@ class _RxCSobject:
                         strError = 'Element %d of > %s < (%s) is NaN, which is not allowed!' \
                             % (inxEl, strParName, strDesc)
                         raise ValueError(strError)
-                        
+
             # ---------------------------------------------------------------------------------
 
-            # Get the current element of the reference                                                
+            # Get the current element of the reference
             refEl = refVal[inxEl]
-            
+
             # Check if the reference is a number
-            if not isinstance(refEl, (float, int)):                        
-                self.__checkRelVal_atl_RET_error(strParName, strRefName, strRelation, inxEl, refEl)                
-            
+            if not isinstance(refEl, (float, int)):
+                self.__checkRelVal_atl_RET_error(strParName, strRefName, strRelation, inxEl, refEl)
+
             # Check if the reference element is NaN. If it is, continue
             if isinstance(refEl, float):
                 if np.isnan(refEl):
@@ -2415,18 +2360,17 @@ class _RxCSobject:
             # ---------------------------------------------------------------------------------
 
             # Check the relation between the element and the reference
-            if not (self.__checkRelVal_engine(parEl,refEl, lCoef, strRelation)):
-                self.__checkRelVal_atl_error(strParName, strDesc, parVal, strRefName, refVal, lCoef, 
+            if not (self.__checkRelVal_engine(parEl, refEl, lCoef, strRelation)):
+                self.__checkRelVal_atl_error(strParName, strDesc, parVal, strRefName, refVal, lCoef,
                                              strErrNote, strRelation, inxEl)
 
-    
     def __checkRelVal_atl_PET_error(self, strParName, strRelation, inxEl, parEl):
         """
-            Function raises an error if elements of a checked parameter are not numbers. 
-        
-            Arguments:                    
+            Function raises an error if elements of a checked parameter are not numbers.
+
+            Arguments:
                     strParName:   [string]        name of a parameter
-                    strRelation   [string]        relation, allowed values: 
+                    strRelation   [string]        relation, allowed values:
                                                   'higher than', 'higher or equal to', 'lower than', 'lower or equal to'
                     inxEl         [number]        index of an element which is not a number
                     parEl                         element which is not a number
@@ -2442,19 +2386,18 @@ class _RxCSobject:
         """
 
         # Throw the error of parameter element type , if it was found above
-        strError = 'Only numbers can be checked for restriction  \'%s...\'!\n'  % (strRelation)
-        strError = strError+'            Element #%d of > %s < is of type %s!' % (inxEl, strParName, type(parEl))
+        strError = 'Only numbers can be checked for restriction  \'%s...\'!\n' % (strRelation)
+        strError = strError + '            Element #%d of > %s < is of type %s!' % (inxEl, strParName, type(parEl))
         raise ValueError(strError)
 
-    
     def __checkRelVal_atl_RET_error(self, strParName, strRefName, strRelation, inxEl, refEl):
         """
             Function raises an error if elements of a reference are not numbers.
 
-            Arguments:                    
+            Arguments:
                     strParName:   [string]        name of a parameter
-                    strRefName    [string]        name of a reference                    
-                    strRelation   [string]        relation, allowed values: 
+                    strRefName    [string]        name of a reference
+                    strRelation   [string]        relation, allowed values:
                                                   'higher than', 'higher or equal to', 'lower than', 'lower or equal to'
                     inxEl         [number]        index of an element of a reference which is not a number
                     refEl                         element of a reference which is not a number
@@ -2470,18 +2413,17 @@ class _RxCSobject:
         """
 
         # Throw the error of reference parameter element type , if it was found above
-        strError = 'Only numbers can be a reference for restriction  \'%s...\'!\n'  % (strRelation)
-        strError = strError+'            Element #%d of %s (reference for > %s< ) is of type %s!' \
+        strError = 'Only numbers can be a reference for restriction  \'%s...\'!\n' % (strRelation)
+        strError = strError + '            Element #%d of %s (reference for > %s< ) is of type %s!' \
             % (inxEl, strRefName, strParName, type(refEl))
         raise ValueError(strError)
 
-
     def __checkRelVal_atl_lenParRef(self, strParName, refVal, strRefName, iLen, iLenRef):
-       """
-            Function compares the lenght of a checked parameter with the lenght of a reference, 
+        """
+            Function compares the lenght of a checked parameter with the lenght of a reference,
             if the reference is a list, a tuple or a numpy array.
-            If the lengths are not equal, it raises en error.           
-             
+            If the lengths are not equal, it raises en error.
+
             Arguments:
                     strParName:   [string]        name of a parameter
                     refVal                        reference
@@ -2501,10 +2443,9 @@ class _RxCSobject:
         if isinstance(refVal, (list, tuple, np.ndarray)):
             if not (iLen == iLenRef):
                 strError = 'Reference must be of equal size to the restricted parameter!\n'
-                strError = strError+'            Parameter > %s < is of size %d, its reference (%s) is of size %d!' \
+                strError = strError + '            Parameter > %s < is of size %d, its reference (%s) is of size %d!' \
                     % (strParName, iLen, strRefName, len(refVal))
                 raise ValueError(strError)
-
 
     def __checkRelVal_atl_error(self, strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRelation, inxEl):
         """
@@ -2516,10 +2457,10 @@ class _RxCSobject:
                     parVal:                       parameter to be checked
                     strRefName    [string]        name of a reference
                     refVal                        reference
-                    lCoef         [list]          list with 'mul' and 'add' coefficients 
+                    lCoef         [list]          list with 'mul' and 'add' coefficients
                     strErrNote    [string]        error note to be displayed if the restriction is broken
                                                   (might be empty, then a default note is generated)
-                    strRelation   [string]        relation, allowed values: 
+                    strRelation   [string]        relation, allowed values:
                                                   'higher than', 'higher or equal to', 'lower than', 'lower or equal to'
                     inxEl         [number]        index of an element which brakes the restriction
 
@@ -2533,30 +2474,30 @@ class _RxCSobject:
                     12 June 2015
         """
 
-        # Throw out an error, if the error note was already given            
+        # Throw out an error, if the error note was already given
         if not (strErrNote == ''):
             raise RelationalError(strErrNote)
 
         # Construct the error note:
-        
+
         iMul = lCoef[0]  # Get the linear coefficients
         iAdd = lCoef[1]  # ^
         # Firstly, change linear coefficients into strings
         (strMul, strAdd) = self.__linearCoef2Strings(lCoef)
 
-        # If the reference is a number it is easy to construct the error info... 
+        # If the reference is a number it is easy to construct the error info...
         if isinstance(refVal, (int, float)):
             strErrNote = 'All elements of > %s < (%s) must be %s %s%s%s' \
                 % (strParName, strDesc, strRelation, strMul, strRefName, strAdd)
-            if (strMul!='' or strAdd!='' or (not self.__strOnlyNumb(strRefName))):
+            if (strMul != '' or strAdd != '' or (not self.__strOnlyNumb(strRefName))):
                 strErrNote = strErrNote + ' (%s%s%s = %s)' \
-                    % (strMul, self.__n2s(refVal), strAdd, self.__n2s(iMul*refVal+iAdd)) 
+                    % (strMul, self.__n2s(refVal), strAdd, self.__n2s(iMul * refVal + iAdd))
             strErrNote = strErrNote + '!\n'
             strErrNote = strErrNote + 17 * ' ' + 'Element #%d of > %s < is %s!' \
                 % (inxEl, strParName, self.__n2s(parVal[inxEl]))
             raise RelationalError(strErrNote)
 
-        # If the reference is an array, a tuple or a list, it is getting complicated... 
+        # If the reference is an array, a tuple or a list, it is getting complicated...
         if (strMul == '') and (strAdd == ''):
             strErrNote = 'Elements of > %s < (%s) must be %s\n' \
                 % (strParName, strDesc, strRelation)
@@ -2569,28 +2510,27 @@ class _RxCSobject:
                 % (strRefName)
 
         # Add info about the element which brakes the restriction
-        strErrNote=strErrNote + 17 * ' ' + 'Element #%d of > %s < is %s, element #%d of %s is %s' \
+        strErrNote = strErrNote + 17 * ' ' + 'Element #%d of > %s < is %s, element #%d of %s is %s' \
             % (inxEl, strParName, self.__n2s(parVal[inxEl]), inxEl, strRefName, self.__n2s(refVal[inxEl]))
         if (strMul != '') or (strAdd != ''):
             strErrNote = strErrNote + ' (%s%s%s = %s)' \
-                % (strMul, self.__n2s(refVal[inxEl]), strAdd, self.__n2s(iMul*refVal[inxEl]+iAdd))
+                % (strMul, self.__n2s(refVal[inxEl]), strAdd, self.__n2s(iMul * refVal[inxEl] + iAdd))
         strErrNote = strErrNote + '!'
 
         # Ok, error is ready, throw out an error
         raise RelationalError(strErrNote)
 
-
     def __checkRelVal_engine(self, iPar, iRef, lCoef, strRelation):
         """
             Engine of value relational restriction check.
 
-            Arguments:                    
+            Arguments:
                     iPar:        [number]       tested parameter
                     iRef:        [number]       reference
                     lCoef        [list]         list with linear coefficients
-                    strRelation  [string]       relation, allowed values: 
-                                                'higher than', 'higher or equal to', 
-                                                'lower than', 'lower or equal to', 
+                    strRelation  [string]       relation, allowed values:
+                                                'higher than', 'higher or equal to',
+                                                'lower than', 'lower or equal to',
             Output:
                     1 - restriction correct
                     0 - restriction incorrect
@@ -2604,10 +2544,10 @@ class _RxCSobject:
         iMul = lCoef[0]
         iAdd = lCoef[1]
         iRef = iMul * iRef + iAdd
-        
+
         if (strRelation == 'higher than'):
             return (iPar > iRef)
-        elif (strRelation == 'higher or equal to'):        
+        elif (strRelation == 'higher or equal to'):
             return (iPar >= iRef)
         elif (strRelation == 'lower than'):
             return (iPar < iRef)
@@ -2616,7 +2556,6 @@ class _RxCSobject:
         else:
             strError = '%s is an unknown type of a relation!' % strRelation
             raise RuntimeError(strError)
-
 
     def __checkSiz(self, strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRes):
         """
@@ -2628,11 +2567,11 @@ class _RxCSobject:
                     parVal:                       parameter to be checked
                     strRefName    [string]        name of a reference
                     refVal                        reference
-                    lCoef         [list]          list with 'mul' and 'add' coefficients 
+                    lCoef         [list]          list with 'mul' and 'add' coefficients
                     strErrNote    [string]        error note to be displayed if the restriction is broken
                                                   (might be empty, then a default note is generated)
-                    strRes        [string]        restriction, allowed values: 
-                                                  'size equal to', 'size higher than', 'size higher or equal to', 
+                    strRes        [string]        restriction, allowed values:
+                                                  'size equal to', 'size higher than', 'size higher or equal to',
                                                   'size lower than', 'size lower or equal to'
             Output:
                     none
@@ -2646,23 +2585,22 @@ class _RxCSobject:
 
         # Take the size of the tested parameter
         iSize = self.__checkSiz_sizParam(parVal, strParName)
-        
+
         # Take the reference size
         iRefSize = self.__checkSiz_sizRef(strParName, refVal, strRefName, strRes)
-        
+
         # Check the restriction, if it is ok, return
         if not self.__checkSiz_engine(iSize, iRefSize, lCoef, strRes):
-            self.__checkSiz_error(strParName, strDesc, strRefName, refVal, lCoef, strErrNote, strRes, iSize)
+            self.__checkSiz_error(strParName, strDesc, strRefName, refVal, lCoef, strErrNote, strRes, iSize, iRefSize)
 
         return
-
 
     def __checkSiz_sizParam(self, parVal, strParName):
         """
             Function gets the size of a restricted parameter.
 
             Arguments:
-                    parVal:                       the parameter to be checked                    
+                    parVal:                       the parameter to be checked
                     strParName:   [string]        name of the parameter
 
             Output:
@@ -2672,47 +2610,46 @@ class _RxCSobject:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    9 June 2015        
+                    9 June 2015
         """
         # Size of numbers is always one
         if isinstance(parVal, (int, float)):
             iSize = 1
-            
-        # Size of tuples, lists and strings             
+
+        # Size of tuples, lists and strings
         elif isinstance(parVal, (tuple, list, str)):
             iSize = len(parVal)
-        
+
         # Size of Numpy arrays
         elif isinstance(parVal, np.ndarray):
             iSize = parVal.size
-        
+
         # Error
         else:
             strError = 'Only numbers, strings, tuples, lists, and numpy arrays can be size restricted!\n'
-            strError = strError+'            ( > %s < is of type: %s )' % (strParName, type(parVal))
+            strError = strError + '            ( > %s < is of type: %s )' % (strParName, type(parVal))
             raise ValueError(strError)
         return iSize
-
 
     def __checkSiz_sizRef(self, strParName, refVal, strRefName, strRes):
         """
             Function gets a reference for a size restriction.
 
-            Arguments:                    
+            Arguments:
                     strParName:   [string]        name of a checked parameter
                     refVal                        reference
                     strRefName    [string]        name of the reference
-                    strRes        [string]        restriction, allowed values: 
-                                                  'size equal to', 'size higher than', 'size higher or equal to', 
+                    strRes        [string]        restriction, allowed values:
+                                                  'size equal to', 'size higher than', 'size higher or equal to',
                                                   'size lower than', 'size lower or equal to'
             Output:
-                    iRefSize:     [number]        the reference of size restrictions
+                    iRefSize:     [number]        reference of size restriction
 
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    9 June 2015        
+                    9 June 2015
         """
 
         # Reference can not be empty
@@ -2723,43 +2660,42 @@ class _RxCSobject:
         # Reference is a number
         if isinstance(refVal, (int, float)):
             iRefSize = refVal
-            
-            # Size can not be equal to a float number            
+
+            # Size can not be equal to a float number
             if isinstance(refVal, float) and (strRes == 'size equal to'):
                 strError = ('Float number can not be a reference for restriction \'size equal to\'!\n')
                 strError = strError + '            %s (reference for > %s < ) is of type %s' \
                     % (strRefName, strParName, type(refVal))
-                raise ValueError(strError) 
-        
+                raise ValueError(strError)
+
         # Reference is a tuple, a list or a string
         elif isinstance(refVal, (tuple, list, str)):
             iRefSize = len(refVal)
-        
+
         # Reference is a Numpy array
         elif isinstance(refVal, np.ndarray):
             iRefSize = refVal.size
-        
-        # Error        
+
+        # Error
         else:
-            strError = 'Only numbers, strings, tuples, lists, and numpy arrays can be a reference for size restriction!'
-            strError = strError + '                        %s (restriction for > %s < ) is of type: %s)' \
+            strError = 'Only numbers, strings, tuples, lists, and numpy arrays can be a reference for size restriction!\n'
+            strError = strError + 12 * ' ' + '%s (restriction for > %s < ) is of type: %s)' \
                 % (strRefName, strParName, type(refVal))
             raise ValueError(strError)
-        
-        return iRefSize
 
+        return iRefSize
 
     def __checkSiz_engine(self, iSize, iRefSize, lCoef, strRelation):
         """
             Engine of size restriction check.
 
-            Arguments:                    
+            Arguments:
                     iSize:        [number]        size of a parameter
                     iRefSize:     [number]        reference for size restriction
                     lCoef         [list]          list with 'mul' and 'add' coefficients
-                    strRelation   [string]        restriction, allowed values: 
-                                                  'size higher than', 'size higher or equal to', 
-                                                  'size lower than', 'size lower or equal to', 
+                    strRelation   [string]        restriction, allowed values:
+                                                  'size higher than', 'size higher or equal to',
+                                                  'size lower than', 'size lower or equal to',
                                                   'size equal to'
             Output:
                     1 - restriction correct
@@ -2775,39 +2711,39 @@ class _RxCSobject:
         iMul = lCoef[0]     # Take the linear coefficients
         iAdd = lCoef[1]     # Take the linear coefficients
 
-        iRefSize = iMul*iRefSize+iAdd  # Apply the linear coefficients
-        
+        iRefSize = iMul * iRefSize + iAdd  # Apply the linear coefficients
+
         if (strRelation == 'size higher than'):
             return (iSize > iRefSize)
-        elif (strRelation == 'size higher or equal to'):        
+        elif (strRelation == 'size higher or equal to'):
             return (iSize >= iRefSize)
         elif (strRelation == 'size lower than'):
             return (iSize < iRefSize)
         elif (strRelation == 'size lower or equal to'):
             return (iSize <= iRefSize)
         elif (strRelation == 'size equal to'):
-           return (iSize == iRefSize)
+            return (iSize == iRefSize)
         else:
             strError = '%s is an unknown type of a relation!' % strRelation
             raise RuntimeError(strError)
 
-
-    def __checkSiz_error(self, strParName, strDesc, strRefName, refVal, lCoef, strErrNote, strRes, iSize):
+    def __checkSiz_error(self, strParName, strDesc, strRefName, refVal, lCoef, strErrNote, strRes, iSize, iRefSize):
         """
             Function raises a size restriction error.
 
-            Arguments:                    
+            Arguments:
                     strParName:   [string]        name of a parameter
                     strDesc:      [string]        description of the parameter
                     strRefName    [string]        name of the reference
                     refVal                        reference
-                    lCoef         [list]          list with 'mul' and 'add' coefficients 
+                    lCoef         [list]          list with 'mul' and 'add' coefficients
                     strErrNote    [string]        error note to be displayed if the restriction is broken
                                                   (might be empty, then the default note is generated)
-                    strRes        [string]        restriction, allowed values: 
-                                                  'size equal to', 'size higher than', 'size higher or equal to', 
+                    strRes        [string]        restriction, allowed values:
+                                                  'size equal to', 'size higher than', 'size higher or equal to',
                                                   'size lower than', 'size lower or equal to'
                     iSize         [number]        size of the parameter which was checked
+                    iRefSize      [number]        reference for size restriction
 
             Output:
                     none
@@ -2816,43 +2752,77 @@ class _RxCSobject:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    9 June 2015        
+                    9 June 2015
         """
-        
+
         # If error note was given, use it
         if not strErrNote == '':
             raise SizeError(strErrNote)
-        
+
         # Change linear coefficients into strings
         (strMul, strAdd) = self.__linearCoef2Strings(lCoef)
 
-        # Construct the error message:        
-        if isinstance(refVal, (int, float)):
-            strError = ('Parameter > %s < (%s) must have %s value of %s %s %s (%s%s%s)!\n') \
-                % (strParName, strDesc, strRes, strMul, strRefName, strAdd, strMul, self.__n2s(refVal), strAdd)
-        else:
-            strError = ('Parameter > %s < (%s) must have %s %ssize of %s %s!\n') \
-                % (strParName, strDesc, strRes, strMul, strRefName, strAdd) 
-        strError = strError + '            Current size of parameter > %s < is %d!' % (strParName, iSize)        
-        raise SizeError(strError)
+        # Construct the error message:
 
+        # Reference is a number or a parameter
+        if isinstance(refVal, (int, float)):
+
+            # Reference was given as a direct number
+            if (self.__strOnlyNumb(strRefName)):
+
+                # No linear coefficients
+                if (strMul == '') and (strAdd == ''):   # Only numbers and no linear coefficients
+                    strErrNote = 'Parameter > %s < (%s) must have %s %s!\n' \
+                        % (strParName, strDesc, strRes, strRefName)
+
+                # Linear coefficients were given
+                else:
+                    strErrNote = 'Parameter > %s < (%s) must have %s %s%s%s (=%s)!\n' \
+                        % (strParName, strDesc, strRes, strMul, strRefName, strAdd, self.__n2s(lCoef[0] * refVal + lCoef[1]))
+
+            # Reference is a parameter which contains a number
+            else:
+                # No linear coefficients
+                if (strMul == '') and (strAdd == ''):
+                    strErrNote = 'Parameter > %s < (%s) must have %s the value of %s (=%s)!\n' \
+                        % (strParName, strDesc, strRes, strRefName, self.__n2s(refVal))
+
+                # Linear coefficients were given
+                else:
+                    strErrNote = 'Parameter > %s < (%s) must have %s the value of %s%s%s (%s%s%s = %s)!\n' \
+                        % (strParName, strDesc, strRes, strMul, strRefName, strAdd, strMul, iRefSize, strAdd, self.__n2s(lCoef[0] * refVal + lCoef[1]))
+
+        # Reference is a size of a parameter
+        else:
+                # No linear coefficients
+                if (strMul == '') and (strAdd == ''):
+                    strErrNote = ('Parameter > %s < (%s) must have %s the size of %s (=%s)!\n') \
+                        % (strParName, strDesc, strRes, strRefName, self.__n2s((iRefSize)))
+
+                # Linear coefficients were given
+                else:
+                    strErrNote = ('Parameter > %s < (%s) must have %s %sthe size of %s%s (%s%s%s = %s)!\n') \
+                        % (strParName, strDesc, strRes, strMul, strRefName, strAdd, strMul, iRefSize, strAdd, self.__n2s(lCoef[0] * iRefSize + lCoef[1]))
+
+        strErrNote = strErrNote + 11 * ' ' + 'The current size of > %s < is %d!' % (strParName, iSize)
+        raise SizeError(strErrNote)
 
     def __checkNDim(self, strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRes):
         """
             Function checks restrictions imposed on the number of dimensions of a parameter.
 
-            Arguments:                    
+            Arguments:
                     strParName:   [string]        name of the parameter
                     strDesc:      [string]        description of the parameter
                     parVal:                       parameter to be checked
                     strRefName    [string]        name of a reference
                     refVal                        reference
-                    lCoef         [list]          list with 'mul' and 'add' coefficients 
+                    lCoef         [list]          list with 'mul' and 'add' coefficients
                     strErrNote    [string]        error note to be displayed if the restriction is broken
                                                   (might be empty, then a default note is generated)
                     strRes        [string]        restriction, allowed values:
-                                                  'number of dimensions equal to', 'number of dimensions higher than', 
-                                                  'number of dimensions higher or equal to', 'number of dimensions lower than', 
+                                                  'number of dimensions equal to', 'number of dimensions higher than',
+                                                  'number of dimensions higher or equal to', 'number of dimensions lower than',
                                                    'number of dimensions lower or equal to'
             Output:
                     none
@@ -2869,23 +2839,22 @@ class _RxCSobject:
 
         # Take the number of dimensions in the reference
         iRefNDim = self.__checkNDim_NDimInRef(strParName, refVal, strRefName, strRes)
-        
+
         # Check the restriction, if it is ok, return
         if not self.__checkNDim_engine(iNDim, iRefNDim, lCoef, strRes):
             self.__checkNDim_error(strParName, strDesc, strRefName, refVal, lCoef, strErrNote, strRes, iNDim, iRefNDim)
         return
 
-
     def __checkNDim_NDimInParam(self, strParName, parVal):
         """
             Function gets the number of dimensions in a tested parameter.
 
-            Arguments:                    
+            Arguments:
                     strParName:   [string]        name of athe parameter
                     parVal:                       the parameter to be checked
 
             Output:
-                    iNDim:        [number]        the number of dimensions 
+                    iNDim:        [number]        the number of dimensions
                                                   in a tested parameter
 
             Author:
@@ -2895,37 +2864,36 @@ class _RxCSobject:
                     9 June 2015
         """
 
-        # Parameter is a number, tuple, list or string        
+        # Parameter is a number, tuple, list or string
         if isinstance(parVal, (int, float, tuple, list, str)):
-            iNDim = 1            
-        
-        # Parameter is a Numpy array       
+            iNDim = 1
+
+        # Parameter is a Numpy array
         elif isinstance(parVal, np.ndarray):
             iNDim = parVal.ndim
-        
-        # illegal type of a tested parameter  
+
+        # illegal type of a tested parameter
         else:
             strError = 'Only numbers, strings, tuples, lists, and numpy arrays can be restricted for the number of dimensions!\n'
-            strError = strError+'            ( > %s < is of type: %s )' % (strParName, type(parVal))
+            strError = strError + '            ( > %s < is of type: %s )' % (strParName, type(parVal))
             raise ValueError(strError)
         return iNDim
-
 
     def __checkNDim_NDimInRef(self, strParName, refVal, strRefName, strRes):
         """
             Function gets the number of dimensions in a reference for the restriction imposed on the number of dimensions.
 
-            Arguments:                    
+            Arguments:
                     strParName:   [string]        name of a parameter
                     refVal:                       reference to a parameter
                     strRefName    [string]        name of a reference
-                    strRes        [string]        restriction, allowed values: 
-                                                  'number of dimensions equal to', 'number of dimensions higher than', 
-                                                  'number of dimensions higher or equal to', 'number of dimensions lower than', 
+                    strRes        [string]        restriction, allowed values:
+                                                  'number of dimensions equal to', 'number of dimensions higher than',
+                                                  'number of dimensions higher or equal to', 'number of dimensions lower than',
                                                   'number of dimensions lower or equal to'
 
             Output:
-                    iRefNDim:     [number]        reference for restriction 
+                    iRefNDim:     [number]        reference for restriction
 
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
@@ -2933,7 +2901,7 @@ class _RxCSobject:
             Last modification:
                     9 June 2015
         """
-        
+
         # Reference can not be empty
         if (strRefName == '> (empty) <'):
             strError = ('Reference for restriction of the number of dimensions of > %s < is empty!') % (strParName)
@@ -2948,15 +2916,15 @@ class _RxCSobject:
                 strError = strError + '            %s (reference for > %s < ) is of type %s' \
                     % (strRefName, strParName, type(refVal))
                 raise ValueError(strError)
-                
+
         # Restriction is a tuple, a list or a string
         elif isinstance(refVal, (tuple, list, str)):
             iRefNDim = 1
-            
+
         # Restriction is a Numpy array
         elif isinstance(refVal, np.ndarray):
             iRefNDim = refVal.ndim
-            
+
         # Illegal type of restriction
         else:
             strError = 'Only numbers, strings, tuples, lists, and numpy arrays can be a reference for restriction of the number of dimensions!'
@@ -2965,18 +2933,17 @@ class _RxCSobject:
             raise ValueError(strError)
         return iRefNDim
 
-
     def __checkNDim_engine(self, iNDim, iRefNDim, lCoef, strRes):
         """
             Engine of 'the number of dimensions' restriction check.
 
-            Arguments:                    
+            Arguments:
                     iNDim:        [number]        the number of dimensions in a parameter
                     iRefNDim:     [number]        reference
                     lCoef         [list]          list with 'mul' and 'add' coefficients
-                    strRes        [string]        restriction, allowed values: 
-                                                  'number of dimensions equal to', 'number of dimensions higher than', 
-                                                  'number of dimensions higher or equal to', 'number of dimensions lower than', 
+                    strRes        [string]        restriction, allowed values:
+                                                  'number of dimensions equal to', 'number of dimensions higher than',
+                                                  'number of dimensions higher or equal to', 'number of dimensions lower than',
                                                   'number of dimensions lower or equal to'
             Output:
                     1 - restriction correct
@@ -2989,12 +2956,12 @@ class _RxCSobject:
                     9 June 2015
         """
         iMul = lCoef[0]     # Take the linear coefficients
-        iAdd = lCoef[1]     # 
-        iRefNDim = iMul * iRefNDim + iAdd  # Apply the linear coefficients        
-        
+        iAdd = lCoef[1]     #
+        iRefNDim = iMul * iRefNDim + iAdd  # Apply the linear coefficients
+
         if (strRes == 'number of dimensions equal to'):
             return (iNDim == iRefNDim)
-        elif (strRes == 'number of dimensions higher than'):        
+        elif (strRes == 'number of dimensions higher than'):
             return (iNDim > iRefNDim)
         elif (strRes == 'number of dimensions higher or equal to'):
             return (iNDim >= iRefNDim)
@@ -3006,22 +2973,21 @@ class _RxCSobject:
             strError = '%s is an unknown type of a relation!' % strRes
             raise RuntimeError(strError)
 
-
     def __checkNDim_error(self, strParName, strDesc, strRefName, refVal, lCoef, strErrNote, strRes, iNDim, iRefNDim):
         """
             Function raises an error if the restriction on the number of dimensions was broken.
 
-            Arguments:                    
+            Arguments:
                     strParName:   [string]        name of the parameter which was checked
                     strDesc:      [string]        description of the parameter
                     strRefName    [string]        name of a reference
                     refVal                        value of the reference
-                    lCoef         [list]          list with 'mul' and 'add' coefficients 
+                    lCoef         [list]          list with 'mul' and 'add' coefficients
                     strErrNote    [string]        error note to be displayed if the restriction is broken
                                                   (might be empty, then a default note is generated)
-                    strRes        [string]        restriction, allowed values: 
-                                                  'number of dimensions equal to', 'number of dimensions higher than', 
-                                                  'number of dimensions higher or equal to', 'number of dimensions lower than', 
+                    strRes        [string]        restriction, allowed values:
+                                                  'number of dimensions equal to', 'number of dimensions higher than',
+                                                  'number of dimensions higher or equal to', 'number of dimensions lower than',
                                                   'number of dimensions lower or equal to'
                     iNDim         [number]        the number of dimensions in the parameter which was checked
                     iRefNDim      [number]        reference
@@ -3033,49 +2999,78 @@ class _RxCSobject:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    9 june 2015        
+                    9 june 2015
         """
 
         # If error note was given, use it
         if not (strErrNote == ''):
             raise NDimError(strErrNote)
 
-        # Construct the error message:        
+        # Construct the error message:
 
         # Change linear coefficients into strings
         (strMul, strAdd) = self.__linearCoef2Strings(lCoef)
 
-        # Reference was a number
+        # Reference was a number or a parameter
         if isinstance(refVal, (int, float)):
-            strError = ('Parameter > %s < (%s) must have the %s \n') \
-                % (strParName, strDesc, strRes)
-            strError = strError + ('            a value of %s %s %s (%s%s%s)!\n') \
-                % (strMul, strRefName, strAdd, strMul, self.__n2s(refVal), strAdd)                
-            strError = strError + '            The number of dimensions of parameter > %s < is %d!' % (strParName, iNDim)
 
-        # reference was not a number
+            # Reference was given directly as a number
+            if (self.__strOnlyNumb(strRefName)):
+
+                # No linear coefficients
+                if (strMul == '') and (strAdd == ''):
+                    strError = ('Parameter > %s < (%s) must have the %s %s!\n') \
+                        % (strParName, strDesc, strRes, strRefName)
+
+                # Linear coefficients were given
+                else:
+                    strError = ('Parameter > %s < (%s) must have the %s %s%s%s (=%s)!\n') \
+                        % (strParName, strDesc, strRes, strMul, strRefName, strAdd, self.__n2s(lCoef[0] * refVal + lCoef[1]))
+
+            # Reference is a parameter which contains a number
+            else:
+
+                # No linear coefficients
+                if (strMul == '') and (strAdd == ''):
+                    strError = ('Parameter > %s < (%s) must have the %s the value of %s (=%s)!\n') \
+                        % (strParName, strDesc, strRes, strRefName, self.__n2s(refVal))
+
+                # Linear coefficients were given
+                else:
+                    strError = ('Parameter > %s < (%s) must have the %s the value of %s%s%s (%s%s%s = %s)\n') \
+                        % (strParName, strDesc, strRes, strMul, strRefName, strAdd, strMul, iRefNDim, strAdd, self.__n2s(lCoef[0] * refVal + lCoef[1]))
+
+        # reference was the number of diemsnions in another parameter
         else:
-            strError = ('Parameter > %s < (%s) must have the %s\n') \
-                % (strParName, strDesc, strRes,) 
-            strError = strError + ('            %s the number of dimensions of %s %s!\n') \
-                % (strMul, strRefName, strAdd) 
-            strError = strError + '            The number of dimensions of parameter > %s < is %d!\n' % (strParName, iNDim)
-            strError = strError + '            The number of dimensions of parameter %s is %d!' % (strRefName, iRefNDim)
-        
-        raise NDimError(strError)
 
+            strError = ('Parameter > %s < (%s) must have the %s\n') \
+                % (strParName, strDesc, strRes)
+
+            # No linear coefficients
+            if (strMul == '') and (strAdd == ''):
+                strError = strError + 11 * ' ' + ('the number of dimensions of %s (%s)!\n') \
+                    % (strRefName, self.__n2s(iRefNDim))
+
+            # Linear coefficients were given
+            else:
+                strError = strError + 11 * ' ' + ('%sthe number of dimensions of %s %s (%s%s%s = %s)!\n') \
+                    % (strMul, strRefName, strAdd, strMul, self.__n2s(iRefNDim), strAdd, self.__n2s(lCoef[0] * iRefNDim + lCoef[1]))
+
+        # Add info about the number of dimensions in the tested parameter and the reference
+        strError = strError + 11 * ' ' + 'The number of dimensions in parameter > %s < is %d!\n' % (strParName, iNDim)
+        raise NDimError(strError)
 
     def __checkDimSiz(self, strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, strRes):
         """
             Function checks restriction imposed on the size of a dimension of a parameter.
 
-            Arguments:         
+            Arguments:
                     strParName:   [string]        name of a parameter
                     strDesc:      [string]        description of the parameter
                     parVal:                       the parameter to be checked
                     strRefName    [string]        name of a reference
                     refVal                        reference
-                    lResData      [list]          list with auxiliary data for the restriction 
+                    lResData      [list]          list with auxiliary data for the restriction
                     strErrNote    [string]        error note to be displayed if the restriction is broken
                                                   (might be empty, then a default note is generated)
                     strRes        [string]        restriction, allowed values:
@@ -3093,60 +3088,217 @@ class _RxCSobject:
         """
 
         # Take the dimensions indices and 'pedantic' flag
-        (iDim, iRefDim, bPedantic) = self.__checkDimSiz_dimensions(lResData)
-        
-        # Take the size of restricted dimension of the tested parameter
-        iDimSize = self.__checkDimSiz_dimSizInParam(parVal, iDim, bPedantic, strParName, strDesc)
-        
-        # Take the size of dimension in reference
-        iRefDimSize = self.__checkDimSiz_dimSizInRef(strParName, strDesc,iDim, refVal, strRefName, iRefDim, bPedantic,  strRes)
+        (iDim, iRefDim, bPedantic, _, _, lResData) = self.__checkDimSiz_dimensions(parVal, refVal, lResData)
 
-        # Check the restriction 
+        # Take the size of restricted dimension of the tested parameter
+        iDimSize = self.__checkDimSiz_dimSizInParam(parVal, iDim, bPedantic, strParName, strDesc, lResData)
+
+        # Take the size of dimension in reference
+        iRefDimSize = self.__checkDimSiz_dimSizInRef(strParName, strDesc, iDim, refVal, lResData, strRefName, iRefDim, bPedantic, strRes)
+
+        # Check the restriction
         if not self.__checkDimSiz_engine(iDimSize, iRefDimSize, lResData, strRes):
-            self.__checkDimSiz_error(strParName, strDesc, strRefName, refVal, lResData, strErrNote, strRes, iDimSize, iRefDimSize)
+            self.__checkDimSiz_error(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, strRes, iDimSize, iRefDimSize)
         return
 
-
-    def __checkDimSiz_dimensions(self, lResData):
+    def __checkDimSiz_dimensions(self, parVal, refVal, lResData):
         """
             Function return indices of dimensions to be checked and 'pedantic' flag.
-             
+
             Arguments:
+                    parVal:                       the parameter to be checked
+                    refVal:                       reference
                     lResData      [list]          list with auxiliary data for the restriction
 
             Output:
-                    iDim          [number]        index of dimension to be checked 
+                    iDim          [number]        index of dimension to be checked
                     iRefDim       [number]        index of reference dimension
                     bPedantic     [number]        'pedantic' flag
+                    dimension     [string]        Human readable name of a dimension, if the name was recognized, otherwise an emtpy string
+                    refdim        [string]        Human readable name of a reference dimension, if the name was recognized,
+                                                  otherwise an emtpy string
+                    lResData      [list]          list with auxiliary data for the restriction
 
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    9 June 2015
+                    16 June 2015
         """
-                
+
         # Take the dimensions indices and 'pedantic' flag
-        iDim = lResData[2]        # Dimension index of a tested parameter
-        iRefDim = lResData[3]     # Dimension index of a reference
-        if np.isnan(iRefDim):     # If th dimension index of a reference is NaN, 
-            iRefDim = iDim        # it must be equal to the dimension index of a tested parameter
-
         bPedantic = lResData[4]   # 'pedantic' flag
-        return (iDim, iRefDim, bPedantic)
+        dimension = lResData[2]   # Dimension of a tested parameter
+        refdim = lResData[3]      # Dimension of a reference
 
+        # If the dimension index of a reference is NaN,
+        # it must be equal to the dimension index of a tested parameter
+        if isinstance(refdim, float):
+            if np.isnan(refdim):
+                refdim = dimension
+                lResData[3] = refdim
 
-    def __checkDimSiz_dimSizInParam(self, parVal, iDim, bPedantic, strParName, strDesc):
+        # If dimension is a string, check if the code of a dimension is correct
+        if isinstance(dimension, str):
+            if dimension == 'columns':
+                pass
+            elif dimension == 'rows':
+                pass
+            elif dimension == 'pages':
+                pass
+            else:
+                strErrNote = '> %s < is an unknown code of a dimension!' % dimension
+                ValueError(strErrNote)
+
+        # If dimension is an integer, it must be higher than 0
+        else:
+            if (dimension < 0):
+                strErrNote = 'Dimension index must be higher than 0!'
+                ValueError(strErrNote)
+
+        # If dimension is a string, decode it
+        if isinstance(dimension, str):
+
+            # If the parameter to be checked is a number or a tuple or a list:
+            if isinstance(parVal, (int, float, tuple, list)):
+                if dimension == 'columns':
+                    iDim = 0
+                    dimension = ''
+                elif dimension == 'rows':
+                    iDim = 1
+                    dimension = ''
+                elif dimension == 'pages':
+                    iDim = 2
+                    dimension = ''
+
+            # If the parameter to be checked is a Numpy array:
+            elif isinstance(parVal, np.ndarray):
+                if dimension == 'columns':
+                    iDim = parVal.ndim - 1
+                    dimension == ' (columns) '
+                elif dimension == 'rows':
+                    iDim = parVal.ndim - 2
+                    dimension == ' (rows) '
+                elif dimension == 'pages':
+                    iDim = parVal.ndim - 3
+                    dimension == ' (pages) '
+
+                # All dimensions lower than 0 are -1
+                if (iDim < 0):
+                    iDim = -1
+        else:
+            iDim = dimension
+
+            # Add name of a dimension, if it is a Numpy array
+            if isinstance(parVal, np.ndarray):
+                # Columns
+                if (iDim == (parVal.ndim - 1)):
+                    dimension = ' (columns) '
+
+                # Rows
+                elif (iDim == (parVal.ndim - 2)):
+                    dimension = ' (rows) '
+
+                # Pages
+                elif (iDim == (parVal.ndim - 3)):
+                    dimension = ' (pages) '
+
+                # Uknown
+                else:
+                    dimension = ''
+
+            # It is is not a Numpy array, there is no name for the dimension
+            else:
+                dimension = ''
+
+        # Reference dimension:
+
+        # If reference dimension is a string, check if the code of a dimension is correct
+        if isinstance(refdim, str):
+            if refdim == 'columns':
+                pass
+            elif refdim == 'rows':
+                pass
+            elif refdim == 'pages':
+                pass
+            else:
+                strErrNote = '> %s < is an unknown code of a dimension!' % refdim
+                ValueError(strErrNote)
+
+        # If dimension is an integer, it must be higher than 0
+        else:
+            if (refdim < 0):
+                strErrNote = 'Dimension index must be higher than 0!'
+                ValueError(strErrNote)
+
+        # If dimension is a string, decode it
+        if isinstance(refdim, str):
+
+            # If the parameter to be checked is a number or a tuple or a list:
+            if isinstance(refVal, (int, float, tuple, list)):
+                if refdim == 'columns':
+                    iRefDim = 0
+                    refdim = ''
+                elif refdim == 'rows':
+                    iRefDim = 1
+                    refdim = ''
+                elif refdim == 'pages':
+                    iRefDim = 2
+                    refdim = ''
+
+            # If the parameter to be checked is a Numpy array:
+            elif isinstance(refVal, np.ndarray):
+                if refdim == 'columns':
+                    iRefDim = refVal.ndim - 1
+                    refdim = ' (columns) '
+                elif refdim == 'rows':
+                    iRefDim = refVal.ndim - 2
+                    refdim = ' (rows) '
+                elif refdim == 'pages':
+                    iRefDim = refVal.ndim - 3
+                    refdim = ' (pages) '
+
+                # All dimensions lower than 0 are -1
+                if (iRefDim < 0):
+                    iRefDim = -1
+        else:
+            iRefDim = refdim
+            # Add name of a dimension, if it is a Numpy array
+            if isinstance(refVal, np.ndarray):
+                # Columns
+                if (iDim == (refVal.ndim - 1)):
+                    refdim = ' (columns) '
+
+                # Rows
+                elif (iDim == (refVal.ndim - 2)):
+                    refdim = ' (rows) '
+
+                # Pages
+                elif (iDim == (refVal.ndim - 3)):
+                    refdim = ' (pages) '
+
+                # Uknown
+                else:
+                    refdim = ''
+
+            # It is is not a Numpy array, there is no name for the dimension
+            else:
+                refdim = ''
+
+        return (iDim, iRefDim, bPedantic, dimension, refdim, lResData)
+
+    def __checkDimSiz_dimSizInParam(self, parVal, iDim, bPedantic, strParName, strDesc, lResData):
         """
             Function gets the size of checked dimension of a tested parameter.
-             
+
             Arguments:
                     parVal:                       the parameter to be checked
-                    iDim          [number]        index of a dimension to be checked 
+                    iDim          [number]        index of a dimension to be checked
                     bPedantic     [number]        'pedantic' flag
                     strParName:   [string]        name of the parameter to be checked
                     strDesc:      [string]        description of the parameter
-                    
+                    lResData      [list]          list with auxiliary data for the restriction
+
             Output:
                     iDimSize      [number]        size of dimension
 
@@ -3154,72 +3306,81 @@ class _RxCSobject:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    9 June 2015
+                    18 June 2015
         """
-        
-        # Parameter is a number        
+
+        # Parameter is a number
         if isinstance(parVal, (int, float)):
             if (iDim == 0):
                 iDimSize = 1
-            elif (bPedantic==0):
+            elif (bPedantic == 0):
                 iDimSize = 1
             else:
-                strError = 'Error in size restriction of dimension #%d for parameter > %s < (%s)!\n' % (iDim, strParName, strDesc)                    
-                strError = strError+'            Numbers do not have dimension #%d, and I was asked to be pedantic!\n' \
+                strError = 'Error in size restriction of dimension #%d for parameter > %s < (%s)!\n' % (iDim, strParName, strDesc)
+                strError = strError + 13 * ' ' + 'Numbers do not have dimension #%d, and I was asked to be pedantic!\n' \
                     % (iDim)
-                strError = strError+'            ( > %s < (%s) is of type %s!)' % (strParName, strDesc, type(parVal))
-                raise ValueError(strError)
-    
+                strError = strError + 13 * ' ' + '( > %s < (%s) is of type %s!)' % (strParName, strDesc, type(parVal))
+                raise DimSizError(strError)
+
         # Parameter is a tuple or a list
         elif isinstance(parVal, (tuple, list)):
             if (iDim == 0):
                 iDimSize = len(parVal)
-            elif (bPedantic==0):
+            elif (bPedantic == 0):
                 iDimSize = 1
             else:
                 if isinstance(parVal, tuple):
                     strType = 'Tuples'
                 else:
                     strType = 'Lists'
-                strError = 'Error in size restriction of dimension #%d for parameter > %s < (%s)!\n' % (iDim, strParName, strDesc)                    
-                strError = strError+'            %s do not have dimension #%d, and I was asked to be pedantic!\n' \
+                strError = 'Error in size restriction of dimension #%d for parameter > %s < (%s)!\n' % (iDim, strParName, strDesc)
+                strError = strError + 13 * ' ' + '%s do not have dimension #%d, and I was asked to be pedantic!\n' \
                     % (strType, iDim)
-                strError = strError+'            ( > %s < (%s) is of type %s!)' % (strParName, strDesc, type(parVal))
-                raise ValueError(strError)
-            
+                strError = strError + 13 * ' ' + '( > %s < (%s) is of type %s!)' % (strParName, strDesc, type(parVal))
+                raise DimSizError(strError)
+
         # Parameter is a Numpy array
         elif isinstance(parVal, np.ndarray):
-            iNDimPar = parVal.ndim  
-            if (iDim < iNDimPar):
+            iNDimPar = parVal.ndim
+            if ((iDim >= 0) and (iDim < iNDimPar)):
                 iDimSize = parVal.shape[iDim]
-            elif (bPedantic==0):
+            elif (bPedantic == 0):
                 iDimSize = 1
             else:
-                strError = 'Error in size restriction of dimension #%d for parameter > %s < (%s)!\n' % (iDim, strParName, strDesc)                    
-                strError = strError+'            Numpy array > %s < (%s) do not have dimension #%d, and I was asked to be pedantic! \n' \
-                    % (strParName, strDesc, iDim)
-                raise ValueError(strError)
-        
-        # Illegal type of a parameter        
+                strError = 'Error in size restriction of dimension '
+                if isinstance(lResData[2], str):
+                    strError = strError + '\'%s\' for parameter > %s < (%s)!\n' % (lResData[2], strParName, strDesc)
+                else:
+                    strError = strError + '#%d for parameter > %s < (%s)!\n' % (lResData[2], strParName, strDesc)
+
+                strError = strError + 13 * ' ' + 'Numpy array > %s < (%s) do not have dimension ' \
+                    % (strParName, strDesc)
+                if isinstance(lResData[2], str):
+                    strError = strError + '\'%s\', and I was asked to be pedantic! \n' % (lResData[2])
+                else:
+                    strError = strError + '#%d, and I was asked to be pedantic! \n' % (lResData[2])
+                raise DimSizError(strError)
+
+        # Illegal type of a parameter
         else:
             strError = 'Only numbers, tuples, lists, and numpy arrays can have size restricted dimensions!\n'
-            strError = strError+'            ( > %s < (%s) is of type: %s )' % (strParName, strDesc, type(parVal))
-            raise ValueError(strError)
+            strError = strError + '            ( > %s < (%s) is of type: %s )' % (strParName, strDesc, type(parVal))
+            raise TypeError(strError)
 
         return iDimSize
 
-
-    def __checkDimSiz_dimSizInRef(self, strParName, strDesc, iDim, refVal, strRefName, iRefDim, bPedantic,  strRes):
+    def __checkDimSiz_dimSizInRef(self, strParName, strDesc, iDim, refVal, lResData, strRefName, iRefDim, bPedantic, strRes):
         """
             Function gets a reference for a restriction imposed on the size of dimension.
 
             Arguments:
                     strParName:   [string]        name of a parameter
                     strDesc:      [string]        description of a parameter
-                    iDim          [number]        index of dimension to be checked 
-                    refVal                        reference 
+                    iDim          [number]        index of dimension to be checked
+                    refVal                        reference
+                    lResData      [list]          list with auxiliary data for the restriction
                     strRefName    [string]        name of a reference
-                    iRefDim       [number]        index of reference dimension                    
+                    iRefDim       [number]        index of reference dimension
                     bPedantic     [number]        'pedantic' flag
                     strRes        [string]        restriction, allowed values:
                                                   'dimension size equal to', 'dimension size higher than',
@@ -3233,9 +3394,9 @@ class _RxCSobject:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    9 June 2015
+                    18 June 2015
         """
-        
+
         # Reference can not be empty
         if (strRefName == '> (empty) <'):
             strError = ('Reference for restriction of #%d dimension size of > %s < (%s) is empty!') % (iDim, strParName, strDesc)
@@ -3248,16 +3409,16 @@ class _RxCSobject:
                 strError = ('Float number can not be a reference for restriction of \'dimension size equal to...\'!\n')
                 strError = strError + '            %s (reference for > %s < ) is of type %s' \
                     % (strRefName, strParName, type(refVal))
-                raise ValueError(strError) 
-                
+                raise ValueError(strError)
+
         # Reference is a tuple or a list
         elif isinstance(refVal, (tuple, list)):
             if (iRefDim == 0):
                 iRefDimSize = len(refVal)
-            elif (bPedantic==0):
+            elif (bPedantic == 0):
                 iRefDimSize = 1
             else:
-                strError = 'Error in size restriction of dimension #%d for parameter > %s < (%s)!\n' % (iDim, strParName, strDesc)                    
+                strError = 'Error in size restriction of dimension #%d for parameter > %s < (%s)!\n' % (iDim, strParName, strDesc)
                 strError = strError + '            Reference %s do not have dimension #%d, and I was asked to be pedantic!\n' \
                     % (strRefName, iRefDim)
                 strError = strError + '            ( Reference %s for > %s < (%s) is of type %s. )' \
@@ -3266,40 +3427,49 @@ class _RxCSobject:
 
         # Reference is a Numpy array
         elif isinstance(refVal, np.ndarray):
-            iNDimRef = refVal.ndim  
-            if (iRefDim < iNDimRef):
+            iNDimRef = refVal.ndim
+            if ((iRefDim >= 0) and (iRefDim < iNDimRef)):
                 iRefDimSize = refVal.shape[iRefDim]
-            elif (bPedantic==0):
+            elif (bPedantic == 0):
                 iRefDimSize = 1
             else:
-                strError = 'Error in size restriction of dimension #%d for parameter > %s < (%s)!\n' % (iDim, strParName, strDesc)                    
-                strError = strError + '            Reference %s do not have dimension #%d, and I was asked to be pedantic!\n' \
-                    % (strRefName, iRefDim)
-                strError = strError + '            ( Reference %s for > %s < (%s) is of type %s. )' \
-                    % (strRefName, strParName, strDesc, type(refVal))
+                strError = 'Error in size restriction of dimension '
+                if isinstance(lResData[2], str):
+                    strError = strError + '\'%s\' for parameter > %s < (%s)!\n' % (lResData[2], strParName, strDesc)
+                else:
+                    strError = strError + '#%d for parameter > %s < (%s)!\n' % (lResData[2], strParName, strDesc)
+
+                strError = strError + '            Reference %s do not have dimension ' % (strRefName)
+                if isinstance(lResData[3], str):
+                    strError = strError + '\'%s\', and I was asked to be pedantic!\n' \
+                        % (lResData[3])
+                else:
+                    strError = strError + '#%d, and I was asked to be pedantic!\n' \
+                        % (lResData[3])
+                strError = strError + '            (Reference %s for > %s < is of type %s. )' \
+                    % (strRefName, strParName, type(refVal))
                 raise ValueError(strError)
-                
+
         # Illegal type of the reference
         else:
             strError = 'Only numbers, lists, and numpy arrays can be a reference for restriction of size of dimension!\n'
             strError = strError + '            %s (restriction for > %s < ) is of type: %s)' \
                 % (strRefName, strParName, type(refVal))
             raise ValueError(strError)
-            
-        return iRefDimSize
 
+        return iRefDimSize
 
     def __checkDimSiz_engine(self, iDimSize, iRefDimSize, lResData, strRes):
         """
             Engine of check of restriction imposed on size of a dimension.
 
-            Arguments:                    
+            Arguments:
                     iDimSize:         [number]         size of a dimensions in a checked parameter
                     iRefDimSize:      [number]         reference
                     lResData          [list]           list with 'mul' and 'add' coefficients
-                    strRes            [string]         restriction, allowed values: 
-                                                       'dimension size equal to', 'dimension size higher than', 
-                                                       'dimension size lower than', 'dimension size higher or equal to', 
+                    strRes            [string]         restriction, allowed values:
+                                                       'dimension size equal to', 'dimension size higher than',
+                                                       'dimension size lower than', 'dimension size higher or equal to',
                                                        'dimension size lower or equal to'
             Output:
                     1 - restriction correct
@@ -3309,39 +3479,39 @@ class _RxCSobject:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    10 June 2015
+                    16 June 2015
         """
 
         iMul = lResData[0]     # Take the linear coefficients
         iAdd = lResData[1]     # Take the linear coefficients
-        
-        iRefDimSize = iMul*iRefDimSize+iAdd   # Apply the linear coefficients
+
+        iRefDimSize = iMul * iRefDimSize + iAdd   # Apply the linear coefficients
 
         if (strRes == 'dimension size equal to'):
             return (iDimSize == iRefDimSize)
-        elif (strRes == 'dimension size higher than'):        
+        elif (strRes == 'dimension size higher than'):
             return (iDimSize > iRefDimSize)
         elif (strRes == 'dimension size lower than'):
-            return (iDimSize >= iRefDimSize)
-        elif (strRes == 'dimension size higher or equal to'):
             return (iDimSize < iRefDimSize)
+        elif (strRes == 'dimension size higher or equal to'):
+            return (iDimSize >= iRefDimSize)
         elif (strRes == 'dimension size lower or equal to'):
             return (iDimSize <= iRefDimSize)
         else:
             strError = '%s is an unknown type of a relation!' % strRes
             raise RuntimeError(strError)
 
-
-    def __checkDimSiz_error(self, strParName, strDesc, strRefName, refVal, lResData, strErrNote, strRes, iDimSize, iRefDimSize):
+    def __checkDimSiz_error(self, strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, strRes, iDimSize, iRefDimSize):
         """
             Function raises an error if a restriction imposed on the size of dimensions was broken.
-            
-            Arguments:                    
+
+            Arguments:
                     strParName:   [string]        name of a parameter
                     strDesc:      [string]        description of a parameter
+                    parVal:                       the parameter to be checked
                     strRefName    [string]        name of a reference
                     refVal                        value of a reference
-                    lResData      [list]          list with auxiliary data for the restriction 
+                    lResData      [list]          list with auxiliary data for the restriction
                     strErrNote    [string]        error note to be displayed if the restriction is broken
                                                   (might be empty, then a default note is generated)
                     strRes        [string]        restriction, allowed values:
@@ -3358,73 +3528,167 @@ class _RxCSobject:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    9 June 2015        
+                    18 June 2015
 
         """
-        # If error note was given, use it 
+        # If error note was given, use it
         if not (strErrNote == ''):
             raise DimSizError(strErrNote)
 
-        # If error note was not given, construct the error message:
-        iDim = lResData[2]        # Dimension index of a tested parameter
-        iRefDim = lResData[3]     # Dimension index of a reference
-        if np.isnan(iRefDim):     # If th dimension index of a reference is NaN, 
-            iRefDim = iDim        # it must be equal to the dimension index of a tested parameter
+        # Get indices and names of dimensions which was checked
+        (iDim, iRefDim, _, dimension, refdim, lResData) = self.__checkDimSiz_dimensions(parVal, refVal, lResData)
 
-        strErrNote = 'Parameter > %s < (%s) must have size of dimension #%d ' \
-            % (strParName, strDesc, iDim)
+        # Change linear coefficients into strings
         (strMul, strAdd) = self.__linearCoef2Strings(lResData)
-        if (strRes == 'dimension size equal to'):
-            strErrNote = strErrNote + 'equal to '
-        elif (strRes == 'dimension size higher than'):
-            strErrNote = strErrNote + 'higher than '
-        elif (strRes == 'dimension size lower than'):
-             strErrNote = strErrNote + 'lower than '          
-        elif (strRes == 'dimension size higher or equal to'):
-             strErrNote = strErrNote + 'higher or equal to '                      
-        elif (strRes == 'dimension size lower or equal to'):
-             strErrNote = strErrNote + 'lower or equal to '
-        strErrNote = strErrNote + '%s\'x\'%s\n' \
-            % (strMul, strAdd)
-        strErrNote = strErrNote + '            where \'x\' is '
-        if isinstance(refVal, (int, float)):
-            if strRefName == 'the given number':
-                strErrNote = strErrNote + 'equal to the given number (%d)\n' \
-                    % (iRefDimSize)
+
+        # Invoke the error:
+
+        # Index of a dimension was given
+        if isinstance(lResData[2], int):
+            strErrNote = 'Parameter > %s < (%s) must have the size of dimension #%d%s%s' \
+                % (strParName, strDesc, iDim, dimension, self.__checkDimSiz_error_restriction(strRes))
+
+        # Name of a dimension was given
+        else:
+
+            # Requested dimension exists in a parameter
+            if (iDim >= 0):  #
+                strErrNote = 'Parameter > %s < (%s) must have the number of %s (dimension #%d) %s' \
+                    % (strParName, strDesc, lResData[2], iDim, self.__checkDimSiz_error_restriction(strRes))
             else:
-                strErrNote = strErrNote + 'equal to a value of %s.\n' \
-                    % (strRefName)
-        else:
-            strErrNote = strErrNote + 'is a size of dimension #%d of parameter %s.\n' \
-                % (iRefDim, strRefName)
-        strErrNote = strErrNote + '            Current size of dimension #%d of > %s < is %d, ' \
-            % (iDim, strParName, iDimSize)
+                strErrNote = 'Parameter > %s < (%s) must have the number of %s %s' \
+                    % (strParName, strDesc, lResData[2], self.__checkDimSiz_error_restriction(strRes))
+
+        # Construct the requirement:
+
+        # If the reference is a number it is easy to construct the error info...
         if isinstance(refVal, (int, float)):
-            strErrNote = strErrNote + 'current value of %s is %d.\n' \
-                % (strRefName, iRefDimSize)
+
+            # Reference was given as a direct number
+            if (self.__strOnlyNumb(strRefName)):
+
+                # No linear coefficients
+                if (strMul == '') and (strAdd == ''):   # Only numbers and no linear coefficients
+                    strErrNote = strErrNote + '%s!\n' % (strRefName)
+
+                else:
+                    strErrNote = strErrNote + ': %s%s%s (=%s)!\n' \
+                        % (strMul, strRefName, strAdd, self.__n2s(lResData[0] * refVal + lResData[1]))
+
+            # Reference was a size of a dimension of another parameter
+            else:
+                # No linear coefficients
+                if (strMul == '') and (strAdd == ''):   # Only numbers and no linear coefficients
+                    strErrNote = strErrNote + 'the value of %s (=%s)!\n' % (strRefName, refVal)
+
+                else:
+                    strErrNote = strErrNote + ': %sthe value of %s%s (%s%s%s = %s)!\n' \
+                        % (strMul, strRefName, strAdd, strMul, refVal, strAdd, self.__n2s(lResData[0] * refVal + lResData[1]))
+
+        # Reference was the size of a dimension of a tuple or list
+        elif isinstance(refVal, (tuple, list)):
+            if (iRefDim == 0):
+
+                # No linear coefficients
+                if (strMul == '') and (strAdd == ''):   # Only numbers and no linear coefficients
+                    strErrNote = strErrNote + 'the size of %s (=%d)!\n' % (strRefName, iRefDimSize)
+
+                else:
+                    strErrNote = strErrNote + ': %sthe size of %s%s (%s%s%s = %s)!\n' \
+                        % (strMul, strRefName, strAdd, strMul, iRefDimSize, strAdd, self.__n2s(lResData[0] * iRefDimSize + lResData[1]))
+
+            else:
+                # No linear coefficients
+                if (strMul == '') and (strAdd == ''):   # Only numbers and no linear coefficients
+                    strErrNote = strErrNote + 'dimension #%d of %s!\n' % (iRefDim, strRefName)
+                    strErrNote = strErrNote + 13 * ' ' + '(Dimension #%d in %s  does not exist...so it is assumed = 1)!\n' % (iRefDim, strRefName)
+
+                else:
+                    strErrNote = strErrNote + ': %sdimension #%d of %s%s (%s%s%s = %s)!\n' \
+                        % (strMul, iRefDim, strRefName, strAdd, strMul, self.__n2s(iRefDimSize), strAdd, self.__n2s(lResData[0] * iRefDimSize + lResData[1]))
+                    strErrNote = strErrNote + 13 * ' ' + '(Dimension #%d in %s  does not exist...so it is assumed = 1)!\n' % (iRefDim, strRefName)
+
+        # Reference was a Numpy array
         else:
-            strErrNote = strErrNote + 'current size of dimension #%d of %s is %d.\n' \
-                % (iRefDim, strRefName, iRefDimSize)
+            # Index of the reference dimension was given
+            if isinstance(lResData[3], int):
+
+                # No linear coefficients
+                if (strMul == '') and (strAdd == ''):   # Only numbers and no linear coefficients
+                    strErrNote = strErrNote + 'dimension #%d%s of %s (=%d)!\n' % (iRefDim, refdim, strRefName, iRefDimSize)
+                else:
+                    strErrNote = strErrNote + ': %sdimension #%d%s of %s%s (%s%s%s = %s)!\n' \
+                        % (strMul, iRefDim, refdim, strRefName, strAdd, strMul, self.__n2s(iRefDimSize), strAdd, self.__n2s(lResData[0] * iRefDimSize + lResData[1]))
+
+            # Name of the rteference dimension was given
+            else:
+                # No linear coefficients
+                if (strMul == '') and (strAdd == ''):   # Only numbers and no linear coefficients
+                    strErrNote = strErrNote + 'the number of %s in %s (=%d)!\n' % (lResData[3], strRefName, iRefDimSize)
+
+                else:
+                    strErrNote = strErrNote + ': %sthe number of %s of %s%s (%s%s%s = %s)!\n' \
+                        % (strMul, lResData[3], strRefName, strAdd, strMul, self.__n2s(iRefDimSize), strAdd, self.__n2s(lResData[0] * iRefDimSize + lResData[1]))
+
+        # Construct the info about the size of a dimension of a parameter:
+
+        # Index of a dimension was given
+        if isinstance(lResData[2], int):
+            strErrNote = strErrNote = strErrNote + 13 * ' ' + 'The size of a dimension #%d of parameter > %s < is %d!' \
+                % (iDim, strParName, iDimSize)
+
+        # Name of a dimension was given
+        else:
+            strErrNote = strErrNote = strErrNote + 13 * ' ' + 'The number of %s in parameter > %s < is %d!' \
+                % (lResData[2], strParName, iDimSize)
+
         raise DimSizError(strErrNote)
 
+    def __checkDimSiz_error_restriction(self, strRel):
+        """
+            Function changes string 'dimension size [relation]' into '[relation]'.
+            This function is used to construct an error message.
+
+            Arguments:
+                    strRel      [string]          string to be transformed
+
+            Output:
+                    strRel      [string]          transformed string
+
+            Author:
+                    Jacek Pierzchlewski jap@es.aau.dk
+
+            Last modification:
+                    19 June 2015
+        """
+        if (strRel == 'dimension size equal to'):
+            return 'equal to '
+        elif (strRel == 'dimension size higher than'):
+            return 'higher than '
+        elif (strRel == 'dimension size lower than'):
+            return 'lower than '
+        elif (strRel == 'dimension size higher or equal to'):
+            return 'higher or equal to '
+        elif (strRel == 'dimension size lower or equal to'):
+            return 'lower or equal to '
 
     def __linearCoef2Strings(self, lResData):
         """
             Function changes linear coefficients into strings.
 
-            Arguments:                    
-                    lResData      [list]          list with auxiliary data for the restriction 
+            Arguments:
+                    lResData      [list]          list with auxiliary data for the restriction
 
             Output:
-                    strMul        [string]        string with  'mul' parameter 
+                    strMul        [string]        string with  'mul' parameter
                     strAdd        [string]        string with  'add' parameter
 
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    9 June 2015        
-            
+                    9 June 2015
+
         """
 
         iMul = lResData[0]     # Take the linear coefficients
@@ -3438,21 +3702,20 @@ class _RxCSobject:
         if (iAdd == 0):
             strAdd = ''
         elif (iAdd < 0):
-            strAdd = ' - %s' % self.__n2s(abs(iAdd))            
+            strAdd = ' - %s' % self.__n2s(abs(iAdd))
         else:
             strAdd = ' + %s' % self.__n2s(iAdd)
-    
+
         return (strMul, strAdd)
-    
 
     def __n2s(self, iX):
         """
             Function changes number to a string.
-            It automatically regulates the number of digits after the comma.  
-  
+            It automatically regulates the number of digits after the comma.
+
             Arguments:
                     iX [number]        number to be changed
-                    
+
             Output:
                     strX [string]      string with a number
 
@@ -3466,30 +3729,29 @@ class _RxCSobject:
         if isinstance(iX, int):
             strX = ('%d') % iX
             return strX
-        
-        iMaxDigits = 24  # Maximum precision 
-        for iPrec in range(1,iMaxDigits+1):
-            strFormat = ('%%.%df') % iPrec         # Change the numer to 
-            strEval= ('\'%s\' %% iX') % strFormat  # a string
-            strX = eval(strEval)                   # ^
-            
-            iX_ = float(strX)    # Change the string back to the number     
-            if (iX_ == iX):      # and check if it is correct      
+
+        iMaxDigits = 24  # Maximum precision
+        for iPrec in range(1, iMaxDigits + 1):
+            strFormat = ('%%.%df') % iPrec          # Change the numer to
+            strEval = ('\'%s\' %% iX') % strFormat  # a string
+            strX = eval(strEval)                    # ^
+
+            iX_ = float(strX)    # Change the string back to the number
+            if (iX_ == iX):      # and check if it is correct
                 return strX      #
-        
-        # No correct solution was found until the max digits, let the CPU decide         
-        strX = ('%f') % iX  
-        return strX           
-        
+
+        # No correct solution was found until the max digits, let the CPU decide
+        strX = ('%f') % iX
+        return strX
 
     def __NthInTuple(self, iN, tup):
         """
             Function takes Nth element of a tuple.
             It is assumed that the elemnts are indexed starting from 0
-  
+
             Arguments:
                     iN [number]        position in a tuple
-                    
+
             Output:
                     element            Nth element of a tuple
 
@@ -3502,24 +3764,23 @@ class _RxCSobject:
 
         if (iN < 0):
             strError = ('Index of the wanted element must not be lower than 0!')
-            raise ValueError(strError)                        
+            raise ValueError(strError)
         if not (len(tup) > iN):
             strError = ('There are only %d elements in the tuple!') % len(tup)
-            raise ValueError(strError)            
-        inxN = 0         
+            raise ValueError(strError)
+        inxN = 0
         for element in tup:
             if inxN == iN:
                 break
             inxN = inxN + 1
         return element
 
-    
     def __strOnlyNumb(self, strString):
         """
-            Function checks if a given string contain only a number.
+            Function checks if a given string contains only a number.
             Arguments:
                     strString [str]    a string to be checked
-                    
+
             Output:
                     1            only numbers
                     0            something else beside a number
@@ -3528,21 +3789,11 @@ class _RxCSobject:
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    12 June 2015        
+                    12 June 2015
         """
         for c in strString:
-            if (c == '0')  or \
-                (c == '1') or \
-                (c == '2') or \
-                (c == '3') or \
-                (c =='4') or \
-                (c == '5') or \
-                (c == '6') or \
-                (c == '7') or \
-                (c == '8') or \
-                (c == '9') or \
-                (c == '.') or \
-                (c == '-'):
+            if ((c == '0') or (c == '1') or (c == '2') or (c == '3') or (c == '4') or (c == '5') or
+               (c == '6') or (c == '7') or (c == '8') or (c == '9') or (c == '.') or (c == '-')):
                 continue
             else:
                 return 0
@@ -3550,30 +3801,64 @@ class _RxCSobject:
 
 
 class ErrorTemplate(Exception):
+    """
+        Error template for the local errors.
+    """
     def __call__(self, *args):
         return self.__class__(*(self.args + args))
 
+
 class ParameterMissingError(ErrorTemplate):
+    """
+        Error: Parameter missing
+    """
     pass
-    
+
+
 class ParameterTypeError(ErrorTemplate):
+    """
+        Error: Parameter type
+    """
     pass
-    
+
+
 class ElementTypeError(ErrorTemplate):
+    """
+        Error: Parameter element type
+    """
     pass
+
 
 class AllowedValuesError(ErrorTemplate):
+    """
+        Error: Allowed values of a parameter
+    """
     pass
+
 
 class RelationalError(ErrorTemplate):
+    """
+        Error: Parameter value (relational)
+    """
     pass
+
 
 class SizeError(ErrorTemplate):
+    """
+        Error: Parameter size
+    """
     pass
+
 
 class NDimError(ErrorTemplate):
+    """
+        Error: The number of dimensions
+    """
     pass
+
 
 class DimSizError(ErrorTemplate):
+    """
+        Error: Dimension size
+    """
     pass
-
