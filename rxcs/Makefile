@@ -42,7 +42,7 @@ CUR_DIR := $(shell pwd  | sed 's/^.*rxcs/rxcs/')
 pep8:
 ifneq ($(PYTHON_FILES),)
 	@echo $(CUR_DIR):
-	pep8 $(PYTHON_FILES)	
+	pep8 --ignore=E501 $(PYTHON_FILES)	
 endif
 	for i in $(SRC_DIR); do \
 		cd "$$i"; make pep8; cd ..; \
