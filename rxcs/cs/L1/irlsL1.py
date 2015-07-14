@@ -43,7 +43,7 @@ def main(dCSConf):
     - c. **iConv** (*float*): the convergence parameter
 
     - e. **bComplex** (*float*): 'complex data' flag
-    
+
     THETA MATRICES:
     The optimization module 'rxcs.cs.irlsL1' is designed to work with
     multiple observed signals, so that many signals can be reconstructed
@@ -94,21 +94,21 @@ def main(dCSConf):
 
     # Check if the configuration for the reconstruction make sense
     _checkConf(dCSConf)
-    
+
     # Print the configuration to the console
     tStart = _printConf(dCSConf)
-    
+
     # Signal reconstruction is here
     mCoef = _recon(dCSConf)
-    
+
     # Print an info that the signal reconstruction is done! (if needed)
     if not np.isnan(tStart):   # <-tStart is nan = console output is off
         rxcs.console.module_progress_done(tStart)
 
     # Return the matrix with signal coefficients
     return mCoef
-    
-    
+
+
 # =================================================================
 # Check the configuration dict. and get the configuration from it
 # =================================================================
@@ -122,7 +122,7 @@ def _getData(dCSConf):
 
     Returns:
         bMute (float):      mute the conole output flag
-        m3Theta (matrix):   the Theta matrices
+        lTheta (list):      list with Theta matrices
         mObSig (matrix):    matrix with the observed signals
         bComplex (float):   complex optinmization flag
         iMaxIter (int):     maximum number of IRLS iterations
@@ -138,12 +138,25 @@ def _getData(dCSConf):
 
     # -----------------------------------------------------------------
     # Get the Theta matrices
-    if not 'm3Theta' in dCSConf:
-        strError = ('The Theta matrices (m3Theta) are missing ')
+    if 'lTheta' in dCSConf:
+       lTheta = dCSConf['lTheta']
+    elif 'm3Theta' in dCSConf:
+        m3Theta = dCSConf['m3Theta']
+
+        # Put the 3d matrix into the list
+        lTheta = []    # Start the list with observation matrices
+
+        # Get the number of pages in the 3D matrix
+        if (m3Theta.ndim == 3):
+            (nPages, _, _) = m3Theta.shape
+            for inxPage in np.arange(nPages):
+                lTheta.append(m3Theta[inxPage, : ,:])
+        else:
+            lTheta.append(m3Theta)
+    else:
+        strError = ('The Theta matrices (lTheta or m3Theta) are missing ')
         strError = strError + ('in the input dictionary')
         raise NameError(strError)
-    else:
-        m3Theta = dCSConf['m3Theta']
 
     # -----------------------------------------------------------------
     # Get the matrix with the observed signals
@@ -181,13 +194,8 @@ def _getData(dCSConf):
     # make it a 2D matrix (2D matrix - array with 2 dimensions).
     mObSig = _make2Dmatrix(mObSig)
 
-    # -----------------------------------------------------------------
-    # Check if the Theta matrix is 2D.
-    # If it is, then make it a 3D with one page
-    m3Theta = _make3Dmatrix(m3Theta, bComplex)
-
     return (bMute,
-            m3Theta,
+            lTheta,
             mObSig,
             bComplex,
             iMaxIter,
@@ -210,17 +218,17 @@ def _checkConf(dCSConf):
     """
 
     # Get configuration data
-    (_, m3Theta, mObSig, bComplex, iMaxIter, iConv) = _getData(dCSConf)
+    (_, lTheta, mObSig, bComplex, iMaxIter, iConv) = _getData(dCSConf)
 
     # -----------------------------------------------------------------
     # Check it the number of the observed signals is equal to the number
     # of the Theta matrices
-    _checkNObs(m3Theta, mObSig)
+    _checkNObs(lTheta, mObSig)
 
     # -----------------------------------------------------------------
     # Check it the number of rows in the Theta matrices is equal to the
     # size of the observed signals
-    _checkThetaRows(m3Theta, mObSig)
+    _checkThetaRows(lTheta, mObSig)
 
     # -----------------------------------------------------------------
     # Check if the number of iterations is an integer and is higher than 0
@@ -271,41 +279,10 @@ def _make2Dmatrix(mObSig):
 
 
 # =================================================================
-# Make a one page 3D matrix from 2D matrix, if needed
-# =================================================================
-def _make3Dmatrix(m3Theta, bComplex):
-    """
-    This function checks if the m3Theta matrix is a 2D numpy matrix.
-    If it is a 2D matrix, then the function makes it a 3D matrix with
-    one page,
-
-    If the input matrix is a 3D matrix, then the function returns it
-    as it is.
-
-    Args:
-        m3Theta (matrix): The Theta matrix
-        bComplex (float): Compelx data flag
-
-    Returns:
-        m3Theta (matrix): The Theta matrix
-    """
-
-    if len(m3Theta.shape) == 2:
-        (nRows , nCols) = m3Theta.shape
-        m3Theta_ = m3Theta.copy()
-        m3Theta = np.zeros((1, nRows , nCols))
-        if bComplex == 1:
-            m3Theta = m3Theta + 1j*np.zeros((1, nRows ,nCols))
-        m3Theta[0, :, :] = m3Theta_
-
-    return m3Theta
-
-
-# =================================================================
 # Check if the number of observed signals is equal to the number
 # of Theta matrices
 # =================================================================
-def _checkNObs(m3Theta, mObSig):
+def _checkNObs(lTheta, mObSig):
     """
     This function checks if the number of observed signals equals
     the number of Theta matrices.
@@ -317,7 +294,7 @@ def _checkNObs(m3Theta, mObSig):
     the 'mObSig' matrix.
 
     Args:
-        m3Theta (3D matrix): 3D matrix with Theta matrices
+        lTheta (list): list with Theta matrices
         mObSig (matrix): matrix with observed signals
 
     Returns:
@@ -328,8 +305,7 @@ def _checkNObs(m3Theta, mObSig):
     (_ , nObSig) = mObSig.shape
 
     # Get the number of Theta matrices
-    (nTheta , _, _) = m3Theta.shape
-
+    nTheta = len(lTheta)
     # -----------------------------------------------------------------
 
     # Main check starts here
@@ -345,32 +321,39 @@ def _checkNObs(m3Theta, mObSig):
 # Check it the number of rows in the Theta matrices is equal to the
 # size of the observed signals
 # =================================================================
-def _checkThetaRows(m3Theta, mObSig):
+def _checkThetaRows(lTheta, mObSig):
     """
     This function checks if the number of rows in the Theta matrices
     equals the size of the observed signals.
 
     Args:
-        m3Theta (3D matrix): 3D matrix with Theta matrices
+        lTheta (list): list with Theta matrices
         mObSig (matrix): matrix with observed signals
 
     Returns:
         nothing
     """
 
-    # Get the number of rows in the theta matrix
-    (_, nRows, _) = m3Theta.shape
+    nTheta = len(lTheta)  # Get the number of the Theta matrices
 
-    # Get the size of the observed signals
-    (nObSiz, _) = mObSig.shape
+    # -----------------------------------------------------------------
+    # Loop over all the Theta matrices
+    for inxTheta in np.arange(nTheta):
+
+        (nRows, _) = lTheta[inxTheta].shape     # Get the number of rows in the current Theta matrix
+
+        # Get the size of the current observed signal
+        vObSig = mObSig[:, inxTheta]
+        vObSig = vObSig[np.invert(np.isnan(vObSig))]
+        nObSiz = vObSig.size
+
+        if nRows != nObSiz:
+            strError = ('The number of rows (%d) in the Theta matrix #%d is not equal ') % (nRows, inxTheta)
+            strError = strError + ('to the size (%d) of the observed signal #%d') % (nObSiz, inxTheta)
+            raise ValueError(strError)
 
     # -----------------------------------------------------------------
 
-    # Main check starts here
-    if nRows != nObSiz:
-        strError = ('The number of rows in the Theta matrices is not equal ')
-        strError = strError + ('to the size of the observed signals')
-        raise ValueError(strError)
 
     return
 
@@ -437,7 +420,7 @@ def _printConf(dCSConf):
 # =================================================================
 # Make real-only Theta matrices, if it is needed
 # =================================================================
-def _makeRealProblem(m3Theta):
+def _makeRealProblem(lTheta):
     """
     This function makes a real only Theta matrix from a complex
     Theta matrix.
@@ -467,21 +450,26 @@ def _makeRealProblem(m3Theta):
 
 
     Args:
-        m3Theta (matrix): The Theta matrix with complex values
+        lTheta (list): The Theta matrix with complex values
 
     Returns:
-        m3ThetaR (matrix): The Theta matrix with a real only values
+        lThetaR (list): The Theta matrix with a real only values
     """
 
     # Get the size of the 3d matrix with Theta matricess
-    (nTheta, nRows, nCols) = m3Theta.shape
+    nTheta = len(lTheta)                # Get the number of Theta matrices
 
-    # Creatwe the real-only Theta matrix
-    m3ThetaR = np.zeros((nTheta, nRows, 2*nCols))
-    m3ThetaR[:, :, np.arange(nCols)] = m3Theta.real
-    m3ThetaR[:, :, np.arange(nCols, 2*nCols)] = m3Theta.imag
+    # Create the real-only Theta matrix
+    lThetaR = []
 
-    return m3ThetaR
+    for inxPage in np.arange(nTheta):
+        (nRows, nCols) = lTheta[inxPage].shape    # Get the number of rows/cols in the current Theta matrix
+        mThetaR = np.zeros((nRows, 2*nCols))      # Construct a new empty real-only Theta matrix
+        mThetaR[:, np.arange(nCols)] = lTheta[inxPage].real
+        mThetaR[:, np.arange(nCols, 2*nCols)] = lTheta[inxPage].imag
+        lThetaR.append(mThetaR.copy())
+
+    return lThetaR
 
 
 # =================================================================
@@ -546,17 +534,17 @@ def _recon(dCSConf):
     """
 
     # Get configuration data
-    (_, m3Theta, mObSig, bComplex, iMaxIter, iConv) = _getData(dCSConf)
+    (_, lTheta, mObSig, bComplex, iMaxIter, iConv) = _getData(dCSConf)
 
     # Get the number of the observed signals
     (_ , nObSig) = mObSig.shape
 
     # If the optimization problems are complex, make them real
     if bComplex == 1:
-        m3Theta = _makeRealProblem(m3Theta)
+        lTheta = _makeRealProblem(lTheta)
 
     # Get the number of columns in the Theta matrix,
-    (_ , _, nCols) = m3Theta.shape
+    (_, nCols) = lTheta[0].shape
 
     # Allocate the output matrix with signal coefficients
     mCoeff = np.zeros((nCols, nObSig))
@@ -566,7 +554,7 @@ def _recon(dCSConf):
     for inxSig in np.arange(nObSig):
 
         # Get the current Theta matrix
-        mTheta = m3Theta[inxSig, :, :]
+        mTheta = lTheta[inxSig]
 
         # Get the current observation signal
         vObSig = mObSig[:, inxSig]
@@ -574,7 +562,7 @@ def _recon(dCSConf):
         # Run the engine: Reconstruct the signal coefficients
         (vCoef, _, _) = rxcs.auxiliary.irls.L1(mTheta, vObSig, iMaxIter, iConv)
         vCoef.shape = (vCoef.size,)
-        
+
         # Store the signal coefficients in the output matrix
         #vCoef.shape = (vCoef.size)
         mCoeff[:, inxSig] = vCoef
