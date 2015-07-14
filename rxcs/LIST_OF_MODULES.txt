@@ -1,0 +1,52 @@
+RXCS toolbox, LIST_OF_MODULES.txt - file with a list of RxCS modules
+
+
+Signal generator modules (1):
+
+    # Random signal generators:
+    1.1. gaussNoise.py         - gaussian noise generator module
+    1.2. sigRandMult.py        - random multitone signal generator
+    1.3. sparseVector          - random sparse vector generator
+
+    # Auxiliary generator modules:
+    1.4. LNA.py                - linear amplifier model
+
+
+Acquistions modules (2):
+
+    # Nonuniform samplers:
+    2.1. nonuniANGIE.py        - nonuniform sampler with ANGIE sampling scheme
+    2.2. nonuniExtern.py       - nonuniform sampler with an external sampling scheme
+    2.3. nonuniExternDummy.py  - dummy nonuniform sampler with an external sampling scheme ('dummy', because it does not sample the signal, only generates the observation matrix)
+    2.4. nonuniARS.py          - nonuniform sampler with ARS sampling scheme
+    2.5. nonuniJS.py           - nonuniform sampler with JS sampling scheme
+
+    # Uniform samplers:
+    2.6. uniform.py      - a uniform sampler
+
+    # Additional acquisition modules:
+    2.7. satur.py      - saturation block
+
+
+Compresed Sensing modules (3):
+
+    # Dictionaries:
+    3.1. IDFToNoDC.py    - module generates inverse discrete fourier transform (IDHT) matrix
+    3.2. IDHT.py         - module generates inverse discrete hartley transform (IDFT) matrix
+
+    # L1 reconstructions:
+    3.3. cvxoptL1.py    - module with L1-based signal reconstruction (regularized regression), the optimization uses cvxopt software
+    3.4. irlsL1.py      - module with L1-based signal reconstruction (basis pursuit), the optimization uses IRLS algorithm
+
+
+System analysis modules (4):
+
+    4.1, SNR.py         - SNR evaluation of the reconstructed signal
+
+
+Auxiliary modules (5):
+
+    5.1. L2Solv_aldkrls.py       - L2 solver which uses KRLS algorithm
+    5.2. irls.py                 - module with iterative reweighted least squares (IRLS) algorithms
+    5.3. aldkrls.py              - kernel recursive least squares (KRLS) algorithm with approximate linear dependency (ALD) criterion
+    5.4. kernel.py               - implementation of kernels used by kernel recursive least squares (KRLS) algorithms
