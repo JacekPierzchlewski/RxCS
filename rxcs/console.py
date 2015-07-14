@@ -664,7 +664,7 @@ def _param_time_write(iVal, strForm):
             raise Exception(strErr)
 
         # Recalculate seconds to hours and create a propoer string with hours
-        iHours = iVal/3600
+        iHours = iVal / 3600
         strHours = ('%.2f [hours]') % (iHours)
 
         # Print the hours
