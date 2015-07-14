@@ -13,17 +13,17 @@
 import numpy as np
 
 # Import the main tested object
-from RxCSobject import _RxCSobject
+from rxcs.RxCSobject import _RxCSobject
 
 # Import errors
-from RxCSobject import ParameterMissingError
-from RxCSobject import ParameterTypeError
-from RxCSobject import ElementTypeError
-from RxCSobject import AllowedValuesError
-from RxCSobject import RelationalError
-from RxCSobject import SizeError
-from RxCSobject import NDimError
-from RxCSobject import DimSizError
+from rxcs.RxCSobject import ParameterMissingError
+from rxcs.RxCSobject import ParameterTypeError
+from rxcs.RxCSobject import ElementTypeError
+from rxcs.RxCSobject import AllowedValuesError
+from rxcs.RxCSobject import RelationalError
+from rxcs.RxCSobject import SizeError
+from rxcs.RxCSobject import NDimError
+from rxcs.RxCSobject import DimSizError
 
 
 class RxCS_object_tester1():
