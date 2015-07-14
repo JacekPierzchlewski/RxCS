@@ -1,4 +1,4 @@
-RXCS toolbox, cs\ - directory with compressed sensing modules
+RXCS toolbox, rxcs\cs\ - directory with compressed sensing modules
 
 contents:
 
@@ -8,14 +8,13 @@ contents:
 
     3. CONTENTS.txt   - the current file
 
-
     4. Makefile       - local Makefile
 
     5. __init__.py    - module initialization file
 
 
     6. @cvxoptL1.py   - link to module with L1-based signal reconstruction (regularized
-                        regression), the optimization uses cvxopt
+                        regression), the optimization uses cvxopt software
 
     7. @irlsL1.py     - link to module with L1-based signal reconstruction (basis pursuit),
-                        the optimization uses irls algorithm
+                        the optimization uses IRLS algorithm

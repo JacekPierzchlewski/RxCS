@@ -1,11 +1,14 @@
-RXCS toolbox, ana\ - directory with system analysis modules
+RXCS toolbox, rxcs\ana\ - directory with system analysis modules
 
 contents:
 
-    1. CONTENTS.txt   - the current file
+    1. CONTENTS.txt    - the current file
 
-    2. Makefile       - local Makefile
+    2. Makefile        - local Makefile
 
-    3. __init__.py    - module initialization file
+    3. __init__.py     - module initialization file
 
-    4, SNR.py         - SNR evaluation of the reconstructed signal
+
+    4, SNR.py          - SNR evaluation of the reconstructed signal
+
+    5. @SNR_test.py    - link to a module with tests for SNR evaluation of the reconstructed signal

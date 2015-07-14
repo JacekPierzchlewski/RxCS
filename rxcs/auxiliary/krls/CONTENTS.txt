@@ -1,4 +1,4 @@
-RXCS toolbox, krls\ - directory with kernel recursive least squares methods
+RXCS toolbox, rxcs\auxiliary\krls\ - directory with kernel recursive least squares methods
 
 contents:
 
@@ -9,6 +9,6 @@ contents:
     3. __init__.py        - module initialization file
 
 
-    4. aldkrls.py  - Kernel Recursive Least Squares algorithm with Approximate Linear Dependency criterion
+    4. aldkrls.py  - kernel recursive least squares (KRLS) algorithm with approximate linear dependency (ALD) criterion
 
-    5. kernel.py   - implementation of kernels used by Kernel Recursive Least Squares algorithms
+    5. kernel.py   - implementation of kernels used by kernel recursive least squares (KRLS) algorithms

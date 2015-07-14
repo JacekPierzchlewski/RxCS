@@ -1,4 +1,4 @@
-RXCS toolbox, acq\ - directory with acquisition systems modules
+RXCS toolbox, rxcs\acq\ - directory with acquisition systems modules
 
 contents:
 
@@ -11,26 +11,28 @@ contents:
 
     # Nonuniform samplers:
 
-    4. nonuniANGIE.py        - a nonuniform sampler with ANGIE sampling scheme
+    4. nonuniANGIE.py         - nonuniform sampler with ANGIE sampling scheme
 
-    5. nonuniExtern.py       - a nonuniform sampler with an external sampling scheme
+    5. @nonuniANGIE_test.py   - link to a module with tests for nonuniform sampler with ANGIE sampling scheme
 
-    6. nonuniExternDummy.py  - a dummy nonuniform sampler with an external sampling scheme
-                               The sampler is 'dummy', because it does not sample the signal,
-                               it only generates the observation matrix.
+    6. nonuniExtern.py        - nonuniform sampler with an external sampling scheme
 
-    7. nonuniARS.py          - a nonuniform sampler with ARS sampling scheme
+    7. nonuniExternDummy.py   - dummy nonuniform sampler with an external sampling scheme
+                                The sampler is 'dummy', because it does not sample the signal,
+                                it only generates the observation matrix.
 
-    8. nonuniJS.py           - a nonuniform sampler with JS sampling scheme
+    8. nonuniARS.py           - nonuniform sampler with ARS sampling scheme
+
+    9. nonuniJS.py            - nonuniform sampler with JS sampling scheme
 
 
     # Uniform samplers:
 
-    9. uniform.py      - a uniform sampler
+   10. uniform.py      - a uniform sampler
 
 
     # Additional modules:
 
-    9. satur.py      - saturation block
+   11. satur.py      - saturation block
 
 

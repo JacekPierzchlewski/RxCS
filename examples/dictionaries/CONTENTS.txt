@@ -21,4 +21,4 @@ contents:
 
     # IDHT dictionary examples:    (IDHT - Inverse Discrete Hartley Transform)
 
-    7. dict_IDFT_ex0.py       - example #0 on how to use the IDHT dictionary
+    7. dict_IDHT_ex0.py       - example #0 on how to use the IDHT dictionary

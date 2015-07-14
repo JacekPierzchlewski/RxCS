@@ -1,15 +1,25 @@
-RXCS toolbox, sig\ - directory with signal generators modules
+RXCS toolbox, rxcs\sig\ - directory with signal generator modules
 
 contents:
 
-    1. CONTENTS.txt   - the current file
+    1. CONTENTS.txt          - the current file
 
-    2. Makefile       - local Makefile
+    2. Makefile              - local Makefile
 
-    3. __init__.py    - module initialization file
+    3. __init__.py           - module initialization file
 
 
-    4. sigRandMult.py - Random Multitone Signal Generator
+    # Auxiliary generator modules:
 
-    5. sigRandMult.py - Random Sparse Vector Generator
+    4. LNA.py                - linear amplifier model
 
+
+    # Random signal generators:
+
+    5. gaussNoise.py         - gaussian noise generator module
+
+    6. sigRandMult.py        - random multitone signal generator
+
+    7. @sigRandMult_test.py  - link to a module with tests for random multitone signal generator
+
+    8. sparseVector          - random sparse vector generator

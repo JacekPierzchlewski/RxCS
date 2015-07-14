@@ -1,4 +1,4 @@
-RXCS toolbox, dict\ - directory with dictionaries
+RXCS toolbox, rxcs\cd\dict\ - directory with dictionaries
 
 contents:
 
@@ -6,7 +6,9 @@ contents:
 
     2. Makefile       - local Makefile
 
+    3. __init__.py    - module initialization file
 
-    3. IDFToNoDC.py    - module generates Inverse Discrete Fourier Transform matrix
 
-    4. IDHT.py         - module generates Inverse Discrete Hartley Transform matrix
+    4. IDFToNoDC.py    - module generates inverse discrete fourier transform (IDFT) matrix
+
+    5. IDHT.py         - module generates inverse discrete hartley transform (IDHT) matrix
