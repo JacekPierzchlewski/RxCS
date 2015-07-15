@@ -3,7 +3,7 @@
 import sigRandMult
 
 # Import sparse vectors generator
-import sparseVector
+from sparseVector import sparseVector
 
 # Import Gaussian noise
 from gaussNoise import gaussNoise
