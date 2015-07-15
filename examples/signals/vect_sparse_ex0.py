@@ -12,6 +12,7 @@ After the generation, the generated sparse vectors are plotted. |br|
 
 *Version*:
     1.0  | 22-JAN-2015 : * Version 1.0 released. |br|
+    2.0  | 15-JUL-2015 : * Version 2.0 released. |br|
 
 *License*:
     BSD 2-Clause
@@ -29,18 +30,16 @@ def _vect_sparse_ex0():
     iS = 0.2       # Sparsity parameter (0.2 * 20 = 4 non-zero elements)
     iNVects = 5    # The number of vectors
 
-    # -----------------------------------------------------------------
-    # Generate settings for the generator
+    # Things on the table:
+    sparseVector = rxcs.sig.sparseVector()  # Sparse vectors generator
 
-    # Start the dictionary with configuration for sparse vectors generator
-    dSigConf = {}
-    dSigConf['iVectSiz'] = iN       # Size of the vectors
-    dSigConf['iS'] = iS             # Sparsity parameter
-    dSigConf['iNVect'] = iNVects    # The number of vectors
-    dSigConf['bMute'] = 0           # Be verbose
+    # Configure the generator...
+    sparseVector.iVectSiz = iN       # Size of the vectors
+    sparseVector.iS = iS             # Sparsity parameter
+    sparseVector.iNVect = iNVects    # The number of vectors
 
-    # Run the sparse vectors generator
-    mVecs = rxcs.sig.sparseVector.main(dSigConf)
+    sparseVector.run()           # ... and run it!
+    mVecs = sparseVector.mVects  # take the generated vectors
 
     # -----------------------------------------------------------------
     # Plot the sparse vectors
