@@ -120,7 +120,7 @@ class gaussNoise(rxcs._RxCSobject):
 
         self.parametersProcess(*args)  # Get parameters given directly to 'run' function
         self.parametersCheck()         # Check if all the needed partameters are in place and are correct
-        self.parametersPrint()         # Print the values of
+        self.parametersPrint()         # Print the values of parameters
 
         self.__engine()                # Run the engine
         return self.__dict__           # Return dictionary with the parameters
