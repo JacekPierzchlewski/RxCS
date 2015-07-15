@@ -9,7 +9,7 @@ For examples of usage, go to examples/signals directory. |br|
 
 Atributes of 'sparseVector' class after calling 'run' method:
 
-    - mVects [Numpy array (2D)] - matrix with generated vectors, one signal p. vector
+    - mVects [Numpy array (2D)] - matrix with generated vectors, one vector p. column
 
 |br|
 
@@ -22,8 +22,6 @@ There are two functions which should be used by user:
 
         - generate(iN, iNs) - this function generate one vector of a size iN,
                               with with iNs non-zero elements.
-                              Look at 'IRLSrecon_ex0.py' in examples/reconstruction 
-                              directory for an example of usage.
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
@@ -145,10 +143,7 @@ class sparseVector(rxcs._RxCSobject):
         """
         This function generates one sparse vector.
         It can be accessed by user.
-    
-        Look at 'IRLSrecon_ex0.py' in examples/reconstruction directory for 
-        an example of usage.
-    
+        
         Args:
             iN  (int):  size of the vector
             iNs (int):  the number of non-zero elements
