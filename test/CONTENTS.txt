@@ -16,5 +16,5 @@ contents:
 
     7. nonuniANGIE_test.py     - tests for nonuniform sampler with ANGIE sampling scheme
 
-    8. sigRandMult_test.py     - tests for random multitone signal generator
+    8. randMult_test.py        - tests for random multitone signal generator
 

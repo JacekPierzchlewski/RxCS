@@ -55,7 +55,7 @@ generated signals.
 
 To start the test run this module directly as a script:
 
-    :bash:`$ python sigRandMultTest.py`
+    :bash:`$ python randMultTest.py`
 
 when in *rxcs/test* directory. The results are then printed to the console.
 |br|
@@ -68,6 +68,7 @@ when in *rxcs/test* directory. The results are then printed to the console.
     0.2  | 15-MAY-2014 : * Docstrings added. |br|
     0.3  | 20-MAY-2014 : * PEP8 adjustments. |br|
     1.0  | 20-MAY-2014 : * Version 1.0 released. |br|
+    1.1  | 15-JUL-2015 : * Adjusted to new name of random multitone gen. |br|  
 
 *License*:
     BSD 2-Clause
@@ -81,7 +82,7 @@ import rxcs
 # =====================================================================
 # Main function of the test
 # =====================================================================
-def _sigRandMult_test():
+def _randMult_test():
     """
     This is main function of the test.
 
@@ -213,7 +214,7 @@ def _TestCase1(iTolerance):
     # Run the multtone signal generator
     tStart = \
         rxcs.console.module_progress('test (case 1) signals generation')
-    dSig = rxcs.sig.sigRandMult.main(dSigConf)
+    dSig = rxcs.sig.randMult.main(dSigConf)
     rxcs.console.module_progress_done(tStart)
 
     # -----------------------------------------------------------------
@@ -315,7 +316,7 @@ def _TestCase2(iTolerance):
     # Run the multtone signal generator
     tStart = \
         rxcs.console.module_progress('test (case 2) signals generation')
-    dSig = rxcs.sig.sigRandMult.main(dSigConf)
+    dSig = rxcs.sig.randMult.main(dSigConf)
     rxcs.console.module_progress_done(tStart)
 
     # -----------------------------------------------------------------
@@ -417,7 +418,7 @@ def _TestCase3(iTolerance):
     # Run the multtone signal generator
     tStart = \
         rxcs.console.module_progress('test (case 3) signals generation')
-    dSig = rxcs.sig.sigRandMult.main(dSigConf)
+    dSig = rxcs.sig.randMult.main(dSigConf)
     rxcs.console.module_progress_done(tStart)
 
     # -----------------------------------------------------------------
@@ -519,7 +520,7 @@ def _TestCase4(iTolerance):
     # Run the multtone signal generator
     tStart = \
         rxcs.console.module_progress('test (case 4) signals generation')
-    dSig = rxcs.sig.sigRandMult.main(dSigConf)
+    dSig = rxcs.sig.randMult.main(dSigConf)
     rxcs.console.module_progress_done(tStart)
 
     # -----------------------------------------------------------------
@@ -619,7 +620,7 @@ def _TestCase5(iTolerance):
     # Run the multtone signal generator
     tStart = \
         rxcs.console.module_progress('test (case 5) signals generation')
-    dSig = rxcs.sig.sigRandMult.main(dSigConf)
+    dSig = rxcs.sig.randMult.main(dSigConf)
     rxcs.console.module_progress_done(tStart)
 
     # -----------------------------------------------------------------
@@ -1764,4 +1765,4 @@ def _isequal(iX, iY, iMargin):
 # Trigger when start as a script
 # =====================================================================
 if __name__ == '__main__':
-    _sigRandMult_test()
+    _randMult_test()

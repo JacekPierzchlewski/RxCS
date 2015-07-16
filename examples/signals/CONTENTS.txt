@@ -11,16 +11,16 @@ contents:
 
     # Single run Random Multitone Signal Generator (RMSG) examples:
 
-    4. sig_RMSG_ex0.py        - example #0 on how to use RMSG generator - the simplest example with FFT analysis of the signal.
+    4. RMSG_ex0.py        - example #0 on how to use RMSG generator - the simplest example with FFT analysis of the signal.
 
-    5. sig_RMSG_ex1.py        - example #1 on how to use RMSG generator - single signal generation, frequency is specified for
-                                3 tones,  1 fully random tone. FFT analysis of the signal
+    5. RMSG_ex1.py        - example #1 on how to use RMSG generator - single signal generation, frequency is specified for
+                            3 tones,  1 fully random tone. FFT analysis of the signal
 
-    6. sig_RMSG_ex2.py        - example #2 on how to use RMSG generator - single signal generation with 3 fully random tones.
-                                FFT analysis of the signal
+    6. RMSG_ex2.py        - example #2 on how to use RMSG generator - single signal generation with 3 fully random tones.
+                            FFT analysis of the signal
 
-    7. sig_RMSG_ex3.py        - example #3 on how to use RMSG generator - multiple signals generation with 11 tones with specfied
-                                frequencies. Welch's analysis of the signals
+    7. RMSG_ex3.py        - example #3 on how to use RMSG generator - multiple signals generation with 11 tones with specfied
+                            frequencies. Welch's analysis of the signals
 
 
     # Sparse vector generator examples:

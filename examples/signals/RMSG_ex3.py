@@ -33,6 +33,8 @@ is analyzed using the Welch's method.
     0.1  | 15-MAY-2014 : * Initial version. |br|
     0.2  | 21-MAY-2014 : * Docstrings added and PEP8 adjustments. |br|
     1.0  | 21-MAY-2014 : * Version 1.0 released. |br|
+    1.1  | 15-JUL-2015 : * Adjusted to new name of random multitone gen. |br|
+
 
 *License*:
     BSD 2-Clause
@@ -44,7 +46,7 @@ from scipy import signal
 import matplotlib.pyplot as plt
 
 
-def _sig_RMSG_ex3():
+def _RMSG_ex3():
 
     # -----------------------------------------------------------------
     # Generate settings for the generator
@@ -127,7 +129,7 @@ def _sig_RMSG_ex3():
 
     # -----------------------------------------------------------------
     # Run the multtone signal generator
-    dSig = rxcs.sig.sigRandMult.main(dSigConf)
+    dSig = rxcs.sig.randMult.main(dSigConf)
 
     # Get the generated signals
     mSig = dSig['mSig']
@@ -189,4 +191,4 @@ def _sig_RMSG_ex3():
 # Trigger when start as a script
 # =====================================================================
 if __name__ == '__main__':
-    _sig_RMSG_ex3()
+    _RMSG_ex3()

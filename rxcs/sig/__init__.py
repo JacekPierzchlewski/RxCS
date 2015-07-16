@@ -1,6 +1,6 @@
 
 # Import Random Multitone Signal Generator
-import sigRandMult
+import randMult
 
 # Import sparse vectors generator
 from sparseVector import sparseVector

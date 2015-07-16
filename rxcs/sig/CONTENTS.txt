@@ -18,7 +18,7 @@ contents:
 
     5. gaussNoise.py         - gaussian noise generator module
 
-    6. sigRandMult.py        - random multitone signal generator
+    6. randMult.py           - random multitone signal generator
 
     7. @sigRandMult_test.py  - link to a module with tests for random multitone signal generator
 

@@ -4,11 +4,22 @@ Generator module. |br|
 
 In this example 1 random multitone signal is generated. |br|
 
-Time of the signal is 10 us, the signal representation sampling frequency is
-5 MHz. The highest possible frequency of a tone in the signal is 2 MHz,
-the signal spectrum resolution is 100 kHz. |br|
+Time of the signal is 1 ms, the signal representation sampling frequency is
+100 kHz. The highest possible frequency of a tone in the signal is 20 kHz,
+the signal spectrum resolution is 1 kHz. |br|
 
-There are 3 completely random tones in the signal. |br|
+The signal contains 3 tones with specified frequencies (2000 Hz, 3000Hz and
+4000 Hz). The amplitudes of these tones are 1, 2 and 3 respectively. The
+phases of these tones are randomly chosen by the generator. |br|
+The above is given in the 3 fields in the generator configuration dictionary:
+
+    dSigConf['vFrqs'] = np.array([2e3, 3e3, 4e3]) |br|
+
+    dSigConf['vAmps'] = np.array([1, 2, 3]) |br|
+
+    dSigConf['vPhs'] = np.array([np.nan, np.nan, np.nan]) |br|
+
+Additonally, there are 3 completely random tones in the signal. |br|
 
 The power of the signal is not regulated. |br|
 
@@ -22,10 +33,11 @@ and ploted.
 
 *Version*:
     0.1  | 15-MAY-2014 : * Initial version. |br|
-    0.2  | 21-MAY-2014 : * Docstrings added and PEP8 adjustments. |br|
-    1.0  | 21-MAY-2014 : * Version 1.0 released. |br|
-    1.1  | 22-MAY-2014 : * Specified frequencies removed, 3 fully random tones
-                           in the signal. |br|
+    0.2  | 20-MAY-2014 : * Docstrings added and PEP8 adjustments. |br|
+    1.0  | 20-MAY-2014 : * Version 1.0 released. |br|
+    1.0r1| 21-MAY-2014 : * Cosmetics in the comments. |br|
+    1.1  | 15-JUL-2015 : * Adjusted to new name of random multitone gen. |br|
+    
 
 *License*:
     BSD 2-Clause
@@ -36,7 +48,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def _sig_RMSG_ex2():
+def _RMSG_ex1():
 
     # -----------------------------------------------------------------
     # Generate settings for the generator
@@ -44,20 +56,28 @@ def _sig_RMSG_ex2():
     # Start the dictionary with signal generator configuration
     dSigConf = {}
 
-    # Signal generator type: random multitone signal
-    dSigConf['strSigType'] = "RandMult"
+    # Time of the signal is 1 ms
+    dSigConf['tS'] = 1e-3
 
-    # Time of the signal is 10 us
-    dSigConf['tS'] = 10e-6
+    # The signal representation sampling frequency is 100 kHz
+    dSigConf['fR'] = 1e5
 
-    # The signal representation sampling frequency is 5 MHz
-    dSigConf['fR'] = 5e6
+    # The highest possible frequency in the signal is 40 kHz
+    dSigConf['fMax'] = 40e3
 
-    # The highest possible frequency in the signal is 2 MHz
-    dSigConf['fMax'] = 2e6
+    # The signal spectrum resolution is 1 kHz
+    dSigConf['fRes'] = 1e3
 
-    # The signal spectrum resolution is 100 kHz
-    dSigConf['fRes'] = 100e3
+    # - - - - - - - - - - - - - - - -
+
+    # Vector with given frequencies
+    dSigConf['vFrqs'] = np.array([2e3, 3e3, 4e3])
+
+    # Vector with given amplitudes
+    dSigConf['vAmps'] = np.array([1, 2, 3])
+
+    # Vector with given phases
+    dSigConf['vPhs'] = np.array([np.nan, np.nan, np.nan])
 
     # - - - - - - - - - - - - - - - -
 
@@ -67,9 +87,9 @@ def _sig_RMSG_ex2():
     # Amplitude and phase parameters of additional tones:
 
     # Amplitude
-    dSigConf['iMinAmp'] = 0.2  # Minimum amplitude
+    dSigConf['iMinAmp'] = 0.1  # Minimum amplitude
     dSigConf['iGraAmp'] = 0.1  # Gradation of amplitude
-    dSigConf['iMaxAmp'] = 0.4  # Maximum amplitude
+    dSigConf['iMaxAmp'] = 1.0  # Maximum amplitude
 
     # Phase:
     dSigConf['iMinPhs'] = 0  # Minimum phase of additional tones
@@ -83,7 +103,7 @@ def _sig_RMSG_ex2():
 
     # -----------------------------------------------------------------
     # Run the multtone signal generator
-    dSig = rxcs.sig.sigRandMult.main(dSigConf)
+    dSig = rxcs.sig.randMult.main(dSigConf)
 
     # Get the generated signal
     mSig = dSig['mSig']
@@ -113,8 +133,8 @@ def _sig_RMSG_ex2():
                                                        linefmt='b-',
                                                        markerfmt='bo',
                                                        basefmt='r-')
-    hSubPlot1.set_xlim(-100e3, 2.5e6)
-    hSubPlot1.set_ylim(-0.1, 1.1)
+    hSubPlot1.set_xlim(-1*1e3, 51*1e3)
+    hSubPlot1.set_ylim(-0.1, 3.1)
     plt.setp(stemlines, color='b', linewidth=2.0)
     plt.setp(markerline, color='b', markersize=10.0)
     plt.show(block=True)
@@ -124,4 +144,4 @@ def _sig_RMSG_ex2():
 # Trigger when start as a script
 # =====================================================================
 if __name__ == '__main__':
-    _sig_RMSG_ex2()
+    _RMSG_ex1()
