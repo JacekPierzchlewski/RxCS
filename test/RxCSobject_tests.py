@@ -91,6 +91,7 @@ class RxCS_object_tester1():
         self.__type_of_elements_correct_long_Numpy_vector()
         self.__type_of_elements_incorrect_float_in_Numpy_vector()
         self.__type_of_elements_correct_long_Numpy_matrix()
+        self.__type_of_elements_incorrect_long_Numpy_matrix()
         self.__type_of_elements_incorrect_dict_in_long_list()
         print('')
 
@@ -544,7 +545,7 @@ class RxCS_object_tester1():
             Test of parameter elements type check.
             Wanted output: Correct
         """
-        strTestName = 'Float elements in a Numpy vector (incorrect)'
+        strTestName = 'Float elements in a Numpy matrix (correct)'
         RxCSObject = _RxCSobject()
 
         RxCSObject.paramAddMan('parameter1', 'Numpy matrix #1')
@@ -559,6 +560,29 @@ class RxCS_object_tester1():
         RxCSObject.parameter2 = np.random.randn(1e2,1e2)
 
         self.__parametersCheck_error(RxCSObject, 'correct', strTestName)
+
+
+    def __type_of_elements_incorrect_long_Numpy_matrix(self):
+        """
+            Test of parameter elements type check.
+            Wanted output: ElementTypeError
+        """
+        strTestName = 'Float elements in a Numpy matrix (incorrect)'
+        RxCSObject = _RxCSobject()
+
+        RxCSObject.paramAddMan('parameter1', 'Numpy matrix #1')
+        RxCSObject.paramType('parameter1', np.ndarray)
+        RxCSObject.paramTypeEl('parameter1', (int))
+
+        RxCSObject.paramAddMan('parameter2', 'Numpy vector #2')
+        RxCSObject.paramType('parameter2', np.ndarray)
+        RxCSObject.paramTypeEl('parameter2', (int))
+
+        RxCSObject.parameter1 = np.random.randn(1e2,1e2)
+        RxCSObject.parameter2 = np.random.randn(1e2,1e2)
+
+        self.__parametersCheck_error(RxCSObject, ElementTypeError, strTestName)
+
 
     def __type_of_elements_incorrect_dict_in_long_list(self):
         """
