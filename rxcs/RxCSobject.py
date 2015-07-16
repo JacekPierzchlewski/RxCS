@@ -1652,10 +1652,13 @@ class _RxCSobject:
                 # Service for numpy array
                 if isinstance(parameter, np.ndarray):
                     if (parameter.size > 0):
+                        original_shape = parameter.shape
+                        parameter.shape = (parameter.size, )
                         if not (isinstance(parameter[0], tuple(lTypesEl))):
                             strError = ('Parameter > %s < contains elements of an illegal type (%s)!') \
                                 % (strParName, type(parameter[0]))
                             raise ElementTypeError(strError)
+                        parameter.shape = original_shape
                     continue
 
                 # Service for a tuple or a list
