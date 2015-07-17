@@ -92,6 +92,7 @@
             __parametersGetArgs            - get parameters given directly to a function as a list of arguments
 
             __parametersCheckMandatory       - check if all the mandatory parameters are given
+            __parametersOptAssignVal         - propagates a value onto optional parameters, if requested
             __parametersCheckType            - check types of all the parameters and their elements
             __parametersCheckRestrictions    - check restrictions given to all the parameters
             __parameterCheckRestrictions     - check restrictions of a single parameter
@@ -1091,6 +1092,7 @@ class _RxCSobject:
                     29 May 2015
         """
         self.__parametersCheckMandatory()     # Check if all the mandatory parameters are given
+        self.__parametersOptAssignVal()       # Assign values to optional parameters which are taken from other parameters        
         self.__parametersCheckType()          # Check types of all the parameters
         self.__parametersCheckRestrictions()  # Check restrictions on the parameters
 
@@ -1682,6 +1684,53 @@ class _RxCSobject:
                 if np.isnan(self.__dict__[strParName]):
                     strError = ('Mandatory parameter > %s < is not given!') % strParName
                     raise ParameterMissingError(strError)
+
+
+    def __parametersOptAssignVal(self):
+        """
+            Function propagates onto optional parameters a value from the other parameters,
+            if such a propagation was requested.
+
+            Arguments:
+                    none
+            Output:
+                    none
+
+            Author:
+                    Jacek Pierzchlewski jap@es.aau.dk
+
+            Last modification:
+                    18 July 2015
+        """
+
+        # Loop over all optional parameters
+        for inxOpt in range(self.iManParam, self.iManParam + self.iOptParam):
+
+            strParName = self.lParameters[inxOpt]['strName']   # Name of the current parameter
+            parVal = self.__dict__[strParName]                 # Get the parameter
+            
+            # If it is not a string, continue to the next parameter
+            if not isinstance(parVal, str):
+                continue
+
+            # If it is shorter than 3, continue to the next parameter
+            if len(parVal) < 3:
+                continue
+            
+            # If the first two values of the parameter are not '$$', continue to the next parameter
+            if not (parVal[0] == '$' and parVal[1] == '$'):
+                continue
+            
+            # Take the name of the parameter from which the value should be propagated
+            strRefName = parVal[2:len(parVal)]
+            if not self.__parameterWasDefined(strRefName):
+                strError = 'Reference parameter %s does not exist! (Reference for parameter > %s <)' \
+                    % (strRefName, strParName)
+                raise NameError(strError)
+            
+            # Propagate the value
+            self.__dict__[strParName] = self.__dict__[strRefName]                        
+        return
 
     def __parametersCheckType(self):
         """
