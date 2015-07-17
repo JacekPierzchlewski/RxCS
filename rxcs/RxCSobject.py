@@ -60,6 +60,8 @@
             paramDimHE       - the size of a dimension higher or equal to a reference
             paramDimLE       - the size of a dimension lower or equal to a reference
 
+            Assign restriction on uniqness of elements of a parameter:
+            paramUnique       - elements of a parameter must be unique
 
             Get and check the parameters given to the module:
             parametersProcess   - process parameters given to a module as arguments for 'run' function
@@ -82,6 +84,7 @@
             __paramAddSizRestriction     -  assign size restriction to a parameter
             __paramAddNDimRestriction    -  assign restriction on the number of dimensions of a parameter
             __paramAddDimSizRestriction  -  assign restriction on the size of a dimension of a parameter
+            __paramAddUniqueRestriction  -  assign restriction on uniqness of elements of a parameter
 
             __parameterWasDefined         - check if a parameter with a given name was already defined
 
@@ -140,6 +143,11 @@
             __checkDimSiz_engine
             __checkDimSiz_error
             __checkDimSiz_error_restriction
+
+            Control of restrictions on the dimensions:
+            __checkUnique
+            __checkUnique_elTypeCheck
+            __checkUnique_error
 
             Auxiliary functions:
             __linearCoef2Strings - change linear coefficients to strings
@@ -1018,6 +1026,28 @@ class _RxCSobject:
         """
         self.__paramAddDimSizRestriction('dimension size lower or equal to', strName, reference, pedantic, dimension, refdim, mul, add, errnote)
 
+    def paramUnique(self, strName, errnote=''):
+        """
+            Assign restriction on uniqness of a parameter.
+
+            Arguments:
+                    strName:   [string]          name of a parameter
+                    errnote    [string]          optional error note, will be displayed if the restriction is broken
+                                                 (optional, by default it is '' (empty string), which means that an error
+                                                  note will be constructed automatically)
+            Output:
+                    none
+
+            Author:
+                    Jacek Pierzchlewski jap@es.aau.dk
+
+            Last modification:
+                    17 July 2015
+
+        """
+        self.__paramAddUniqueRestriction(strName, errnote)
+        
+
     def parametersProcess(self, *args):
         """
             Process parameters given to a module as arguments for 'run' function.
@@ -1513,6 +1543,49 @@ class _RxCSobject:
 
         return
 
+    def __paramAddUniqueRestriction(self, strName, strErrNote):
+        """
+            Assign restriction of uniqness of elements of a parameter
+
+            Arguments:
+                    strName:      [string]    name of a parameter
+                    strErrNote:   [string]    optional error note, will be displayed if the restriction is broken
+
+            Output:
+                    none
+
+            Author:
+                    Jacek Pierzchlewski jap@es.aau.dk
+
+            Last modification:
+                    17 July 2015
+        """
+
+        # Error checks -------------------------------------------------------
+
+        # Parameter to be checked
+        if not isinstance(strName, str):
+            raise ValueError('Name of a parameter must be a string!')
+
+        (bDefined, inxParam) = self.__parameterWasDefined(strName)
+        if not bDefined:
+            strError = ('Parameter > %s < was not yet defined!') % strName
+            raise RuntimeError(strError)
+
+        # Error note
+        if not isinstance(strErrNote, str):
+            raise ValueError('Error note must be a string ')
+
+        # ---------------------------------------------------------------------
+        
+        self.lParameters[inxParam]['lRes'].append('unique elements')
+        self.lParameters[inxParam]['lResErrNote'].append(strErrNote)
+        self.lParameters[inxParam]['lResReference'].append(0)
+        self.lParameters[inxParam]['lResData'].append([])
+        
+        return
+
+
     def __parameterWasDefined(self, strName):
         """
             Check if a parameter with a given name was already defined
@@ -1727,7 +1800,7 @@ class _RxCSobject:
 
         # Loop over all restrictions
         for inxRes in range(len(dParam['lRes'])):
-
+            
             # Get the restriction code, error note, reference and coefficients
             strRes = dParam['lRes'][inxRes]                # Restriction
             lResData = dParam['lResData'][inxRes]          # Data associated with the restriction
@@ -1801,6 +1874,10 @@ class _RxCSobject:
                     strRes == 'dimension size higher or equal to' or
                     strRes == 'dimension size lower or equal to'):
                 self.__checkDimSiz(strParName, strDesc, parVal, strRefName, refVal, lResData, strErrNote, strRes)
+
+            # uniqness
+            elif (strRes == 'unique elements'):
+                self.__checkUnique(strParName, strDesc, parVal, strErrNote)
 
             # unknown restrictions
             else:
@@ -3674,7 +3751,121 @@ class _RxCSobject:
             return 'higher or equal to '
         elif (strRel == 'dimension size lower or equal to'):
             return 'lower or equal to '
+            
+    def  __checkUnique(self, strParName, strDesc, parVal, strErrNote):
+        """
+            Function checks restriction imposed on uniqness of elements of a parameter.
 
+            Arguments:
+                    strParName:   [string]        name of a parameter
+                    strDesc:      [string]        description of the parameter
+                    parVal:                       the parameter to be checked
+                    strErrNote    [string]        error note to be displayed if the restriction is broken
+                                                  (might be empty, then a default note is generated)
+            Output:
+                    none
+
+            Author:
+                    Jacek Pierzchlewski jap@es.aau.dk
+
+            Last modification:
+                    17 July 2015
+        """
+        # Parameter is a tuple or a list
+        if isinstance(parVal, (tuple, list)):
+
+            # Check if all the elements are numbers, lists or strings
+            self.__checkUnique_elTypeCheck(parVal)
+
+            parValUnique = list(set(parVal))  # Create a list with only unique elements
+            if len(parValUnique) != len(parVal):
+                self.__checkUnique_error(strParName, strDesc, len(parValUnique), len(parVal), strErrNote)
+
+        # Parameter is a Numpy array
+        elif isinstance(parVal, np.ndarray):
+            
+            # If the Numpy array is empty, there is nothing to be checked
+            if parVal.size == 0:
+                return
+            
+            # Check if all the elements are numbers, lists or strings
+            self.__checkUnique_elTypeCheck(parVal)            
+
+            parVal.shape = (parVal.size, )      # Change the parameter to 1-dim
+            parValUnique = np.unique(parVal)    # 
+            
+            if (parValUnique.size != parVal.size):
+                self.__checkUnique_error(strParName, strDesc, parValUnique.size, parVal.size, strErrNote)
+
+        # Parameter is of illegal type for uniqness check
+        else:
+            strError = ('Uniqness check can be assigned only to tuples, lists and Numpy arrays!\n')
+            strError = strError + ('            Parameter > %s < (%s) is of type %s') \
+                % (strParName, strDesc, type(parVal))
+            raise ValueError(strError)
+
+    def __checkUnique_elTypeCheck(self, parVal):
+        """
+            Function checks if a parameter which is supposed to be checked for 
+            uniqness contains only allowed elements (numbers or strings).
+
+            Arguments:
+                    parVal:   [list/tuple/Numpy array]   parameter to be checked
+
+            Output:
+                    none
+
+            Author:
+                    Jacek Pierzchlewski jap@es.aau.dk
+
+            Last modification:
+                    17 July 2015
+       
+        """
+        # Parameter is a tuple or a list
+        if isinstance(parVal, (tuple, list)):
+            for iEl in parVal:
+                if not isinstance(iEl, (int, float, str)):
+                    strError = 'Parameter checked for uniqness must contain only numbers or strings!'
+                    raise ValueError(strError)
+                    
+        # Parameter is a Numpy array                 
+        else:
+            parVal.shape = (parVal.size, )  # Change the parameter to 1-dim
+            if not isinstance(parVal[0], (int, float, str)):
+                strError = 'Parameter checked for uniqness must contain only numbers or strings!'
+                raise ValueError(strError)
+
+
+    def __checkUnique_error(self, strParName, strDesc, iParSize, iUniqParSize, strErrNote):            
+        """
+            Function raises an error if a restriction imposed on the uniqness is broken.
+
+            Arguments:
+                    strParName:   [string]        name of a parameter
+                    strDesc:      [string]        description of a parameter
+                    iParSize      [number]        size of parameter which was checked
+                    iUniqParSize  [number]        the number of uniqe elements
+                    strErrNote    [string]        error note to be displayed if the restriction is broken
+                                                  (might be empty, then a default note is generated)
+
+            Output:
+                    none
+
+            Author:
+                    Jacek Pierzchlewski jap@es.aau.dk
+
+            Last modification:
+                    17 July 2015
+        """
+        if strErrNote != '':
+            raise UniqnessError(strErrNote)
+            
+        strError = ('Parameter > %s < (%s) of size = %d contains only %d unique elements!') \
+            % (strParName, strDesc, iUniqParSize, iParSize)            
+        raise UniqnessError(strError)
+
+    
     def __linearCoef2Strings(self, lResData):
         """
             Function changes linear coefficients into strings.
@@ -3863,5 +4054,11 @@ class NDimError(ErrorTemplate):
 class DimSizError(ErrorTemplate):
     """
         Error: Dimension size
+    """
+    pass
+
+class UniqnessError(ErrorTemplate):
+    """
+        Error: Uniqness of elements
     """
     pass
