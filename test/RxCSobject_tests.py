@@ -66,6 +66,9 @@ class RxCS_object_tester1():
         # Restrictions of uniqness of elements
         self.__Unique_restrictions()
 
+        # Optional parameter, which default value depends on another parameter
+        self.__Opt_default()
+
 
     # Tests on check of mandatory parameters
     def __defined_parameters(self):
@@ -298,6 +301,12 @@ class RxCS_object_tester1():
         self.__Unique_restriction_incorrect_ndarray()
         print('')
         
+    # Tests on the value of an optional parameter, which default value depends on another parameter
+    def __Opt_default(self):
+        print('TESTS VALUE PROPAGATION ONTO OPTIONAL PARAMETERS')
+        self.__Opt_value_depends_on_another_correct()
+        print('')
+
 
     def __mandatory_after_optional(self):
         """
@@ -3404,7 +3413,7 @@ class RxCS_object_tester1():
 
     def __Unique_restriction_correct_ndarray(self):
         """
-            Test of 'size of a dimension' restriction check.
+            Test of element uniqness restriction check.
             Wanted output: Correct
         """
         strTestName = 'Uniqness of elements in Numpy array (correct)'
@@ -3421,7 +3430,7 @@ class RxCS_object_tester1():
 
     def __Unique_restriction_incorrect_ndarray(self):
         """
-            Test of 'size of a dimension' restriction check.
+            Test of element uniqness restriction check.
             Wanted output: UniqnessError
         """
         strTestName = 'Uniqness of elements in Numpy array (incorrect)'
@@ -3435,6 +3444,33 @@ class RxCS_object_tester1():
         RxCSObject.parameter1 = np.random.randint(1, 1e3, (1e2, 1e2))
 
         self.__parametersCheck_error(RxCSObject, UniqnessError, strTestName)
+
+    def __Opt_value_depends_on_another_correct(self):
+        """
+            Test of value propagation onto optional parameters.
+            Wanted output: Correct
+        """
+        strTestName = 'Test of value propagation onto optional parameters'
+        RxCSObject = _RxCSobject()
+
+        RxCSObject.paramAddMan('parameter1', 'Reference parameter #1')
+        RxCSObject.paramAddMan('parameter2', 'Reference parameter #2')
+
+        RxCSObject.paramAddOpt('optpar1', 'Optional parameter #1', default='$$parameter1')
+        RxCSObject.paramType('optpar1', int)
+        RxCSObject.paramHE('optpar1', 4)
+        RxCSObject.paramLE('optpar1', 4)
+
+        RxCSObject.paramAddOpt('optpar2', 'Optional parameter #1', default='$$parameter2')
+        RxCSObject.paramType('optpar2', int)
+        RxCSObject.paramHE('optpar2', 1)
+        RxCSObject.paramLE('optpar2', 1)
+        
+        RxCSObject.parameter1 = 4
+        RxCSObject.parameter2 = 1
+        
+        self.__parametersCheck_error(RxCSObject, 'correct', strTestName)
+
 
     def __parametersCheck_error(self, RxCSObject, error, strTestName):
         """
