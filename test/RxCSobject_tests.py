@@ -24,6 +24,7 @@ from rxcs.RxCSobject import RelationalError
 from rxcs.RxCSobject import SizeError
 from rxcs.RxCSobject import NDimError
 from rxcs.RxCSobject import DimSizError
+from rxcs.RxCSobject import UniqnessError
 
 
 class RxCS_object_tester1():
@@ -61,6 +62,10 @@ class RxCS_object_tester1():
 
         # Restrictions on sizes of dimensions
         self.__DimSiz_restrictions()
+        
+        # Restrictions of uniqness of elements
+        self.__Unique_restrictions()
+
 
     # Tests on check of mandatory parameters
     def __defined_parameters(self):
@@ -285,6 +290,14 @@ class RxCS_object_tester1():
         self.__DimSiz_restriction_correct_ndarray_ndarray_pedantic3()
         self.__DimSiz_restriction_incorrect_ndarray_ndarray_pedantic3()
         print('')
+
+    # Tests on checks of uniqness of parameters
+    def __Unique_restrictions(self):
+        print('TESTS ON RESTRICTIONS OF UNIQNESS')
+        self.__Unique_restriction_correct_ndarray()
+        self.__Unique_restriction_incorrect_ndarray()
+        print('')
+        
 
     def __mandatory_after_optional(self):
         """
@@ -3388,6 +3401,40 @@ class RxCS_object_tester1():
         RxCSObject.aParameter1 = np.random.randn(3, 2)
 
         self.__parametersCheck_error(RxCSObject, ValueError, strTestName)
+
+    def __Unique_restriction_correct_ndarray(self):
+        """
+            Test of 'size of a dimension' restriction check.
+            Wanted output: Correct
+        """
+        strTestName = 'Uniqness of elements in Numpy array (correct)'
+        RxCSObject = _RxCSobject()
+
+        # Let us define a Numpy Array
+        RxCSObject.paramAddMan('parameter1', 'Numpy array parameter')
+        RxCSObject.paramType('parameter1', np.ndarray)
+        RxCSObject.paramUnique('parameter1')
+
+        RxCSObject.parameter1 =  np.unique(np.random.randint(1, 1e6, 1e6))
+        
+        self.__parametersCheck_error(RxCSObject, 'correct', strTestName)
+
+    def __Unique_restriction_incorrect_ndarray(self):
+        """
+            Test of 'size of a dimension' restriction check.
+            Wanted output: UniqnessError
+        """
+        strTestName = 'Uniqness of elements in Numpy array (incorrect)'
+        RxCSObject = _RxCSobject()
+
+        # Let us define a Numpy Array
+        RxCSObject.paramAddMan('parameter1', 'Numpy array parameter')
+        RxCSObject.paramType('parameter1', np.ndarray)
+        RxCSObject.paramUnique('parameter1')
+
+        RxCSObject.parameter1 = np.random.randint(1, 1e3, (1e2, 1e2))
+
+        self.__parametersCheck_error(RxCSObject, UniqnessError, strTestName)
 
     def __parametersCheck_error(self, RxCSObject, error, strTestName):
         """
