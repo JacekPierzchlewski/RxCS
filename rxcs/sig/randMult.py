@@ -28,7 +28,7 @@ Parameters of the generator (attributes of the class which must/can be set befor
 
     - g. **iSNR** (*float*): level of noise in signals [dB] (SNR)  [default = +int]
 
-    - h. **iP** (*float*): requested power of signals  [default = 1W]
+    - h. **iP** (*float*): requested power of signals  [default = do not regulate the power]
 
 
     - i. **vFrqs** (*Numpy array vector*): vector with requested frequencies of tones  [default = empty vector]
@@ -180,7 +180,7 @@ class randMult(rxcs._RxCSobject):
         self.paramType('iSNR', (int, float))
 
         # Power of signals [W]
-        self.paramAddOpt('iP', 'Power of signals', default=1)
+        self.paramAddOpt('iP', 'Power of signals', default=np.nan)
         self.paramType('iP', (int, float))
         self.paramH('iP', 0)
         self.paramL('iP', np.inf)
