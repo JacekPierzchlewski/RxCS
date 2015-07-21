@@ -102,6 +102,9 @@ def _RMSG_ex3():
     gen.iGraPhs = 1    # Gradation of phase of random tones
     gen.iMaxPhs = 90   # Maximum phase of random tones
 
+    # Power of the signals
+    gen.iP = 1
+
     # The number of signals to be generated
     gen.nSigs = 4
 
