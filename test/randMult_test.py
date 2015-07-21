@@ -186,7 +186,7 @@ def _TestCase1(iTolerance):
 
     # -----------------------------------------------------------------
     # Check signals
-    #_checkSignals(dSigConf, dSig, iTolerance)
+    _checkSignals(gen, iTolerance)
 
     # -----------------------------------------------------------------
 
@@ -253,7 +253,7 @@ def _TestCase2(iTolerance):
 
     # -----------------------------------------------------------------
     # Check signals
-    #_checkSignals(dSigConf, dSig, iTolerance)
+    _checkSignals(gen, iTolerance)
 
     # -----------------------------------------------------------------
 
@@ -320,7 +320,7 @@ def _TestCase3(iTolerance):
 
     # -----------------------------------------------------------------
     # Check signals
-    #_checkSignals(dSigConf, dSig, iTolerance)
+    _checkSignals(gen, iTolerance)
 
     # -----------------------------------------------------------------
 
@@ -352,7 +352,7 @@ def _TestCase4(iTolerance):
     
     gen.tS = 1e-6     # Time of the signal is 1 us
     gen.fR = 1e9      # The signal representation sampling frequency is 1 GHz
-    gen.fMax = 50e3   # The highest possible frequency in the signal is 50 kHz
+    gen.fMax = 50e6   # The highest possible frequency in the signal is 50 MHz
     gen.fRes = 1e6    # The signal spectrum resolution is 1 MHz
 
     gen.iSNR = 100    # Signal noise
@@ -387,7 +387,7 @@ def _TestCase4(iTolerance):
 
     # -----------------------------------------------------------------
     # Check signals
-    #_checkSignals(dSigConf, dSig, iTolerance)
+    _checkSignals(gen, iTolerance)
 
     # -----------------------------------------------------------------
 
@@ -450,7 +450,7 @@ def _TestCase5(iTolerance):
 
     # -----------------------------------------------------------------
     # Check signals
-    #_checkSignals(dSigConf, dSig, iTolerance)
+    _checkSignals(gen, iTolerance)
 
     # -----------------------------------------------------------------
 
@@ -460,7 +460,7 @@ def _TestCase5(iTolerance):
 # =====================================================================
 # ENGINE OF THE TEST: Check the generated signals
 # =====================================================================
-def _checkSignals(dSigConf, dSig, iTolerance):
+def _checkSignals(gen, iTolerance):
     """
     This function is an engine of all the tests. |br|
 
@@ -468,10 +468,8 @@ def _checkSignals(dSigConf, dSig, iTolerance):
     the test fucntions which perform particular tests.
 
     Args:
-        dSigConf: dictionary with the configuration of Random Multitone Signal
-                  Generator |br|
 
-        sSig: the dictionary with generated signals |br|
+        gen: random multitone signal generator object |br|
 
         iTolerance: maximum tolerance of a difference between an expected value
         and a real value |br|
@@ -481,28 +479,28 @@ def _checkSignals(dSigConf, dSig, iTolerance):
     """
 
     # Check the number of generated signals
-    _checkNoOfSignals(dSigConf, dSig)
+    _checkNoOfSignals(gen)
 
     # Check the number of samples in the signal
-    _checkNoOfSamples(dSigConf, dSig)
+    _checkNoOfSamples(gen)
 
     # Check the number of tones in the spectrum
-    _checkNoOfTones(dSigConf, dSig)
+    _checkNoOfTones(gen)
 
     # Check the frequencies of tones in the spectrum
-    _checkFrequencies(dSigConf, dSig)
+    _checkFrequencies(gen)
 
     # Check the amplitudes of tones in the spectrum
-    _checkAmplitudes(dSigConf, dSig, iTolerance)
+    _checkAmplitudes(gen, iTolerance)
 
     # Check the phases of tones in the spectrum
-    _checkPhases(dSigConf, dSig, iTolerance)
+    _checkPhases(gen, iTolerance)
 
     # Check the power of non noisy signals
-    _checkPower(dSigConf, dSig, iTolerance)
+    _checkPower(gen, iTolerance)
 
     # Check the noise of signals
-    _checkNoise(dSigConf, dSig, iTolerance)
+    _checkNoise(gen, iTolerance)
 
     return
 
@@ -510,16 +508,13 @@ def _checkSignals(dSigConf, dSig, iTolerance):
 # =====================================================================
 # This function tests the number of generated signals
 # =====================================================================
-def _checkNoOfSignals(dSigConf, dSig):
+def _checkNoOfSignals(gen):
     """
     This function tests if the number of generated signals is equal to the
     requested number of signals.
 
     Args:
-        dSigConf: dictionary with the configuration of Random Multitone Signal
-                  Generator |br|
-
-        sSig: the dictionary with generated signals |br|
+        gen: random multitone signal generator object |br|
 
     Returns:
         Nothing
@@ -529,17 +524,12 @@ def _checkNoOfSignals(dSigConf, dSig):
     bOk = 1
 
     # Get the correct number of generated signals
-    nSigsCorr = dSigConf['nSigPack']
-
-    # Get the reported number of generated signals
-    nSigsRep = dSig['nSigs']
+    nSigsCorr = gen.nSigs
 
     # Compute the number of generated signals
-    (nSigsReal, _) = dSig['mSigNN'].shape
+    (nSigsReal, _) = gen.mSigNN.shape
 
     # Check:
-    if nSigsReal != nSigsRep:
-        bOk = 0
     if nSigsReal != nSigsCorr:
         bOk = 0
 
@@ -555,7 +545,7 @@ def _checkNoOfSignals(dSigConf, dSig):
 # =====================================================================
 # This function tests the number of generated samples
 # =====================================================================
-def _checkNoOfSamples(dSigConf, dSig):
+def _checkNoOfSamples(gen):
     """
     This function tests the number of samples in the generated signals. |br|
 
@@ -567,10 +557,7 @@ def _checkNoOfSamples(dSigConf, dSig):
           the reported number.
 
     Args:
-        dSigConf: dictionary with the configuration of Random Multitone Signal
-                  Generator |br|
-
-        sSig: the dictionary with generated signals |br|
+        gen: random multitone signal generator object |br|
 
     Returns:
         Nothing
@@ -580,13 +567,13 @@ def _checkNoOfSamples(dSigConf, dSig):
     bOk = 1
 
     # Compute the correct number of samples in the signal
-    nSmpCorr = int(np.round(dSigConf['tS'] * dSigConf['fR']))
+    nSmpCorr = int(np.round(gen.tS * gen.fR))
 
     # Get the reported number of samples in the signal
-    nSmpRep = dSig['nSmp']
+    nSmpRep = gen.nSmp
 
-    # Compute the number of generated signals
-    (_, nSmpReal) = dSig['mSigNN'].shape
+    # Compute the number of samples in the generated signals
+    (_, nSmpReal) = gen.mSigNN.shape
 
     # Check:
     if nSmpReal != nSmpRep:
@@ -606,7 +593,7 @@ def _checkNoOfSamples(dSigConf, dSig):
 # =====================================================================
 # This function tests the number of tones in the spectrum
 # =====================================================================
-def _checkNoOfTones(dSigConf, dSig):
+def _checkNoOfTones(gen):
     """
     This function tests the number of tones in the spectrum.
 
@@ -618,10 +605,7 @@ def _checkNoOfTones(dSigConf, dSig):
           the reported number of tones.
 
     Args:
-        dSigConf: dictionary with the configuration of Random Multitone Signal
-                  Generator |br|
-
-        sSig: the dictionary with generated signals |br|
+        gen: random multitone signal generator object |br|
 
     Returns:
         Nothing
@@ -631,16 +615,16 @@ def _checkNoOfTones(dSigConf, dSig):
     bOk = 1
 
     # Get the correct number of generated signals
-    nSigsCorr = dSigConf['nSigPack']
+    nSigsCorr = gen.nSigs
 
     # Compute the correct number of tones in the spectrum
-    nTonesCorr = dSigConf['vFrqs'].size + dSigConf['nTones']
+    nTonesCorr = gen.vFrqs.size + gen.nTones
 
     # Compute the real number of tones in the spectrum
-    vTonesReal = _computeTones(dSig['mSigNN'])
+    vTonesReal = _computeTones(gen.mSigNN)
 
     # Get the reported number of tones in the spectrum
-    (_, nTonesRep) = (dSig['mFrqs']).shape
+    (_, nTonesRep) = (gen.mFrqs).shape
 
     # Check:
     if nTonesRep != nTonesCorr:
@@ -661,7 +645,7 @@ def _checkNoOfTones(dSigConf, dSig):
 # =====================================================================
 # This function tests the frequencies of tones in the spectrum
 # =====================================================================
-def _checkFrequencies(dSigConf, dSig):
+def _checkFrequencies(gen):
     """
     This function tests the frequencies of tones in the spectrum.
 
@@ -672,10 +656,7 @@ def _checkFrequencies(dSigConf, dSig):
         - if the requested frequencies are present in the real spectrum.
 
     Args:
-        dSigConf: dictionary with the configuration of Random Multitone Signal
-                  Generator |br|
-
-        sSig: the dictionary with generated signals |br|
+        gen: random multitone signal generator object |br|
 
     Returns:
         Nothing
@@ -685,16 +666,16 @@ def _checkFrequencies(dSigConf, dSig):
     bOk = 1
 
     # Get the correct number of generated signals
-    nSigsCorr = dSigConf['nSigPack']
+    nSigsCorr = gen.nSigs
 
     # Compute the correct number of tones in the spectrum
-    nTonesCorr = dSigConf['vFrqs'].size + dSigConf['nTones']
+    nTonesCorr = gen.vFrqs.size + gen.nTones
 
     # Get the reported frequencies of tones in the spectrum
-    mFrqsRep = dSig['mFrqs']
+    mFrqsRep = gen.mFrqs
 
     # Compute the real frequencies of tones in the spectrum
-    mFrqsReal = _computeFreqs(dSig['mSigNN'], dSig['fFFTR'], nTonesCorr)
+    mFrqsReal = _computeFreqs(gen.mSigNN, gen.fFFTR, nTonesCorr)
 
     # Check if reported frequencies agree with real frequencies in the spectrum
     for inxSig in np.arange(nSigsCorr):  # Loop over all signals
@@ -718,7 +699,7 @@ def _checkFrequencies(dSigConf, dSig):
     # Check if requested frequencies are in the real spectrum
 
     # Get the vector with requested frequencies
-    vFrqs = dSigConf['vFrqs']
+    vFrqs = gen.vFrqs
 
     # Take only the specified frequencies
     vFrqs = vFrqs[np.isnan(vFrqs) == 0]
@@ -753,7 +734,7 @@ def _checkFrequencies(dSigConf, dSig):
 # =====================================================================
 # This function tests amplitudes of tones in the spectrum
 # =====================================================================
-def _checkAmplitudes(dSigConf, dSig, iTolerance):
+def _checkAmplitudes(gen, iTolerance):
     """
     This function tests amplitudes of tones in the spectrum.
 
@@ -768,10 +749,7 @@ def _checkAmplitudes(dSigConf, dSig, iTolerance):
           limits.
 
     Args:
-        dSigConf: dictionary with the configuration of Random Multitone Signal
-                  Generator |br|
-
-        sSig: the dictionary with generated signals |br|
+        gen: random multitone signal generator object |br|
 
         iTolerance: maximum tolerance of a difference between an expected value
         and a real value |br|
@@ -784,23 +762,23 @@ def _checkAmplitudes(dSigConf, dSig, iTolerance):
     bOk = 1
 
     # Get the correct number of generated signals
-    nSigsCorr = dSigConf['nSigPack']
+    nSigsCorr = gen.nSigs
 
     # Compute the correct number of tones in the spectrum
-    nTonesCorr = dSigConf['vFrqs'].size + dSigConf['nTones']
+    nTonesCorr = gen.vFrqs.size + gen.nTones
 
     # Compute the real amplitudes of tones in the spectrum
-    (mFrqsReal, mAmpsReal) = _computeAmps(dSig['mSigNN'],
-                                          dSig['fFFTR'], nTonesCorr)
+    (mFrqsReal, mAmpsReal) = _computeAmps(gen.mSigNN,
+                                          gen.fFFTR, nTonesCorr)
 
     # Get the reported frequencies of tones in the spectrum
-    mFrqsRep = dSig['mFrqs']
+    mFrqsRep = gen.mFrqs
 
     # Get the reported amplitudes
-    mAmpsRep = dSig['mAmps']
+    mAmpsRep = gen.mAmps
 
     # Get the power adjustment coefficients which were used on signals
-    vPCoef = dSig['vPCoef']
+    vPCoef = gen.vPCoef
 
     # - - - - - - - - - - - - - - - - -
     # Check if the reported amplitudes are equal to the real:
@@ -851,19 +829,19 @@ def _checkAmplitudes(dSigConf, dSig, iTolerance):
     # amplitudes of tones?:
 
     # Get the vector with requested frequencies
-    vFrqs = dSigConf['vFrqs']
+    vFrqs = gen.vFrqs
 
     # Get the number of requested frequencies
     nFrqs = vFrqs.size
 
     # Get the vector with requested amplitudes
-    vAmps = dSigConf['vAmps']
+    vAmps = gen.vAmps
 
     # Get the requested minimum amplitude of random amplitudes
-    iMinAmp = dSigConf['iMinAmp']
+    iMinAmp = gen.iMinAmp
 
     # Get the requested maximum amplitude of random amplitudes
-    iMaxAmp = dSigConf['iMaxAmp']
+    iMaxAmp = gen.iMaxAmp
 
     # Check signal by signal
     for inxSig in np.arange(nSigsCorr):   # Loop over all signals
@@ -931,7 +909,7 @@ def _checkAmplitudes(dSigConf, dSig, iTolerance):
 # =====================================================================
 # This function tests phases of tones in the spectrum
 # =====================================================================
-def _checkPhases(dSigConf, dSig, iTolerance):
+def _checkPhases(gen, iTolerance):
     """
     This function tests phases of tones in the spectrum
 
@@ -946,10 +924,7 @@ def _checkPhases(dSigConf, dSig, iTolerance):
           limits.
 
     Args:
-        dSigConf: dictionary with the configuration of Random Multitone Signal
-                  Generator |br|
-
-        sSig: the dictionary with generated signals |br|
+        gen: random multitone signal generator object |br|
 
         iTolerance: maximum tolerance of a difference between an expected value
         and a real value |br|
@@ -962,20 +937,20 @@ def _checkPhases(dSigConf, dSig, iTolerance):
     bOk = 1
 
     # Get the correct number of generated signals
-    nSigsCorr = dSigConf['nSigPack']
+    nSigsCorr = gen.nSigs
 
     # Compute the correct number of tones in the spectrum
-    nTonesCorr = dSigConf['vFrqs'].size + dSigConf['nTones']
+    nTonesCorr = gen.vFrqs.size + gen.nTones
 
     # Compute the real phases of tones in the spectrum
-    (mFrqsReal, mPhsReal) = _computePhs(dSig['mSigNN'],
-                                        dSig['fFFTR'], nTonesCorr)
+    (mFrqsReal, mPhsReal) = _computePhs(gen.mSigNN,
+                                        gen.fFFTR, nTonesCorr)
 
     # Get the reported frequencies of tones in the spectrum
-    mFrqsRep = dSig['mFrqs']
+    mFrqsRep = gen.mFrqs
 
     # Get the reported phases
-    mPhsRep = dSig['mPhs']
+    mPhsRep = gen.mPhs
 
     # - - - - - - - - - - - - - - - - -
     # Check if the reported phases are equal to the real:
@@ -1045,19 +1020,19 @@ def _checkPhases(dSigConf, dSig, iTolerance):
     # Check if the reported phases are as requested:
 
     # Get the vector with requested frequencies
-    vFrqs = dSigConf['vFrqs']
+    vFrqs = gen.vFrqs
 
     # Get the number of requested frequencies
     nFrqs = vFrqs.size
 
     # Get the vector with requested phases
-    vPhs = dSigConf['vPhs']
+    vPhs = gen.vPhs
 
     # Get the requested minimum phase of random phases
-    iMinPhs = dSigConf['iMinPhs']
+    iMinPhs = gen.iMinPhs
 
     # Get the requested maximum phase of random phases
-    iMaxPhs = dSigConf['iMaxPhs']
+    iMaxPhs = gen.iMaxPhs
 
     # Check signal by signal
     for inxSig in np.arange(nSigsCorr):   # Loop over all signals
@@ -1134,7 +1109,7 @@ def _checkPhases(dSigConf, dSig, iTolerance):
 # =====================================================================
 # This function tests the power of signals
 # =====================================================================
-def _checkPower(dSigConf, dSig, iTolerance):
+def _checkPower(gen, iTolerance):
     """
     This function tests the power of generated signals.
 
@@ -1146,10 +1121,7 @@ def _checkPower(dSigConf, dSig, iTolerance):
           the requested power (if it was requested).
 
     Args:
-        dSigConf: dictionary with the configuration of Random Multitone Signal
-                  Generator |br|
-
-        sSig: the dictionary with generated signals |br|
+        gen: random multitone signal generator object |br|
 
         iTolerance: maximum tolerance of a difference between an expected value
         and a real value |br|
@@ -1162,13 +1134,13 @@ def _checkPower(dSigConf, dSig, iTolerance):
     bOk = 1
 
     # Compute the correct number of samples in the signal
-    nSmpCorr = int(np.round(dSigConf['tS'] * dSigConf['fR']))
+    nSmpCorr = int(np.round(gen.tS * gen.fR))
 
     # Get the correct number of generated signals
-    nSigsCorr = dSigConf['nSigPack']
+    nSigsCorr = gen.nSigs
 
     # Take the matrix with non noisy signals
-    mSigNN = dSig['mSigNN']
+    mSigNN = gen.mSigNN
 
     # Compute the real power of non noisy signals
     vPNN = (np.sum(mSigNN * mSigNN, axis=1) / nSmpCorr)
@@ -1178,7 +1150,7 @@ def _checkPower(dSigConf, dSig, iTolerance):
     # non noisy sygnals
 
     # Get the reported power of nonnoisy signals
-    vPNNRep = dSig['vPNN']
+    vPNNRep = gen.vPNN
 
     # Compare the reported power with the real power
     for inxSig in np.arange(nSigsCorr):       # Loop over all signal
@@ -1198,7 +1170,7 @@ def _checkPower(dSigConf, dSig, iTolerance):
     # non noisy sygnals
 
     # Get the requested power of signals
-    iPCorr = dSig['iP']
+    iPCorr = gen.iP
 
     # Check, if the power adjustment was requested
     if not np.isnan(iPCorr) and not np.isinf(iPCorr):
@@ -1216,13 +1188,13 @@ def _checkPower(dSigConf, dSig, iTolerance):
     # noisy sygnals
 
     # Take the matrix with noisy signals
-    mSig = dSig['mSig']
+    mSig = gen.mSig
 
     # Compute the real power of noisy signals
     vP = np.sum(mSig * mSig, axis=1) / nSmpCorr
 
     # Get the reported power of noisy signals
-    vPRep = dSig['vP']
+    vPRep = gen.vP
 
     # Compare the reported power with the real power
     for inxSig in np.arange(nSigsCorr):       # Loop over all signals
@@ -1251,7 +1223,7 @@ def _checkPower(dSigConf, dSig, iTolerance):
 # =====================================================================
 # This function tests the noise in signals
 # =====================================================================
-def _checkNoise(dSigConf, dSig, iTolerance):
+def _checkNoise(gen, iTolerance):
     """
     This function tests the noise in the generated signals.
 
@@ -1261,10 +1233,7 @@ def _checkNoise(dSigConf, dSig, iTolerance):
           requested level of nosie (if it was requested).
 
     Args:
-        dSigConf: dictionary with the configuration of Random Multitone Signal
-                  Generator |br|
-
-        sSig: the dictionary with generated signals |br|
+        gen: random multitone signal generator object |br|
 
         iTolerance: maximum tolerance of a difference between an expected value
         and a real value |br|
@@ -1277,22 +1246,22 @@ def _checkNoise(dSigConf, dSig, iTolerance):
     bOk = 1
 
     # Compute the correct number of samples in the signal
-    nSmpCorr = int(np.round(dSigConf['tS'] * dSigConf['fR']))
+    nSmpCorr = int(np.round(gen.tS * gen.fR))
 
     # Get the correct number of generated signals
-    nSigsCorr = dSigConf['nSigPack']
+    nSigsCorr = gen.nSigs
 
     # Get the requested noise in the signals
-    iSNR = dSigConf['iSNR']
+    iSNR = gen.iSNR
 
     # Take the matrix with non noisy signals
-    mSigNN = dSig['mSigNN']
+    mSigNN = gen.mSigNN
 
     # Take the matrix with noisy signals
-    mSig = dSig['mSig']
+    mSig = gen.mSig
 
     # Get the vector with the power of non noisy signals
-    vPNN = dSig['vPNN']
+    vPNN = gen.vPNN
 
     if not np.isnan(iSNR) and not np.isinf(iSNR):
 
