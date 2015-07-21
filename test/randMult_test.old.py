@@ -149,34 +149,36 @@ def _TestCase1(iTolerance):
     # Put the generator on board
     gen = rxcs.sig.randMult()
     
-    gen.tS = 1e-3   # Time of the signal is 1 ms
-    gen.fR = 2e4    # The signal representation sampling frequency is 20 kHz
-    gen.fMax = 8e3  # The highest possible frequency in the signal is 8 kHz
-    gen.fRes = 1e3  # The signal spectrum resolution is 1 kHz
+    dSigConf['tS'] = 1e-3   # Time of the signal is 1 ms
+    dSigConf['fR'] = 2e4    # The signal representation sampling frequency is 20 kHz
+    dSigConf['fMax'] = 8e3  # The highest possible frequency in the signal is 8 kHz
+    dSigConf['fRes'] = 1e3  # The signal spectrum resolution is 1 kHz
 
-    gen.iSNR = 30   # Signal noise
 
-    gen.iP = 2      # Signal power adjustments
+    dSigConf['iSNR'] = 30   # Signal noise
 
-    gen.vFrqs = np.array([2e3, np.nan, 4e3])   # Vector with given frequencies
-    gen.vAmps = np.array([np.nan, 1, np.nan])  # Vector with given amplitudes
-    gen.vPhs = np.array([np.nan, np.nan, 90])  # Vector with given phases
+    dSigConf['iP'] = 2      # Signal power adjustments
+
+    dSigConf['vFrqs'] = np.array([2e3, np.nan, 4e3])   # Vector with given frequencies
+    dSigConf['vAmps'] = np.array([np.nan, 1, np.nan])  # Vector with given amplitudes
+    dSigConf['vPhs'] = np.array([np.nan, np.nan, 90])  # Vector with given phases
 
     # The number of random tones
-    gen.nTones = 2
+    dSigConf['nTones'] = 2
 
-    # Amplitude and phase parameters of ranimd tones:
-    gen.iMinAmp = 0.1  # Minimum amplitude
-    gen.iGraAmp = 0.1  # Gradation of amplitude
-    gen.iMaxAmp = 1.0  # Maximum amplitude
+    # Amplitude and phase parameters of random tones:
 
-    gen.iMinPhs = 0   # Minimum phase of additional tones
-    gen.iGraPhs = 2   # Gradation of phase of additional tones
-    gen.iMaxPhs = 90  # Maximum phase of additional tones
+    dSigConf['iMinAmp'] = 0.1  # Minimum amplitude
+    dSigConf['iGraAmp'] = 0.1  # Gradation of amplitude
+    dSigConf['iMaxAmp'] = 1.0  # Maximum amplitude
 
-    gen.nSigs = int(1e4)  # The number of signals to be generated
-    
-    gen.bMute = 1   # Mute the output from the gneerator
+    dSigConf['iMinPhs'] = 0  # Minimum phase of additional tones
+    dSigConf['iGraPhs'] = 2  # Gradation of phase of additional tones
+    dSigConf['iMaxPhs'] = 90  # Maximum phase of additional tones
+
+    dSigConf['nSigPack'] = 1e4  # The number of signals to be generated
+
+    dSigConf['bMute'] = 1   # Mute the output from the generator
 
     # -----------------------------------------------------------------
     # Run the multtone signal generator
@@ -186,7 +188,7 @@ def _TestCase1(iTolerance):
 
     # -----------------------------------------------------------------
     # Check signals
-    #_checkSignals(dSigConf, dSig, iTolerance)
+    _checkSignals(dSigConf, dSig, iTolerance)
 
     # -----------------------------------------------------------------
 
@@ -215,45 +217,75 @@ def _TestCase2(iTolerance):
 
     # Put the generator on board
     gen = rxcs.sig.randMult()
-    
-    gen.tS = 1e-3     # Time of the signal is 1 ms
-    gen.fR = 1e6      # The signal representation sampling frequency is 1 MHz
-    gen.fMax = 100e3  # The highest possible frequency in the signal is 100 kHz
-    gen.fRes = 1e3    # The signal spectrum resolution is 1 kHz
 
-    gen.iSNR = 100    # Signal noise
+    # Time of the signal is 100 ms
+    dSigConf['tS'] = 1e-3
 
-    gen.iP = 10       # Signal power adjustments
+    # The signal representation sampling frequency is 1 MHz
+    dSigConf['fR'] = 1e6
 
-    gen.vFrqs = np.array([1e3])   # Vector with given frequencies
-    gen.vAmps = np.array([0.5])   # Vector with given amplitudes
-    gen.vPhs = np.array([180])    # Vector with given phases
+    # The highest possible frequency in the signal is 100 kHz
+    dSigConf['fMax'] = 100e3
 
-    # The number of random tones
-    gen.nTones = 10
+    # The signal spectrum resolution is 1 kHz
+    dSigConf['fRes'] = 1e3
 
-    # Amplitude and phase parameters of ranimd tones:
-    gen.iMinAmp = 1.0   # Minimum amplitude
-    gen.iGraAmp = 0.1   # Gradation of amplitude
-    gen.iMaxAmp = 10.0  # Maximum amplitude
+    # - - - - - - - - - - - - - - - -
 
-    gen.iMinPhs = -179  # Minimum phase of additional tones
-    gen.iGraPhs = 1     # Gradation of phase of additional tones
-    gen.iMaxPhs = 180   # Maximum phase of additional tones
+    # Signal noise
+    dSigConf['iSNR'] = 100
 
-    gen.nSigs = int(1e4)  # The number of signals to be generated
-    
-    gen.bMute = 1   # Mute the output from the gneerator
+    # Signal power adjustments
+    dSigConf['iP'] = 10
+
+    # - - - - - - - - - - - - - - - -
+
+    # Vector with given frequencies
+    dSigConf['vFrqs'] = np.array([1e3])
+
+    # Vector with given amplitudes
+    dSigConf['vAmps'] = np.array([0.5])
+
+    # Vector with given phases
+    dSigConf['vPhs'] = np.array([180])
+
+    # - - - - - - - - - - - - - - - -
+
+    # The number of additional tones
+    dSigConf['nTones'] = 10
+
+    # Amplitude and phase parameters of additional tones:
+
+    # Amplitude
+    dSigConf['iMinAmp'] = 1.0  # Minimum amplitude
+    dSigConf['iGraAmp'] = 0.1  # Gradation of amplitude
+    dSigConf['iMaxAmp'] = 10.0  # Maximum amplitude
+
+    # Phase:
+    dSigConf['iMinPhs'] = -179  # Minimum phase of additional tones
+    dSigConf['iGraPhs'] = 1     # Gradation of phase of additional tones
+    dSigConf['iMaxPhs'] = 180  # Maximum phase of additional tones
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # The number of signals to be generated
+    dSigConf['nSigPack'] = 1e4
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Mute the output from the gneerator
+    dSigConf['bMute'] = 1
 
     # -----------------------------------------------------------------
     # Run the multtone signal generator
-    tStart = rxcs.console.module_progress('test (case 2) signals generation')
-    gen.run()
+    tStart = \
+        rxcs.console.module_progress('test (case 2) signals generation')
+    dSig = rxcs.sig.randMult.main(dSigConf)
     rxcs.console.module_progress_done(tStart)
 
     # -----------------------------------------------------------------
     # Check signals
-    #_checkSignals(dSigConf, dSig, iTolerance)
+    _checkSignals(dSigConf, dSig, iTolerance)
 
     # -----------------------------------------------------------------
 
@@ -280,47 +312,82 @@ def _TestCase3(iTolerance):
         Nothing
     """
 
-    # Put the generator on board
-    gen = rxcs.sig.randMult()
-    
-    gen.tS = 1         # Time of the signal is 1 s
-    gen.fR = 1e6       # The signal representation sampling frequency is 1 MHz
-    gen.fMax = 20e3    # The highest possible frequency in the signal is 20 kHz
-    gen.fRes = 1       # The signal spectrum resolution is 1 Hz
+    # Start the dictionary with signal generator configuration
+    dSigConf = {}
 
-    gen.iSNR = np.inf  # Signal noise
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    gen.iP = np.nan    # Signal power adjustments
+    # Signal generator type: random multitone signal
+    dSigConf['strSigType'] = "RandMult"
 
-    gen.vFrqs = np.array([1e3, np.nan, np.nan])   # Vector with given frequencies
-    gen.vAmps = np.array([0.5, 1, 10])            # Vector with given amplitudes
-    gen.vPhs = np.array([78, np.nan, np.nan])     # Vector with given phases
+    # Time of the signal is 1 s
+    dSigConf['tS'] = 1
 
-    # The number of random tones
-    gen.nTones = 20
+    # The signal representation sampling frequency is 1 MHz
+    dSigConf['fR'] = 1e6
 
-    # Amplitude and phase parameters of ranimd tones:
-    gen.iMinAmp = 5.0   # Minimum amplitude
-    gen.iGraAmp = 0.1   # Gradation of amplitude
-    gen.iMaxAmp = 10.0  # Maximum amplitude
+    # The highest possible frequency in the signal is 20 kHz
+    dSigConf['fMax'] = 20e3
 
-    gen.iMinPhs = 1     # Minimum phase of additional tones
-    gen.iGraPhs = 1     # Gradation of phase of additional tones
-    gen.iMaxPhs = 20    # Maximum phase of additional tones
+    # The signal spectrum resolution is 1 Hz
+    dSigConf['fRes'] = 1
 
-    gen.nSigs = int(1e2)  # The number of signals to be generated
-    
-    gen.bMute = 1   # Mute the output from the generator
+    # - - - - - - - - - - - - - - - -
+
+    # Signal noise
+    dSigConf['iSNR'] = np.nan
+
+    # Signal power adjustments
+    dSigConf['iP'] = np.nan
+
+    # - - - - - - - - - - - - - - - -
+
+    # Vector with given frequencies
+    dSigConf['vFrqs'] = np.array([1e3, np.nan, np.nan])
+
+    # Vector with given amplitudes
+    dSigConf['vAmps'] = np.array([0.5, 1, 10])
+
+    # Vector with given phases
+    dSigConf['vPhs'] = np.array([78, np.nan, np.nan])
+
+    # - - - - - - - - - - - - - - - -
+
+    # The number of additional tones
+    dSigConf['nTones'] = 20
+
+    # Amplitude and phase parameters of additional tones:
+
+    # Amplitude
+    dSigConf['iMinAmp'] = 5.0  # Minimum amplitude
+    dSigConf['iGraAmp'] = 0.1  # Gradation of amplitude
+    dSigConf['iMaxAmp'] = 10.0  # Maximum amplitude
+
+    # Phase:
+    dSigConf['iMinPhs'] = 1  # Minimum phase of additional tones
+    dSigConf['iGraPhs'] = 1     # Gradation of phase of additional tones
+    dSigConf['iMaxPhs'] = 20  # Maximum phase of additional tones
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # The number of signals to be generated
+    dSigConf['nSigPack'] = 1e2
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Mute the output from the gneerator
+    dSigConf['bMute'] = 1
 
     # -----------------------------------------------------------------
     # Run the multtone signal generator
-    tStart = rxcs.console.module_progress('test (case 3) signals generation')
-    gen.run()
+    tStart = \
+        rxcs.console.module_progress('test (case 3) signals generation')
+    dSig = rxcs.sig.randMult.main(dSigConf)
     rxcs.console.module_progress_done(tStart)
 
     # -----------------------------------------------------------------
     # Check signals
-    #_checkSignals(dSigConf, dSig, iTolerance)
+    _checkSignals(dSigConf, dSig, iTolerance)
 
     # -----------------------------------------------------------------
 
@@ -347,47 +414,82 @@ def _TestCase4(iTolerance):
         Nothing
     """
 
-    # Put the generator on board
-    gen = rxcs.sig.randMult()
-    
-    gen.tS = 1e-6     # Time of the signal is 1 us
-    gen.fR = 1e9      # The signal representation sampling frequency is 1 GHz
-    gen.fMax = 50e3   # The highest possible frequency in the signal is 50 kHz
-    gen.fRes = 1e6    # The signal spectrum resolution is 1 MHz
+    # Start the dictionary with signal generator configuration
+    dSigConf = {}
 
-    gen.iSNR = 100    # Signal noise
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    gen.iP = 0.1      # Signal power adjustments
+    # Signal generator type: random multitone signal
+    dSigConf['strSigType'] = "RandMult"
 
-    gen.vFrqs = np.array([10e6, 20e6, 30e6, 40e6])  # Vector with given frequencies
-    gen.vAmps = np.array([1.0, 1, 10, 20])          # Vector with given amplitudes
-    gen.vPhs = np.array([78, 10, -50, -40])         # Vector with given phases
+    # Time of the signal is 1 ms
+    dSigConf['tS'] = 1e-6
 
-    # The number of random tones
-    gen.nTones = 10
+    # The signal representation sampling frequency is 1 GHz
+    dSigConf['fR'] = 1e9
 
-    # Amplitude and phase parameters of ranimd tones:
-    gen.iMinAmp = 0.1    # Minimum amplitude
-    gen.iGraAmp = 0.01   # Gradation of amplitude
-    gen.iMaxAmp = 10.0   # Maximum amplitude
+    # The highest possible frequency in the signal is 50MHz kHz
+    dSigConf['fMax'] = 50e6
 
-    gen.iMinPhs = -45   # Minimum phase of additional tones
-    gen.iGraPhs = 1     # Gradation of phase of additional tones
-    gen.iMaxPhs = 45    # Maximum phase of additional tones
+    # The signal spectrum resolution is 1 MHz
+    dSigConf['fRes'] = 1e6
 
-    gen.nSigs = int(1e4)  # The number of signals to be generated
-    
-    gen.bMute = 1   # Mute the output from the generator
+    # - - - - - - - - - - - - - - - -
+
+    # Signal noise
+    dSigConf['iSNR'] = np.nan
+
+    # Signal power adjustments
+    dSigConf['iP'] = 0.1
+
+    # - - - - - - - - - - - - - - - -
+
+    # Vector with given frequencies
+    dSigConf['vFrqs'] = np.array([10e6, 20e6, 30e6, 40e6])
+
+    # Vector with given amplitudes
+    dSigConf['vAmps'] = np.array([1.0, 1, 10, 20])
+
+    # Vector with given phases
+    dSigConf['vPhs'] = np.array([78, 10, -50, -40])
+
+    # - - - - - - - - - - - - - - - -
+
+    # The number of additional tones
+    dSigConf['nTones'] = 10
+
+    # Amplitude and phase parameters of additional tones:
+
+    # Amplitude
+    dSigConf['iMinAmp'] = 0.1  # Minimum amplitude
+    dSigConf['iGraAmp'] = 0.01  # Gradation of amplitude
+    dSigConf['iMaxAmp'] = 10.0  # Maximum amplitude
+
+    # Phase:
+    dSigConf['iMinPhs'] = -45  # Minimum phase of additional tones
+    dSigConf['iGraPhs'] = 1   # Gradation of phase of additional tones
+    dSigConf['iMaxPhs'] = 45  # Maximum phase of additional tones
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # The number of signals to be generated
+    dSigConf['nSigPack'] = 1e4
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Mute the output from the gneerator
+    dSigConf['bMute'] = 1
 
     # -----------------------------------------------------------------
     # Run the multtone signal generator
-    tStart = rxcs.console.module_progress('test (case 4) signals generation')
-    gen.run()
+    tStart = \
+        rxcs.console.module_progress('test (case 4) signals generation')
+    dSig = rxcs.sig.randMult.main(dSigConf)
     rxcs.console.module_progress_done(tStart)
 
     # -----------------------------------------------------------------
     # Check signals
-    #_checkSignals(dSigConf, dSig, iTolerance)
+    _checkSignals(dSigConf, dSig, iTolerance)
 
     # -----------------------------------------------------------------
 
@@ -414,43 +516,80 @@ def _TestCase5(iTolerance):
         Nothing
     """
 
-    # Put the generator on board
-    gen = rxcs.sig.randMult()
-    
-    gen.tS = 1e-6     # Time of the signal is 1 us
-    gen.fR = 1e9      # The signal representation sampling frequency is 1 GHz
-    gen.fMax = 50e6   # The highest possible frequency in the signal is 50 MHz
-    gen.fRes = 1e6    # The signal spectrum resolution is 1 MHz
+    # Start the dictionary with signal generator configuration
+    dSigConf = {}
 
-    gen.iSNR = 10     # Signal noise
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    gen.iP = np.nan   # Signal power adjustments
+    # Signal generator type: random multitone signal
+    dSigConf['strSigType'] = "RandMult"
 
-    # The number of random tones
-    gen.nTones = 10
+    # Time of the signal is 1 ms
+    dSigConf['tS'] = 1e-6
 
-    # Amplitude and phase parameters of ranimd tones:
-    gen.iMinAmp = 0.1    # Minimum amplitude
-    gen.iGraAmp = 0.01   # Gradation of amplitude
-    gen.iMaxAmp = 10.0   # Maximum amplitude
+    # The signal representation sampling frequency is 1 GHz
+    dSigConf['fR'] = 1e9
 
-    gen.iMinPhs = -45  # Minimum phase of additional tones
-    gen.iGraPhs = 1    # Gradation of phase of additional tones
-    gen.iMaxPhs = 45   # Maximum phase of additional tones
+    # The highest possible frequency in the signal is 50MHz kHz
+    dSigConf['fMax'] = 50e6
 
-    gen.nSigs = int(1e4)  # The number of signals to be generated
-    
-    gen.bMute = 1   # Mute the output from the generator
+    # The signal spectrum resolution is 1 MHz
+    dSigConf['fRes'] = 1e6
+
+    # - - - - - - - - - - - - - - - -
+
+    # Signal noise
+    dSigConf['iSNR'] = 10
+
+    # Signal power adjustments
+    dSigConf['iP'] = np.nan
+
+    # - - - - - - - - - - - - - - - -
+
+    # Vector with given frequencies
+    dSigConf['vFrqs'] = np.array([])
+
+    # Vector with given amplitudes
+    dSigConf['vAmps'] = np.array([])
+
+    # Vector with given phases
+    dSigConf['vPhs'] = np.array([])
+
+    # The number of additional tones
+    dSigConf['nTones'] = 10
+
+    # Amplitude and phase parameters of additional tones:
+
+    # Amplitude
+    dSigConf['iMinAmp'] = 0.1  # Minimum amplitude
+    dSigConf['iGraAmp'] = 0.01  # Gradation of amplitude
+    dSigConf['iMaxAmp'] = 10.0  # Maximum amplitude
+
+    # Phase:
+    dSigConf['iMinPhs'] = -45  # Minimum phase of additional tones
+    dSigConf['iGraPhs'] = 1   # Gradation of phase of additional tones
+    dSigConf['iMaxPhs'] = 45  # Maximum phase of additional tones
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # The number of signals to be generated
+    dSigConf['nSigPack'] = 1e4
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Mute the output from the gneerator
+    dSigConf['bMute'] = 1
 
     # -----------------------------------------------------------------
     # Run the multtone signal generator
-    tStart = rxcs.console.module_progress('test (case 5) signals generation')
-    gen.run()
+    tStart = \
+        rxcs.console.module_progress('test (case 5) signals generation')
+    dSig = rxcs.sig.randMult.main(dSigConf)
     rxcs.console.module_progress_done(tStart)
 
     # -----------------------------------------------------------------
     # Check signals
-    #_checkSignals(dSigConf, dSig, iTolerance)
+    _checkSignals(dSigConf, dSig, iTolerance)
 
     # -----------------------------------------------------------------
 
