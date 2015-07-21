@@ -10,9 +10,7 @@ the signal spectrum resolution is 1 kHz. |br|
 
 The signal contains 1 random tone.
 
-The power of the signal is adjusted to 1 W. |br|
-
-The noise is added to the signal, the SNr of the signal is 5 [dB]. |br|
+The noise is added to the signal, the SNR of the signal is 5 [dB]. |br|
 
 After the generation, spectrum fo the signal is analyzed with an FFT
 and ploted. The signal is also plotted in the time domain.
@@ -23,6 +21,7 @@ and ploted. The signal is also plotted in the time domain.
 *Version*:
     1.0  | 21-MAY-2014 : * Version 1.0 released. |br|
     1.1  | 15-JUL-2015 : * Adjusted to new name of random multitone gen. |br|
+    2.0  | 21-JUL-2015 : * Version 2.0 released (adjusted to v2.0 of the generator) |br|
 
 *License*:
     BSD 2-Clause
@@ -35,69 +34,35 @@ import matplotlib.pyplot as plt
 
 def _RMSG_ex0():
 
-    # -----------------------------------------------------------------
-    # Generate settings for the generator
+    # Put the generator on board
+    gen = rxcs.sig.randMult()
+    
+    # Settings for the generator
+    gen.tS = 1e-3     # Time of the signal is 1 ms
+    gen.fR = 1e6      # The signal representation sampling frequency is 1 MHz
+    gen.fMax = 10e3   # The highest possible frequency in the signal is 10 kHz
+    gen.fRes = 1e3    # The signal spectrum resolution is 1 kHz
 
-    # Start the dictionary with signal generator configuration
-    dSigConf = {}
+    gen.nTones = 1    # The number of random tones
+    
+    gen.iSNR = 5      # The noise added to the signal
 
-    # Time of the signal is 1 ms
-    dSigConf['tS'] = 1e-3
-
-    # The signal representation sampling frequency is 1 MHz
-    dSigConf['fR'] = 1e6
-
-    # The highest possible frequency in the signal is 10 kHz
-    dSigConf['fMax'] = 10e3
-
-    # The signal spectrum resolution is 1 kHz
-    dSigConf['fRes'] = 1e3
-
-    # - - - - - - - - - - - - - - - -
-
-    # The number of tones
-    dSigConf['nTones'] = 1
-
-    # - - - - - - - - - - - - - - - -
-
-    # The power of the signal
-    dSigConf['iP'] = 1
-
-    # The noise added to the signal
-    dSigConf['iSNR'] = 5
-
-    # - - - - - - - - - - - - - - - -
-
-    # The number of signals to be generated
-    dSigConf['nSigPack'] = 1
-
-    # -----------------------------------------------------------------
-    # Run the multitone signal generator
-    dSig = rxcs.sig.randMult.main(dSigConf)
-
-    # -----------------------------------------------------------------
-
-    # Get the generated signal
-    mSig = dSig['mSig']
-    vSig = mSig[0, :]
+    # Run the generator and get the output    
+    gen.run()    
+    vSig = gen.mSig[0, :]  # Get the generated signal
+    vTSig = gen.vTSig      # Get the time vector of the signal
+    fFFTR =  gen.fFFTR     # Signal FFT frequency resolution
 
     # -----------------------------------------------------------------
     # Analyze the signal and plot it
 
-    # Get the time vector of the signal
-    vTSig = dSig['vTSig']
+    vFFT = np.fft.fft(vSig)  # Analyze the spectrum of the signal
+    iS = vFFT.size           # Get the size of the spectrum
 
-    # Analyze the spectrum of the signal
-    vFFT = np.fft.fft(vSig)
-
-    # Get the size of the spectrum
-    iS = vFFT.size
-
-    # Get the amplitudes of tones
-    vFFTa = 2*np.abs(vFFT[np.arange(iS/2).astype(int)])/iS
+    # Compute the amplitudes of tones
+    vFFTa = 2*np.abs(vFFT[np.arange(iS/2).astype(int)])/iS   # Get 
 
     # Create a vector with frequencies of the signal spectrum
-    fFFTR = dSig['fFFTR']  # Signal FFT frequency resolution
     vF = fFFTR * np.arange(iS/2)
 
     # -----------------------------------------------------------------

@@ -27,6 +27,7 @@ and ploted.
     1.1  | 22-MAY-2014 : * Specified frequencies removed, 3 fully random tones
                            in the signal. |br|
     1.2  | 15-JUL-2015 : * Adjusted to new name of random multitone gen. |br|
+    2.0  | 21-JUL-2015 : * Version 2.0 released (adjusted to v2.0 of the generator) |br|
 
 
 *License*:
@@ -40,68 +41,41 @@ import matplotlib.pyplot as plt
 
 def _RMSG_ex2():
 
-    # -----------------------------------------------------------------
-    # Generate settings for the generator
+    # Put the generator on board
+    gen = rxcs.sig.randMult()
+    
+    # Settings for the generator
+    gen.tS = 10e-6      # Time of the signal is 10 us
+    gen.fR = 5e6        # The signal representation sampling frequency is 5 MHz
+    gen.fMax = 2e6      # The highest possible frequency in the signal is 2 MHz
+    gen.fRes = 100e3    # The signal spectrum resolution is 100 kHz
 
-    # Start the dictionary with signal generator configuration
-    dSigConf = {}
+    # Random tones in the signal
+    gen.nTones = 3    # The number of random tones
 
-    # Signal generator type: random multitone signal
-    dSigConf['strSigType'] = "RandMult"
+    # Allowed amplitudes in the random tones:
+    gen.iMinAmp = 0.2    # Minimum amplitude of random tones
+    gen.iGraAmp = 0.1    # Gradation of amplitude of random tones
+    gen.iMaxAmp = 0.4    # Maximum amplitude of random tones
 
-    # Time of the signal is 10 us
-    dSigConf['tS'] = 10e-6
+    # Allowed phases in the random tones:
+    gen.iMinPhs = 0    # Minimum phase of random tones
+    gen.iGraPhs = 1    # Gradation of phase of random tones
+    gen.iMaxPhs = 90   # Maximum phase of random tones
 
-    # The signal representation sampling frequency is 5 MHz
-    dSigConf['fR'] = 5e6
-
-    # The highest possible frequency in the signal is 2 MHz
-    dSigConf['fMax'] = 2e6
-
-    # The signal spectrum resolution is 100 kHz
-    dSigConf['fRes'] = 100e3
-
-    # - - - - - - - - - - - - - - - -
-
-    # The number of additional tones
-    dSigConf['nTones'] = 3
-
-    # Amplitude and phase parameters of additional tones:
-
-    # Amplitude
-    dSigConf['iMinAmp'] = 0.2  # Minimum amplitude
-    dSigConf['iGraAmp'] = 0.1  # Gradation of amplitude
-    dSigConf['iMaxAmp'] = 0.4  # Maximum amplitude
-
-    # Phase:
-    dSigConf['iMinPhs'] = 0  # Minimum phase of additional tones
-    dSigConf['iGraPhs'] = 1  # Gradation of phase of additional tones
-    dSigConf['iMaxPhs'] = 90  # Maximum phase of additional tones
-
-    # - - - - - - - - - - - - - - - -
-
-    # The number of signals to be generated
-    dSigConf['nSigPack'] = 1
+    # Run the generator and get the output    
+    gen.run()    
+    vSig = gen.mSig[0, :]  # Get the generated signal
+    fFFTR =  gen.fFFTR     # Signal FFT frequency resolution
 
     # -----------------------------------------------------------------
-    # Run the multtone signal generator
-    dSig = rxcs.sig.randMult.main(dSigConf)
+    vFFT = np.fft.fft(vSig)  # Analyze the spectrum of the signal
+    iS = vFFT.size           # Get the size of the spectrum
 
-    # Get the generated signal
-    mSig = dSig['mSig']
-    vSig = mSig[0, :]
-
-    # Analyze the spectrum of the signal
-    vFFT = np.fft.fft(vSig)
-
-    # Get the size of the spectrum
-    iS = vFFT.size
-
-    # Get the amplitudes of tones
+    # Compute the amplitudes of tones
     vFFTa = 2*np.abs(vFFT[np.arange(iS/2).astype(int)])/iS
 
     # Create a vector with frequencies of the signal spectrum
-    fFFTR = dSig['fFFTR']  # Signal FFT frequency resolution
     vF = fFFTR * np.arange(iS/2)
 
     # -----------------------------------------------------------------
