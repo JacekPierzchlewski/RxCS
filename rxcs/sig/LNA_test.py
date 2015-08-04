@@ -1,1 +1,1 @@
-../../test/LNA_test.py
+../../test/signals/LNA_test.py

@@ -1,0 +1,12 @@
+RXCS toolbox, test\reconstruction\ - directory with tests for the reconstruction modules
+
+contents:
+
+    1. rxcs~                   - soft link to the directory with all the RxCS modules
+
+    2. CONTENTS.txt            - this file
+
+    3. Makefile                - local Makefile
+
+
+

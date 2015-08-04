@@ -1,0 +1,15 @@
+RXCS toolbox, test\signals\ - directory with tests for the signal generators
+
+contents:
+
+    1. rxcs~                   - soft link to the directory with all the RxCS modules
+
+    2. CONTENTS.txt            - this file
+
+    3. Makefile                - local Makefile
+
+
+    4. LNA_test.py             - tests for the low-noise nonlinear amplifier
+
+    5. randMult_test.py        - tests for random multitone signal generator
+

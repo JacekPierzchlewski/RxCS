@@ -1,0 +1,12 @@
+RXCS toolbox, test\auxiliary\ - directory with tests for the auxiliary modules
+
+contents:
+
+    1. rxcs~                   - soft link to the directory with all the RxCS modules
+
+    2. CONTENTS.txt            - this file
+
+    3. Makefile                - local Makefile
+
+
+    4. L2solv_aldkrls_test.py  - tests for the L2 solver which uses Kernel Recursive Least Squares Method

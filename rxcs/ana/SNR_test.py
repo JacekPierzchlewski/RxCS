@@ -1,1 +1,1 @@
-../../test/SNR_test.py
+../../test/analysis/SNR_test.py

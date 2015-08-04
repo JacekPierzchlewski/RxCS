@@ -1,1 +1,1 @@
-../../test/L2solv_aldkrls_test.py
+../../test/auxiliary/L2solv_aldkrls_test.py

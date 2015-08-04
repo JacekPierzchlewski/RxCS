@@ -2,19 +2,30 @@ RXCS toolbox, test\ - directory with the tests for RxCS toolbox modules
 
 contents:
 
-    1. rxcs~                   - soft link to the directory with all the RxCS modules
+    1. CONTENTS.txt            - this file
 
-    2. CONTENTS.txt            - this file
+    2. Makefile                - local Makefile
 
-    3. L2solv_aldkrls_test.py  - tests for the L2 solver which uses Kernel Recursive Least Squares Method
+    3. rxcs~                   - soft link to the directory with all the RxCS modules
 
-    4. Makefile                - local Makefile
 
-    5. RxCSobject_tests.py     - tests for main base class for all modules of RxCS
+    # Directories with tests:
 
-    6. SNR_test.py             - tests for SNR evaluation of the reconstructed signal
+    4. acquisitions\    - directory with tests for the acquisition systems
 
-    7. nonuniANGIE_test.py     - tests for nonuniform sampler with ANGIE sampling scheme
+    5. analysis\        - directory with tests for the system analysis modules
 
-    8. randMult_test.py        - tests for random multitone signal generator
+    6. auxiliary\       - directory with tests for the auxiliary modules
+
+    7. dictionaries\    - directory with tests for the dictionaries
+
+    8. reconstruction\  - directory with tests for the reconstruction modules
+
+    9. signals\         - directory with tests for the signal generators
+
+
+    # Test files:
+
+    10. RxCSobject_tests.py     - tests for main base class for all modules of RxCS
+
 
