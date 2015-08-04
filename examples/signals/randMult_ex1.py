@@ -32,12 +32,13 @@ and ploted.
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    0.1  | 15-MAY-2014 : * Initial version. |br|
-    0.2  | 20-MAY-2014 : * Docstrings added and PEP8 adjustments. |br|
-    1.0  | 20-MAY-2014 : * Version 1.0 released. |br|
-    1.0r1| 21-MAY-2014 : * Cosmetics in the comments. |br|
-    1.1  | 15-JUL-2015 : * Adjusted to new name of random multitone gen. |br|
-    2.0  | 21-JUL-2015 : * Version 2.0 released (adjusted to v2.0 of the generator) |br|
+    0.1    | 15-MAY-2014 : * Initial version. |br|
+    0.2    | 20-MAY-2014 : * Docstrings added and PEP8 adjustments. |br|
+    1.0    | 20-MAY-2014 : * Version 1.0 released. |br|
+    1.0r1  | 21-MAY-2014 : * Cosmetics in the comments. |br|
+    1.1    | 15-JUL-2015 : * Adjusted to new name of random multitone gen. |br|
+    2.0    | 21-JUL-2015 : * Version 2.0 released (adjusted to v2.0 of the generator) |br|
+    2.0r1  | 04-AUG-2015 : * File name changed |br|
 
 
 *License*:
@@ -49,7 +50,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def _RMSG_ex1():
+def _randMult_ex1():
 
     # Put the generator on board
     gen = rxcs.sig.randMult()
@@ -109,4 +110,4 @@ def _RMSG_ex1():
 # Trigger when start as a script
 # =====================================================================
 if __name__ == '__main__':
-    _RMSG_ex1()
+    _randMult_ex1()
