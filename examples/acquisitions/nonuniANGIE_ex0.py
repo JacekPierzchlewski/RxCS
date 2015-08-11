@@ -19,7 +19,10 @@ plotted.
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 27-MAY-2014 : * Version 1.0 released. |br|
+    1.0    | 27-MAY-2014 : * Version 1.0 released. |br|
+    2.0    | 11-AUG-2015 : * Version 2.0 released (adjusted to signal generator v2.0)  |br|
+    2.0r1  | 11-AUG-2015 : * File name changed |br|
+
 
 *License*:
     BSD 2-Clause
@@ -31,35 +34,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def _samp_RMSG_ANGIE_ex0():
+def nonuniANGIE_ex0():
 
-    # -----------------------------------------------------------------
-    # Generate settings for the generator
+    # Put the generator on board
+    gen = rxcs.sig.randMult()
+    
+    # Settings for the generator
+    gen.tS = 1e-3     # Time of the signal is 1 ms
+    gen.fR = 1e6      # The signal representation sampling frequency is 1 MHz
+    gen.fMax = 10e3   # The highest possible frequency in the signal is 10 kHz
+    gen.fRes = 1e3    # The signal spectrum resolution is 1 kHz
 
-    # Start the dictionary with signal generator configuration
-    dSigConf = {}
-
-    # Time of the signal is 1 ms
-    dSigConf['tS'] = 1e-3
-
-    # The signal representation sampling frequency is 1 MHz
-    dSigConf['fR'] = 1e6
-
-    # The highest possible frequency in the signal is 10 kHz
-    dSigConf['fMax'] = 10e3
-
-    # The signal spectrum resolution is 1 kHz
-    dSigConf['fRes'] = 1e3
-
-    # - - - - - - - - - - - - - - - -
-
-    # The number of tones
-    dSigConf['nTones'] = 3
-
-    # - - - - - - - - - - - - - - - -
-
-    # The number of signals to be generated
-    dSigConf['nSigPack'] = 1
+    gen.nTones = 3    # The number of random tones
 
     # -----------------------------------------------------------------
     # Generate settings for the sampler
@@ -75,16 +61,16 @@ def _samp_RMSG_ANGIE_ex0():
 
     # -----------------------------------------------------------------
     # Run the multitone signal generator and the sampler
-    dSig = rxcs.sig.sigRandMult.main(dSigConf)            # the generator
+    dSig = gen.run()  # Run the generator    
+    vSig = gen.mSig[0, :]   # Get the signal from the generator
+  
     dObSig = rxcs.acq.nonuniANGIE.main(dAcqConf, dSig)    # the sampler
 
     # -----------------------------------------------------------------
     # Plot the results of sampling
 
-    # Get the original signal and its time vector
-    mSig = dSig['mSig']
-    vSig = mSig[0, :]
-    vT = dSig['vTSig']
+    # Get the time vector of the original signal 
+    vT = gen.vTSig
 
     # Get the observed signal and sampling moments
     mObSig = dObSig['mObSig']  # the observed signal
@@ -150,4 +136,4 @@ def _samp_RMSG_ANGIE_ex0():
 # Trigger when start as a script
 # =====================================================================
 if __name__ == '__main__':
-    _samp_RMSG_ANGIE_ex0()
+    nonuniANGIE_ex0()
