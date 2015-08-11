@@ -3,7 +3,18 @@
 import dict
 
 # Import L1 reconstruction which uses cvxopt
-import cvxoptL1
+cvxoptOK = 1
+try:
+    import cvxopt
+except ImportError:
+    print('RxCS DEPENDENCY WARNING !!!                                                ')
+    print('RxCS Warning: no \'cvxopt\' software found! Some reconstruction methods will not work!')
+    print('')
+    cvxoptOK = 0
+    
+if cvxoptOK == 1:
+    import cvxoptL1
+
 
 # Import irls L1 reconstruction
 import irlsL1
