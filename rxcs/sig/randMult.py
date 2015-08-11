@@ -139,32 +139,32 @@ class randMult(rxcs._RxCSobject):
     def __parametersDefine(self):
 
         # Time of the signal [s]
-        self.paramAddMan('tS', 'Time of the signal')
+        self.paramAddMan('tS', 'Time of the signal', unit='s')
         self.paramType('tS', (int, float))
         self.paramH('tS', 0)
         self.paramL('tS', np.inf)       
 
         # The signal representation sampling freuqency [Hz]
-        self.paramAddMan('fR', 'The signal representation sampling freuqency')
+        self.paramAddMan('fR', 'The signal representation sampling freuqency', unit='Hz')
         self.paramType('fR', (int, float))
         self.paramH('fR', 0)
         self.paramL('fR', np.inf)
  
         # The highest possible frequency in the signal [Hz]
-        self.paramAddMan('fMax', 'The highest possible frequency in the signal')
+        self.paramAddMan('fMax', 'The highest possible frequency in the signal', unit='Hz')
         self.paramType('fMax', (int, float))
         self.paramH('fMax', 0)
         self.paramL('fMax', 'fR', mul=0.5)  # Nyquist principle
 
         # Signal spectrum resolution [Hz]
-        self.paramAddMan('fRes', 'Signal spectrum resolution')
+        self.paramAddMan('fRes', 'Signal spectrum resolution', unit='Hz')
         self.paramType('fRes', (int, float))
         self.paramH('fRes', 0)
         self.paramL('fRes', np.inf)
 
 
         # The minimum frequency of additional tones
-        self.paramAddOpt('fMin', 'Minimum frequency of additional tones', default='$$fRes')
+        self.paramAddOpt('fMin', 'Minimum frequency of additional tones', default='$$fRes', unit='Hz')
         self.paramType('fMin', (int, float))
         self.paramH('fMin', 0)
         self.paramLE('fMin', 'fMax')
@@ -176,11 +176,11 @@ class randMult(rxcs._RxCSobject):
         self.paramL('nSigs', np.inf)       # ...and lower than infinity
 
         # Signal noise [dB]
-        self.paramAddOpt('iSNR', 'Signal to noise ratio', default=np.inf)
+        self.paramAddOpt('iSNR', 'Signal to noise ratio', default=np.inf, unit='dB')
         self.paramType('iSNR', (int, float))
 
         # Power of signals [W]
-        self.paramAddOpt('iP', 'Power of signals', default=np.nan)
+        self.paramAddOpt('iP', 'Power of signals', default=np.nan, unit='W')
         self.paramType('iP', (int, float))
         self.paramH('iP', 0)
         self.paramL('iP', np.inf)
