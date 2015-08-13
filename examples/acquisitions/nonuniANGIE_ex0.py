@@ -22,6 +22,7 @@ plotted.
     1.0    | 27-MAY-2014 : * Version 1.0 released. |br|
     2.0    | 11-AUG-2015 : * Version 2.0 released (adjusted to signal generator v2.0)  |br|
     2.0r1  | 11-AUG-2015 : * File name changed |br|
+    2.1    | 13-AUG-2015 : * Adjusted to ANGIE sampler v2.0  |br|
 
 
 *License*:
@@ -36,52 +37,44 @@ import matplotlib.pyplot as plt
 
 def nonuniANGIE_ex0():
 
-    # Put the generator on board
-    gen = rxcs.sig.randMult()
+    # Put the stuff on board
+    gen = rxcs.sig.randMult()      # Signal generator
+    samp = rxcs.acq.nonuniANGIE()  # Sampler   
+    
+    # General settings    
+    TIME = 1e-3  # Time of the signal is 1 ms    
+    FSMP = 1e6   # The signal representation sampling frequency is 1 MHz
     
     # Settings for the generator
-    gen.tS = 1e-3     # Time of the signal is 1 ms
-    gen.fR = 1e6      # The signal representation sampling frequency is 1 MHz
-    gen.fMax = 10e3   # The highest possible frequency in the signal is 10 kHz
-    gen.fRes = 1e3    # The signal spectrum resolution is 1 kHz
+    gen.tS = TIME      # Time of the signal is 1 ms
+    gen.fR = FSMP      # The signal representation sampling frequency is 1 MHz
+    gen.fMax = 10e3    # The highest possible frequency in the signal is 10 kHz
+    gen.fRes = 1e3     # The signal spectrum resolution is 1 kHz
+    gen.nTones = 3     # The number of random tones
 
-    gen.nTones = 3    # The number of random tones
-
-    # -----------------------------------------------------------------
     # Generate settings for the sampler
-
-    # Start the dictionary with signal acquisition configuration
-    dAcqConf = {}
-
-    # The sampling grid period
-    dAcqConf['Tg'] = 1e-6
-
-    # The average sampling frequency
-    dAcqConf['fSamp'] = 8e3
+    samp.tS = TIME     # Time of the signal
+    samp.fR = FSMP     # The signal representation sampling freuqnecy
+    samp.Tg = 1e-6     # The sampling grid period
+    samp.fSamp = 8e3   # The average sampling frequency
 
     # -----------------------------------------------------------------
     # Run the multitone signal generator and the sampler
-    dSig = gen.run()  # Run the generator    
-    vSig = gen.mSig[0, :]   # Get the signal from the generator
-  
-    dObSig = rxcs.acq.nonuniANGIE.main(dAcqConf, dSig)    # the sampler
+    gen.run()               # Run the generator    
+    samp.mSig = gen.mSig    # Connect the signal from the generator to the sampler 
+    samp.run()              # Run the sampler
 
     # -----------------------------------------------------------------
     # Plot the results of sampling
 
-    # Get the time vector of the original signal 
-    vT = gen.vTSig
+    vSig = gen.mSig[0, :]   # The signal from the generator
+    vT = gen.vTSig          # The time vector of the original signal
+    vObSig = samp.mObSig[0, :]    # The observed signal
+    vPattsT = samp.mPattsT[0, :]  # The sampling moments
 
-    # Get the observed signal and sampling moments
-    mObSig = dObSig['mObSig']  # the observed signal
-    vObSig = mObSig[0, :]
-
-    mPattsT = dObSig['mPattsT']  # the sampling moments
-    vPattsT = mPattsT[0, :]
-
+    # Plot the signal and the observed sampling points    
     hFig1 = plt.figure(1)
 
-    # Plot the signal and the observed sampling points
     hSubPlot1 = hFig1.add_subplot(211)
     hSubPlot1.grid(True)
     hSubPlot1.set_title('Signal and the observed sampling points')
@@ -104,20 +97,12 @@ def nonuniANGIE_ex0():
     plt.setp(markerline, color='b', markersize=10.0)
 
     # -----------------------------------------------------------------
-
-    # -----------------------------------------------------------------
     # APPENDIX:
     # This part is to show how to use the observation matrix, if it is needed
     # (for example in compressed sensing systems)
 
-    # Get a 3D matrix with observation matrices
-    m3Phi = dObSig['m3Phi']
-
-    # Get the first observation matrix (1st page of the m3Phi matrix)
-    mPhi = m3Phi[0, : ,:]
-
-    # Sample the signal using the observation matrix
-    vObSigPhi = np.dot(mPhi, vSig)
+    mPhi = samp.m3Phi[0, : ,:]      # get the observation matrix (1st page of the 3D m3Phi matrix)
+    vObSigPhi = np.dot(mPhi, vSig)  # Sample the signal using the observation matrix
 
     # Plot the signal and the observed sampling points
     hFig2 = plt.figure(2)
