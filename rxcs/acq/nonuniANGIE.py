@@ -18,10 +18,10 @@ available in arXiv: http://arxiv.org/abs/1409.1002
     1.1  | 11-JUN-2014 : * Observation matrices added to the output. |br|
     1.1r1| 18-SEP-2014 : * Bug in checking time of patterns is fixed. |br|
     1.1r2| 28-JAN-2015 : * Patterns generator adjusted to Numpy indexing. |br|
-    2.0  | 11-AUG-2015 : * Objectified version (2.0) |br|
+    2.0  | 13-AUG-2015 : * Objectified version (2.0) |br|
 
 *License*:
-    BSD 2-Clause
+    BSD 2-Clause 
 """
 
 from __future__ import division
@@ -30,13 +30,13 @@ import math
 import rxcs
 
 
-class randMult(rxcs._RxCSobject):
+class nonuniANGIE(rxcs._RxCSobject):
 
     def __init__(self, *args):
         rxcs._RxCSobject.__init__(self)    # Make it a RxCS object 
         
-        self.strRxCSgroup = 'Signal generator'     # Name of group of RxCS modules
-        self.strModuleName = 'Random multitone'    # Module name        
+        self.strRxCSgroup = 'Acquisition'       # Name of group of RxCS modules
+        self.strModuleName = 'ANGIE sampler'    # Module name        
 
         self.__inputSignals()          # Define input signals
         self.__parametersDefine()      # Define the parameters
@@ -48,14 +48,23 @@ class randMult(rxcs._RxCSobject):
     # Input signals
     def __inputSignals(self):
 
-        # 2d array with input signals, one signal p. column
+        # 1d/2d array with input signals, one signal p. row
         self.paramAddMan('mSig', 'Input signals')
+        self.paramType('mSig', np.ndarray)
+        self.paramTypeEl('mSig', (int, float))
+        self.paramNDimLE('mSig', 2)
 
         # Input signals representation sampling frequency
         self.paramAddMan('fR', 'Input signals representation sampling frequency', unit='Hz')
+        self.paramType('fR', (int, float))
+        self.paramH('fR', 0)
+        self.paramL('fR', np.inf)
 
         # Time of input signals
         self.paramAddMan('tS', 'Time of input signals', unit='s')
+        self.paramType('tS', (int, float))
+        self.paramH('tS', 0)
+        self.paramL('fR', np.inf)
 
 
     # Define parameters
@@ -80,13 +89,13 @@ class randMult(rxcs._RxCSobject):
         self.paramL('iSigma', np.inf)            # ...and lower than infinity
 
         # Minimum time between sampling points
-        self.paramAddOpt('tMin', 'Minimum time between sampling points', default=0, unit='s')
+        self.paramAddOpt('tMin', 'Minimum time between sampling points', default=np.nan, unit='s')
         self.paramType('tMin', (int, float))     # Must be of int or float type
         self.paramHE('tMin', 0)                  # Minimum time must be higher or equal to zero
         self.paramL('tMin', np.inf)              # ...and lower than infinity
 
         # Maximum time between sampling points
-        self.paramAddOpt('tMax', 'Maximum time between sampling points', default=np.inf, unit='s')
+        self.paramAddOpt('tMax', 'Maximum time between sampling points', default=np.nan, unit='s')
         self.paramType('tMax', (int, float))     # Must be of int or float type
         self.paramH('tMax', 0)                   # Maximum time must be higher than zero
 
@@ -193,6 +202,15 @@ class randMult(rxcs._RxCSobject):
 
 
     def _checkConf(self):
+        """
+        This function checks configuration of sampling
+
+        Args:
+            none
+    
+        Returns:
+            none
+        """
 
         # -----------------------------------------------------------------
         # Check if the number of grid points in patterns is higher than 0
@@ -261,16 +279,36 @@ class randMult(rxcs._RxCSobject):
         # -----------------------------------------------------------------
         return
 
-
     # Generate the sampling patterns
     def _generatePatterns(self):
-        
-        # --------------------------------------------------------------
+        """
+        This function generates the required number of sampling patterns.
+    
+        Args:
+                none
+                
+        Returns:
+                none
+
+                List of variables added by function to the object:
+
+                nSigs (number):       the number of input signals 
+                mPatts (matrix):      the sampling patterns (grid indices)
+                mPattsRep (matrix):   the sampling patterns (signal rep. sampling points)
+                mPattsT (matrix):     the sampling patterns (time moments)
+        """
+
+        # Make the matrix with signals 2 dim, if it is 1 dim
+        if self.mSig.ndim == 1:
+            self.mSig = self.mSig.copy()            
+            self.mSig.shape = (1, self.mSig.size)
+        (nSigs, _) = self.mSig.shape          # The number of input signals
+
         # Allocate the matrix for all the sampling patterns
-        mPatts = np.ones((self.nPatts, self.nK_s), dtype='int64')
+        mPatts = np.ones((nSigs, self.nK_s), dtype='int64')
 
         # Generate all the needed sampling patterns
-        for inxP in np.arange(self.nPatts):
+        for inxP in np.arange(nSigs):
     
             # Generate a vector with a sampling pattern
             vPattern = self._angie_engine(self.nK_s, self.nK_g, self.nK_min, self.nK_max, self.iSigma)
@@ -281,36 +319,81 @@ class randMult(rxcs._RxCSobject):
         # Because Numpy indexes arrays from 0, the patterns should be represented 
         # in range from <0 ; N-1>
         mPatts = mPatts - 1
-           
+
+        # --------------------------------------------------------------
+
         # Compute the number of signal representation points which equals
         # one grid point
-        iGridvsRep = int(np.round((Tg * fR)))
-        
+        iGridvsRep = int(np.round((self.Tg * self.fR)))
+
         # Recalculate the patterns to the signal representation frequency
-        mPattsRep = iGridvsRep * mPatts  
-    
+        mPattsRep = iGridvsRep * mPatts
+
         # --------------------------------------------------------------
+
+        # Create the time vector of the input signal
+        vTSig = (1 / self.fR) * np.arange(int(np.round(self.tTau_real * self.fR)))
+        
         # Recalculate the patterns to the time moments
-    
-        # Get the time vector of the original signal (if it is given)
-        if 'vTSig' in dSig:
-            vTSig = dSig['vTSig']
-        else:
-            vTSig = (1 / fR) * np.arange(int(np.round(tTau_real*fR)))
-            
         mPattsT = vTSig[mPattsRep]
 
+        self.nSigs = nSigs
+        self.mPattsT = mPattsT
+        self.mPattsRep = mPattsRep
+        self.mPattsT = mPattsT
         return
-    
+
     # Sample the signals
-    def _sampleSignals(self):    
-        pass
-
+    def _sampleSignals(self):
+        """
+        This function samples signals using the previously generated
+        sampling patterns.
     
-    # Generate the observation matrices
-    def _generObser(self):       
-        pass
+        Args:
+                none
+        Returns:
+                none
 
+                List of variables added by function to the object:                
+                mObSig (matrix):  the observed signals
+        """
+
+        self.mObSig = (self.mSig[np.arange(self.nSigs), self.mPattsRep.T]).T
+        return
+
+    # Generate the observation matrices
+    def _generObser(self):
+        """
+        This function generates the observation matrices.
+    
+        Args:
+                none
+            
+        Returns:
+                none
+                
+                List of variables added by function to the object:                
+                m3Phi (3D matrix): observation matrices
+        """
+
+        nSmp = int(round(self.tS * self.fR))  # The number of representation samples in the input signals
+
+        # Allocate the observation matrices
+        m3Phi = np.zeros((self.nSigs, self.nK_s, nSmp))
+
+        # Generate the observation matrices
+        for inxPat in np.arange(self.nSigs):  # <- loop over all observation matrices
+
+            vPatts = self.mPattsRep[inxPat, :]    # Get the current pattern
+    
+            # Generate the current observation matrix
+            inxRow = 0
+            for iSamp in vPatts:    # <- loop over all samling points in pattern
+                m3Phi[inxPat, inxRow, iSamp] = 1
+                inxRow = inxRow + 1
+
+        self.m3Phi = m3Phi
+        return
 
     def _angie_engine(self, nK_s, K_g, K_min, K_max, sigma):
         """
@@ -422,5 +505,3 @@ class randMult(rxcs._RxCSobject):
                                                 #
         # -----------------------------------------------------------------
         return vPattern
-
-
