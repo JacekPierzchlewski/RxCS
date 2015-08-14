@@ -209,7 +209,7 @@ def _checkSampler(samp, iTolerance):
     # Generated signals which will be sampled
     tStart = rxcs.console.module_progress('signals generation')
     gen = _generateSigs(samp)
-    rxcs.console.module_progress_done(tStart)
+    rxcs.console.progress_done(tStart)
 
     # Sample the signals
     samp.mSig = gen.mSig  # Connect generated signals to the sampler
@@ -219,7 +219,7 @@ def _checkSampler(samp, iTolerance):
 
     tStart = rxcs.console.module_progress('signals sampling')
     samp.run()   # Run the sampler
-    rxcs.console.module_progress_done(tStart)
+    rxcs.console.progress_doneNL(tStart)
 
     # Check the average sampling frequency
     _check_sampFreq(samp, iTolerance)
