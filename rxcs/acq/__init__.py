@@ -3,7 +3,7 @@
 import uniform
 
 # Import nonuniform sampler with ARS scheme
-import nonuniARS
+from nonuniARS import nonuniARS
 
 # Import nonuniform sampler with JS scheme
 import nonuniJS
