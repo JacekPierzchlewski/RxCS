@@ -338,7 +338,7 @@ class nonuniANGIE(rxcs._RxCSobject):
         mPattsT = vTSig[mPattsRep]
 
         self.nSigs = nSigs
-        self.mPattsT = mPattsT
+        self.mPatts = mPatts
         self.mPattsRep = mPattsRep
         self.mPattsT = mPattsT
         return
