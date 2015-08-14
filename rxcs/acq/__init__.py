@@ -6,7 +6,7 @@ import uniform
 from nonuniARS import nonuniARS
 
 # Import nonuniform sampler with JS scheme
-import nonuniJS
+from nonuniJS import nonuniJS
 
 # Import nonuniform sampler with ANGIE scheme
 from nonuniANGIE import nonuniANGIE
