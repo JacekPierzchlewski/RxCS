@@ -1,6 +1,6 @@
 """
 This script is an example of how to use the nonuniform sampler with the ARS
-(jittered sampling) scheme. |br|
+(additive random sampling) scheme. |br|
 
 In this example 1 random multitone signal is generated and sampled |br|
 
@@ -19,9 +19,9 @@ plotted.
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 28-JAN-2015 : * Version 1.0 released. |br|
-    1.1  | 9-MAR-2015 :  * Adjusted to the new format of bbservation matrices from ARS sampler |br|
-
+    1.0  | 28-JAN-2015 :  * Version 1.0 released. |br|
+    1.1  |  9-MAR-2015 :  * Adjusted to the new format of observation matrices from ARS sampler |br|
+    2.0  | 14-AUG-2015 :  * Adjusted to ARS sampler v2.0  |br|
 
 *License*:
     BSD 2-Clause
@@ -33,65 +33,45 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def _samp_RMSG_ARS_ex0():
+def _nonuniARS_ex0():
 
-    # -----------------------------------------------------------------
-    # Generate settings for the generator
+    # Put the stuff on board
+    gen = rxcs.sig.randMult()      # Signal generator
+    samp = rxcs.acq.nonuniARS()    # Sampler   
 
-    dSigConf = {}   # Start the dictionary with signal generator configuration
-    dSigConf['tS'] = 1e-3     # Time of the signal is 1 ms
-    dSigConf['fR'] = 1e6      # The signal representation sampling frequency is 1 MHz
-    dSigConf['fMax'] = 10e3   # The highest possible frequency in the signal is 10 kHz
-    dSigConf['fRes'] = 1e3    # The signal spectrum resolution is 1 kHz
+    # General settings    
+    TIME = 1e-3  # Time of the signal is 1 ms    
+    FSMP = 1e6   # The signal representation sampling frequency is 1 MHz
+    
+    # Settings for the generator
+    gen.tS = TIME      # Time of the signal is 1 ms
+    gen.fR = FSMP      # The signal representation sampling frequency is 1 MHz
+    gen.fMax = 10e3    # The highest possible frequency in the signal is 10 kHz
+    gen.fRes = 1e3     # The signal spectrum resolution is 1 kHz
+    gen.nTones = 1     # The number of random tones
 
-    dSigConf['nTones'] = 1    # The number of tones
-    dSigConf['nSigPack'] = 1  # The number of signals to be generated
-
-    # -----------------------------------------------------------------
     # Generate settings for the sampler
-
-    dAcqConf = {}               # Start the dictionary with signal acquisition configuration
-    dAcqConf['Tg'] = 1e-6       # The sampling grid period
-    dAcqConf['fSamp'] = 8e3     # The average sampling frequency
-    dAcqConf['iSigma'] = 10     # Sigma parameter
+    samp.tS = TIME     # Time of the signal
+    samp.fR = FSMP     # The signal representation sampling freuqnecy
+    samp.Tg = 1e-6     # The sampling grid period
+    samp.fSamp = 8e3   # The average sampling frequency
 
     # -----------------------------------------------------------------
     # Run the multitone signal generator and the sampler
-    dSig = rxcs.sig.sigRandMult.main(dSigConf)         # the generator
-    dObSig = rxcs.acq.nonuniARS.main(dAcqConf, dSig)   # the sampler
+    gen.run()               # Run the generator    
+    samp.mSig = gen.mSig    # Connect the signal from the generator to the sampler 
+    samp.run()              # Run the sampler
 
     # -----------------------------------------------------------------
     # Plot the results of sampling
+    vSig = gen.mSig[0, :]   # The signal from the generator
+    vT = gen.vTSig          # The time vector of the original signal
+    vObSig = samp.mObSig[0, :]    # The observed signal
+    vPattsT = samp.mPattsT[0, :]  # The sampling moments
 
-    # Get the original signal and its time vector
-    mSig = dSig['mSig']
-    vSig = mSig[0, :]
-    vT = dSig['vTSig']
-
-    # Get the observed signal and sampling moments
-    mObSig = dObSig['mObSig']  # the observed signal
-    vObSig = mObSig[0, :]
-
-    #  If the ARS is the sampler, there may be a different number of samples for
-    #  every signal. Therefore some observation matrices have NaN-filled rows,
-    #  which generate NaN samples in observation signals, which should be
-    #  removed.
-    vObSig = vObSig[np.invert(np.isnan(vObSig))]
-
-    # -----------------------------------------------------------------
-
-    mPattsT = dObSig['mPattsT']  # the sampling moments
-    vPattsT = mPattsT[0, :]
-
-    #  If the ARS is the sampler, there may be a different number of samples for
-    #  every signal. Therefore some observation matrices have NaN-filled rows,
-    #  which generate NaN samples in observation signals, which should be
-    #  removed.
-    vPattsT = vPattsT[np.invert(np.isnan(vPattsT))]
-
+    # Plot the signal and the observed sampling points    
     hFig1 = plt.figure(1)
 
-    # Plot the signal and the observed sampling points
     hSubPlot1 = hFig1.add_subplot(211)
     hSubPlot1.grid(True)
     hSubPlot1.set_title('Signal and the observed sampling points')
@@ -114,26 +94,14 @@ def _samp_RMSG_ARS_ex0():
     plt.setp(markerline, color='b', markersize=10.0)
 
     # -----------------------------------------------------------------
-
-    # -----------------------------------------------------------------
     # APPENDIX:
     # This part is to show how to use the observation matrix, if it is needed
     # (for example in compressed sensing systems)
 
-    # Get a 3D matrix with observation matrices
-    lPhi = dObSig['lPhi']
+    lPhi = samp.lPhi   # Get a 3D matrix with observation matrices
+    mPhi = lPhi[0]     # Get the first observation matrix (1st element of lPhi list)
 
-    # Get the first observation matrix (1st page of the m3Phi matrix)
-    mPhi = lPhi[0]
-
-    # Sample the signal using the observation matrix
-    vObSigPhi = np.dot(mPhi, vSig)
-
-    #  If the ARS is the sampler, there may be a different number of samples for
-    #  every signal. Therefore some observation matrices have NaN-filled rows,
-    #  which generate NaN samples in observation signals, which should be
-    #  removed.
-    vObSigPhi = vObSigPhi[np.invert(np.isnan(vObSigPhi))]
+    vObSigPhi = np.dot(mPhi, vSig)   # Sample the signal using the observation matrix
 
     # Plot the signal and the observed sampling points
     hFig2 = plt.figure(2)
@@ -144,12 +112,10 @@ def _samp_RMSG_ARS_ex0():
     hSubPlot1.plot(vPattsT, vObSigPhi, 'ro', markersize=10)
 
     # -----------------------------------------------------------------
-
     plt.show(block=True)
-
 
 # =====================================================================
 # Trigger when start as a script
 # =====================================================================
 if __name__ == '__main__':
-    _samp_RMSG_ARS_ex0()
+    _nonuniARS_ex0()
