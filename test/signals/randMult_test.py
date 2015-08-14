@@ -182,7 +182,7 @@ def _TestCase1(iTolerance):
     # Run the multtone signal generator
     tStart = rxcs.console.module_progress('test (case 1) signals generation')
     gen.run()
-    rxcs.console.module_progress_done(tStart)
+    rxcs.console.progress_doneNL(tStart)
 
     # -----------------------------------------------------------------
     # Check signals
@@ -249,7 +249,7 @@ def _TestCase2(iTolerance):
     # Run the multtone signal generator
     tStart = rxcs.console.module_progress('test (case 2) signals generation')
     gen.run()
-    rxcs.console.module_progress_done(tStart)
+    rxcs.console.progress_doneNL(tStart)
 
     # -----------------------------------------------------------------
     # Check signals
@@ -316,7 +316,7 @@ def _TestCase3(iTolerance):
     # Run the multtone signal generator
     tStart = rxcs.console.module_progress('test (case 3) signals generation')
     gen.run()
-    rxcs.console.module_progress_done(tStart)
+    rxcs.console.progress_doneNL(tStart)
 
     # -----------------------------------------------------------------
     # Check signals
@@ -383,7 +383,7 @@ def _TestCase4(iTolerance):
     # Run the multtone signal generator
     tStart = rxcs.console.module_progress('test (case 4) signals generation')
     gen.run()
-    rxcs.console.module_progress_done(tStart)
+    rxcs.console.progress_doneNL(tStart)
 
     # -----------------------------------------------------------------
     # Check signals
@@ -446,7 +446,7 @@ def _TestCase5(iTolerance):
     # Run the multtone signal generator
     tStart = rxcs.console.module_progress('test (case 5) signals generation')
     gen.run()
-    rxcs.console.module_progress_done(tStart)
+    rxcs.console.progress_doneNL(tStart)
 
     # -----------------------------------------------------------------
     # Check signals
