@@ -326,7 +326,7 @@ class nonuniANGIE(rxcs._RxCSobject):
         # one grid point
         iGridvsRep = int(np.round((self.Tg * self.fR)))
 
-        # Recalculate the patterns to the signal representation frequency
+        # Recalculate the patterns to the signal representation sampling points
         mPattsRep = iGridvsRep * mPatts
 
         # --------------------------------------------------------------
