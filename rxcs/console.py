@@ -10,6 +10,7 @@ from this module.
     0.1  | 14-MAY-2014 : * Initial version. |br|
     0.2  | 15-MAY-2014 : * Docstrings added.
     0.21 | 15-MAY-2014 : * New colors ('PARAM' + 'OK') added to the dictionary
+    0.22 | 14-AUG-2015 : * New function (progress_doneNL) is added 
 
 
 *License*:
@@ -164,6 +165,44 @@ def progress_done(tStart):
 
     strTime = ('done in %.2f seconds') % (tTime)
     sys.stdout.write(_colors('OK') + strTime + _colors('ENDC'))
+    sys.stdout.flush()
+
+    return
+
+
+# =====================================================================
+# Finish the progress print + print the tme of execution + new line
+# =====================================================================
+def progress_doneNL(tStart):
+    """
+    Function adds 'done' to a console message previously printed by a
+    'module_progress' function. |br|
+
+    Additionally, the function print an info about an execution time of a
+    module, based on the time stamp of the start of the module, + a new line.|br|
+
+    The function takes care of the proper coloring of the console output. |br|
+
+    >>> tStart = console.module_progressNL('The module X is starting')
+    >>> time.sleep(1)
+    >>> console.module_progress_done(tStart)
+
+    gives an output:
+
+    :bash:`|        > The module X is starting...done in 1.00 seconds`
+
+    Args:
+        tStart (float): time stamp of the start
+
+    Returns:
+        nothing
+    """
+
+    # Measure the time
+    tTime = time.time() - tStart
+
+    strTime = ('done in %.2f seconds') % (tTime)
+    sys.stdout.write(_colors('OK') + strTime + _colors('ENDC') + '\n')
     sys.stdout.flush()
 
     return
