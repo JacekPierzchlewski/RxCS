@@ -1,6 +1,6 @@
 
 # Import uniform sampler
-import uniform
+from uniform import uniform
 
 # Import nonuniform sampler with ARS scheme
 from nonuniARS import nonuniARS
