@@ -25,7 +25,8 @@ when in *rxcs/test* directory. The results are then printed to the console.
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 27-MAY-2014 : * Version 1.0 released. |br|
+    1.0   | 27-MAY-2014 : * Version 1.0 released. |br|
+    2.0   | 14-AUG-2015 : * Adjusted to ANGIE sampler v2.0  |br|
 
 
 *License*:
@@ -96,21 +97,12 @@ def _TestCase1(iTolerance):
         Nothing
     """
 
-    # Start the dictionary with signal acquisition configuration
-    dAcqConf = {}
-
-    # The sampling grid period
-    dAcqConf['Tg'] = 1e-6
-
-    # The average sampling frequency
-    dAcqConf['fSamp'] = 50e3
-
-    # -----------------------------------------------------------------
-    # Check the sampler
-    _checkSampler(dAcqConf, iTolerance)
-
-    # -----------------------------------------------------------------
-
+    # Settings for the sampler
+    samp = rxcs.acq.nonuniANGIE()  # Sampler
+    samp.Tg = 1e-6      # The sampling grid period
+    samp.fSamp = 50e3   # The average sampling frequency
+       
+    _checkSampler(samp, iTolerance)      # Check the sampler
     return
 
 
@@ -132,21 +124,11 @@ def _TestCase2(iTolerance):
         Nothing
     """
 
-    # Start the dictionary with signal acquisition configuration
-    dAcqConf = {}
-
-    # The sampling grid period
-    dAcqConf['Tg'] = 1e-6
-
-    # The average sampling frequency
-    dAcqConf['fSamp'] = 100e3
-
-    # -----------------------------------------------------------------
-    # Check the sampler
-    _checkSampler(dAcqConf, iTolerance)
-
-    # -----------------------------------------------------------------
-
+    samp = rxcs.acq.nonuniANGIE()  # Sampler
+    samp.Tg = 1e-6       # The sampling grid period
+    samp.fSamp = 100e3   # The average sampling frequency
+       
+    _checkSampler(samp, iTolerance)      # Check the sampler
     return
 
 
@@ -168,21 +150,11 @@ def _TestCase3(iTolerance):
         Nothing
     """
 
-    # Start the dictionary with signal acquisition configuration
-    dAcqConf = {}
-
-    # The sampling grid period
-    dAcqConf['Tg'] = 1e-3
-
-    # The average sampling frequency
-    dAcqConf['fSamp'] = 500
-
-    # -----------------------------------------------------------------
-    # Check the sampler
-    _checkSampler(dAcqConf, iTolerance)
-
-    # -----------------------------------------------------------------
-
+    samp = rxcs.acq.nonuniANGIE()  # Sampler
+    samp.Tg = 1e-3      # The sampling grid period
+    samp.fSamp = 500    # The average sampling frequency
+       
+    _checkSampler(samp, iTolerance)      # Check the sampler
     return
 
 
@@ -204,34 +176,20 @@ def _TestCase4(iTolerance):
         Nothing
     """
 
-    # Start the dictionary with signal acquisition configuration
-    dAcqConf = {}
-
-    # The sampling grid period
-    dAcqConf['Tg'] = 1e-3
-
-    # The average sampling frequency
-    dAcqConf['fSamp'] = 100
-
-    # The minimum distance between sampling points
-    dAcqConf['tMin'] = 5e-3
-
-    # The maximum distance between sampling points
-    dAcqConf['tMax'] = 15e-3
-
-    # -----------------------------------------------------------------
-    # Check the sampler
-    _checkSampler(dAcqConf, iTolerance)
-
-    # -----------------------------------------------------------------
-
+    samp = rxcs.acq.nonuniANGIE()  # Sampler
+    samp.Tg = 1e-3      # The sampling grid period
+    samp.fSamp = 100    # The average sampling frequency
+    samp.tMin = 5e-3    # The minimum distance between sampling points
+    samp.tMax = 15e-3   # The maximum distance between sampling points
+     
+    _checkSampler(samp, iTolerance)      # Check the sampler
     return
 
 
 # =====================================================================
 # ENGINE OF THE TEST: Check the sampeld signals
 # =====================================================================
-def _checkSampler(dAcqConf, iTolerance):
+def _checkSampler(samp, iTolerance):
     """
     This function is the engine of all the tests. |br|
 
@@ -239,7 +197,7 @@ def _checkSampler(dAcqConf, iTolerance):
     checks the observed signals.
 
     Args:
-        dAcqConf: dictionary with the configuration of the sampler |br|
+        samp:   the sampler to be tested  |br|
 
         iTolerance: maximum tolerance of a difference between an expected
                     value and a real value |br|
@@ -250,21 +208,24 @@ def _checkSampler(dAcqConf, iTolerance):
 
     # Generated signals which will be sampled
     tStart = rxcs.console.module_progress('signals generation')
-    dSig = _generateSigs(dAcqConf)
+    gen = _generateSigs(samp)
     rxcs.console.module_progress_done(tStart)
 
     # Sample the signals
-    dAcqConf['bMute'] = 1   # Mute the output from the sampler
+    samp.mSig = gen.mSig  # Connect generated signals to the sampler
+    samp.fR = gen.fR      # Give the sampler information about signal rep. sampling frequency...    
+    samp.tS = gen.tS      # ... and time of the signal
+    samp.bMute = 1        # Mute the output from the sampler
+
     tStart = rxcs.console.module_progress('signals sampling')
-    dObSig = rxcs.acq.nonuniANGIE.main(dAcqConf, dSig)
+    samp.run()   # Run the sampler
     rxcs.console.module_progress_done(tStart)
 
     # Check the average sampling frequency
-    _check_sampFreq(dAcqConf, dObSig, iTolerance)
+    _check_sampFreq(samp, iTolerance)
 
-    # Check if the signal was sampled in the time sampling moments which
-    # are reported
-    _check_sampTMoments(dSig, dObSig, iTolerance)
+    # Check if the signal was sampled in the time sampling moments which  are reported
+    _check_sampTMoments(gen, samp, iTolerance)
 
     return
 
@@ -272,7 +233,7 @@ def _checkSampler(dAcqConf, iTolerance):
 # =====================================================================
 # Generate signals to be sampled
 # =====================================================================
-def _generateSigs(dAcqConf):
+def _generateSigs(samp):
     """
     This function generates a single-tone random signals. |br|
 
@@ -280,67 +241,43 @@ def _generateSigs(dAcqConf):
     of sampling, so that the sampling process will be possible.
 
     Args:
-        dAcqConf: dictionary with the configuration of the sampler |br|
+        samp:   the sampler to be tested  |br|
 
     Returns:
-        dSig: dictionary with signals to be sampled
+        gen:   the signals generator
     """
+    gen = rxcs.sig.randMult()      # Signal generator
+    gen.tS = 1000 * samp.Tg        # Time of the signal is equal to 1000*grid
+    gen.fR = 2 / samp.Tg           # The signal representation sampling frequency is 2 x the grid frequency
+    gen.fRes = 1 / gen.tS          # The signal spectrum resolution
+    gen.fMax = 10 * gen.fRes       # The highest possible frequency in the signal is 10 time the resolution
 
-    # Start the dictionary with configuration for random signal generator
-    dSigConf = {}
+    gen.nTones = 1                 # There is one tone in every signal
+    gen.nSigPack = 1e4             # The number of signals to be generated
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    gen.iMinPhs = 0                # Phase of all the signals equals zero
+    gen.iMaxPhs = 0
 
-    # Time of the signal is equal to 100*grid
-    dSigConf['tS'] = 1000*dAcqConf['Tg']
+    gen.bMute = 1         # Mute the output from the generator
 
-    # The signal representation sampling frequency is 2 x the grid frequency
-    dSigConf['fR'] = 2/dAcqConf['Tg']
+    # ----------------------------------------------
+    gen.run()             # Run the generator
+    # ----------------------------------------------
 
-    # The signal spectrum resolution
-    dSigConf['fRes'] = 1/dSigConf['tS']
-
-    # The highest possible frequency in the signal is 10 time the resolution
-    dSigConf['fMax'] = 10*dSigConf['fRes']
-
-    # - - - - - - - - - - - - - - - -
-
-    # The number of tones
-    dSigConf['nTones'] = 1
-
-    # The number of signals to be generated
-    dSigConf['nSigPack'] = 1e4
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    # Phase of all the signals equals zero
-    dSigConf['iMinPhs'] = 0
-    dSigConf['iMaxPhs'] = 0
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    # Mute the output from the generator
-    dSigConf['bMute'] = 1
-
-    # -----------------------------------------------------------------
-    # Run the multtone signal generator
-    dSig = rxcs.sig.sigRandMult.main(dSigConf)
-
-    return dSig
+    return (gen)
 
 
 # =====================================================================
 # This function checks the average sampling frequency
 # =====================================================================
-def _check_sampFreq(dAcqConf, dObSig, iTolerance):
+def _check_sampFreq(samp, iTolerance):
     """
     This function function checks the average sampling frequency. |br|
 
     Args:
-        dAcqConf: dictionary with the configuration of the sampler |br|
-        dSig: dictionary with the observed signals
-        iTolerance: maximum tolerance of a difference between an expected
-                    value and a real value |br|
+        samp:         the sampler to be tested  |br|
+        iTolerance:   maximum tolerance of a difference between an expected
+                      value and a real value |br|
 
     Returns:
         nothing
@@ -350,11 +287,8 @@ def _check_sampFreq(dAcqConf, dObSig, iTolerance):
     # Check if the reported average sampling frequency
     # equals the requested
 
-    # Get the requested average sampling frequency
-    fSamp_req = dAcqConf['fSamp']
-
-    # Get the reported average sampling frequency
-    fSamp_rep = dObSig['f_s']
+    fSamp_req = samp.fSamp   # the requested average sampling frequency
+    fSamp_rep = samp.f_s     # the reported average sampling frequency
 
     if not _isequal(fSamp_req, fSamp_rep, fSamp_rep*iTolerance):
         strErr = ('the reported average samp. freq is ')
@@ -364,33 +298,24 @@ def _check_sampFreq(dAcqConf, dObSig, iTolerance):
     # -----------------------------------------------------------------
     # Check if the real average sampling frequency is correct
 
-    # Get the real length of a sampling pattern
-    tTau_real = dObSig['tTau_real']
+    tTau_real = samp.tTau_real   # The real length of a sampling pattern
+    nK_s_corr = int(np.round(fSamp_req * tTau_real))   # Calculate the correct number of sampling points
 
-    # Calculate the correct number of sampling points
-    nK_s_corr = int(np.round(fSamp_req * tTau_real))
-
-    # Get the real number of samples in the observed signals
-    (_, nK_s_real) = (dObSig['mPatts']).shape
-
+    (_, nK_s_real) = samp.mPatts.shape  # Get the real number of samples in the observed signals
     if nK_s_corr != nK_s_real:
         strErr = ('the number of samples in the observed signals is ')
         strErr = strErr + ('incorrect: error!!!')
         raise Exception(strErr)
 
     # -----------------------------------------------------------------
-    # Check if the reported average sampling frequency
-    # equals the real
+    # Check if the reported average sampling frequency equals the real
 
-    # Get the reported number of samples in the observed signals
-    nK_s_rep = dObSig['nK_s']
-
+    nK_s_rep = samp.nK_s    # The reported number of samples in the observed signals
     if nK_s_rep != nK_s_real:
         strErr = ('the reported number of samples in the observed signals is ')
         strErr = strErr + ('different than the real number: error!!!')
         raise Exception(strErr)
 
-    # -----------------------------------------------------------------
     rxcs.console.note('sampling frequency:                  ok!')
     return
 
@@ -399,51 +324,31 @@ def _check_sampFreq(dAcqConf, dObSig, iTolerance):
 # This function checks if the signals were sampled in the time
 # sampling moments which are reported
 # =====================================================================
-def _check_sampTMoments(dSig, dObSig, iTolerance):
+def _check_sampTMoments(gen, samp, iTolerance):
     """
     This function checks if the signals were sampled in the time
     sampling moments which are reported. |br|
 
     Args:
-        dAcqConf: dictionary with the configuration of the sampler |br|
-        dSig: dictionary with the observed signals
-        iTolerance: maximum tolerance of a difference between an expected
-                    value and a real value |br|
-
-    Returns:
-        nothing
+        gen:          the signals generator  |br|
+        samp:         the sampler to be tested  |br|
+        iTolerance:   maximum tolerance of a difference between an expected
+                      value and a real value |br|
     """
 
-    # Get the observed signals
-    mObSig = dObSig['mObSig']
+    
+    mObSig = samp.mObSig          # Get the observed signals
+    (nSigs, nK_s) = mObSig.shape  # Get the number of observed signals and the number of samples in the signals
+    mPattsT = samp.mPattsT        # Get the sampling patterns (in time domain)
 
-    # Get the number of observed signals and the number of samples in
-    # the signals
-    (nSigs, nK_s) = mObSig.shape
-
-    # Get the sampling patterns (in time domain)
-    mPattsT = dObSig['mPattsT']
-
-    # - - - - - - - - - - - - - - - - - - -
-
-    # Get the frequencies of signals
-    mFrqs = dSig['mFrqs']
-
-    # Get the amplitudes of signals
-    mAmps = dSig['mAmps']
-
-    # Get the phases of signals
-    mPhs = dSig['mPhs']
-
-    # Get the time vector for signals
-    vTSig = dSig['vTSig']
+    mFrqs = gen.mFrqs    # Get the frequencies of signals
+    mAmps = gen.mAmps    # Get the amplitudes of signals
 
     for inxSig in np.arange(nSigs):  # <- loop over all signals
 
-        # Get the frequency, amplitude and phase of the current signal
+        # Get the frequency and amplitude of the current signal
         iF = mFrqs[inxSig, 0]
         iAmp = mAmps[inxSig, 0]
-        iPhs = mPhs[inxSig, 0]
 
         # Get the current observed signal
         vObSig = mObSig[inxSig, :]
