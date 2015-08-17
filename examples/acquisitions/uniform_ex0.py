@@ -19,6 +19,7 @@ plotted.
 *Version*:
     1.0  | 29-JAN-2015 :  * Version 1.0 released. |br|
     2.0  | 14-AUG-2015 :  * Adjusted to uniform sampler v2.0  |br|
+    2.1  | 17-AUG-2015 :  * Adjusted to uniform sampler v2.1 (observation matrices in a list) |br|
 
 *License*:
     BSD 2-Clause
@@ -96,7 +97,7 @@ def _uniform_ex0():
     # This part is to show how to use the observation matrix, if it is needed
     # (for example in compressed sensing systems)
 
-    mPhi = samp.m3Phi[0, : ,:]       # Get the observation matrix (1st page of the 3D m3Phi matrix)
+    mPhi = samp.lPhi[0]        # Get the observation matrix (1st element of the list with observation matrices)
     vObSigPhi = np.dot(mPhi, vSig)   # Sample the signal using the observation matrix
 
     # Plot the signal and the observed sampling points
