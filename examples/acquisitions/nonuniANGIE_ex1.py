@@ -98,7 +98,8 @@ def nonuniANGIE_ex1():
     hFig3 = plt.figure(3)
     hSubPlot1 = hFig3.add_subplot(111)
     hSubPlot1.grid(True)
-    hSubPlot1.set_title('Signal and the observed sampling points')
+    strTitle = 'Signal #%d and the observed sampling points' % iSigInx1
+    hSubPlot1.set_title(strTitle)
     hSubPlot1.plot(vT, vSig1, '-')
     hSubPlot1.plot(vPattsT1, vObSigPhi1, 'ro', markersize=10)
 
@@ -106,7 +107,8 @@ def nonuniANGIE_ex1():
     hFig4 = plt.figure(4)
     hSubPlot1 = hFig4.add_subplot(111)
     hSubPlot1.grid(True)
-    hSubPlot1.set_title('Signal and the observed sampling points')
+    strTitle = 'Signal #%d and the observed sampling points' % iSigInx2
+    hSubPlot1.set_title(strTitle)
     hSubPlot1.plot(vT, vSig2, '-')
     hSubPlot1.plot(vPattsT2, vObSigPhi2, 'ro', markersize=10)
 
