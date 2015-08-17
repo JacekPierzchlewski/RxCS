@@ -72,7 +72,7 @@ Available atributes of 'randMult' class after calling 'run' method:
 
     - f. **nSmp** (*float*): The number of samples in the signals
 
-    - g. **vTSig** (*float*): The time vector for the generated signals
+    - g. **vTSig** (*float*): The time vector for the generated signals (name alias vT is available)
 
     - h. **iSNR** (*vector*): Signal 2 noise ratio
 
@@ -301,6 +301,7 @@ class randMult(rxcs._RxCSobject):
         
         # Generate the time vector for the signal
         self.vTSig = np.arange(self.nSmp) / self.fR 
+        self.vT = self.vTSig   # Name alias for vTSig is vT
 
         return
 
