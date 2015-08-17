@@ -9,6 +9,7 @@ The modules samples the given signals uniformly. |br|
 *Version*:
     1.0  | 29-JAN-2015 : * Initial version. |br|
     2.0  | 14-AUG-2015 : * Objectified version (2.0) |br|
+    2.1  | 17-AUG-2015 : * Observation matrices are gathered in list, not in 3D matrix |br|
 
 *License*:
     BSD 2-Clause
@@ -320,11 +321,8 @@ class uniform(rxcs._RxCSobject):
         for inxCol in vPatts:    # <- loop over all samling points in pattern
             mPhi[inxRow, int(inxCol)] = 1
             inxRow = inxRow + 1
-                   
-        # Duplicate the generates observations matrix into 3D matrix
-        m3Phi = np.tile(mPhi,(self.nSigs, 1 ,1))                 
-
-        self.m3Phi = m3Phi
+        lPhi = [mPhi]   # Put the matrix into a list
+        self.lPhi = lPhi
         return
 
     # =================================================================
