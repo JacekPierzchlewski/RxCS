@@ -19,6 +19,7 @@ from the saturated sampling patterns.
 
 *Version*:
     1.0  | 04-MAR-2015 : * Version 1.0 released. |br|
+    2.0  | 17-AUG-2015 : * Adjusted to saturation block v2.0 (objectified)  |br|
 
 *License*:
     BSD 2-Clause
@@ -30,74 +31,62 @@ import numpy as np
 
 def _saturation_ex1():
 
-    # -----------------------------------------------------------------
-    # Generate the signal
+    # Put the stuff on board
+    gen = rxcs.sig.randMult()      # Signal generator
+    samp = rxcs.acq.uniform()      # Uniform sampler
+    satur = rxcs.acq.satur()       # Saturation block
 
-    # Generate settings for the generator
-    dSigConf = {}
-    dSigConf['tS'] = 1e-3     # Time of the signal is 1 ms
-    dSigConf['fR'] = 1e6      # The signal representation sampling frequency is 1 MHz
-    dSigConf['fMax'] = 10e3   # The highest possible frequency in the signal is 10 kHz
-    dSigConf['fRes'] = 1e3    # The signal spectrum resolution is 1 kHz
+    # General settings    
+    TIME = 1e-3  # Time of the signal is 1 ms    
+    FSMP = 1e6   # The signal representation sampling frequency is 1 MHz
+    
+    # Settings for the generator
+    gen.tS = TIME      # Time of the signal is 1 ms
+    gen.fR = FSMP      # The signal representation sampling frequency is 1 MHz
+    gen.fMax = 10e3    # The highest possible frequency in the signal is 10 kHz
+    gen.fRes = 1e3     # The signal spectrum resolution is 1 kHz
+    gen.nTones = 5     # The number of random tones
+    gen.iMinAmp = 0.1   # The minimum amplitude of a tone
+    gen.iMaxAmp = 1.0   # The maximum amplitude of a tone
+    gen.nSigPack = 1    # The number of signals to be generated
 
-    dSigConf['nTones'] = 3    # The number of tones
-
-    dSigConf['iMinAmp'] = 0.1  # Minimum amplitude of a single tone
-    dSigConf['iMaxAmp'] = 1.0  # Maximum amplitude of a single tone
-
-    dSigConf['nSigPack'] = 1  # The number of signals to be generated
-
-    # Generate the signal
-    dSig = rxcs.sig.sigRandMult.main(dSigConf)
-
-    # -----------------------------------------------------------------
-    # Sample the signal
-
-    # Start the dictionary with signal acquisition configuration
-    dAcqConf = {}
-    dAcqConf['Tg'] = 1e-6      # The sampling grid period
-    dAcqConf['fSamp'] = 40e3   # The average sampling frequency
-    dAcqConf['iAlpha'] = 0.5   # The alpha parameter
-
-    # Sample the signal
-    dObSig = rxcs.acq.uniform.main(dAcqConf, dSig)
-
-    # -----------------------------------------------------------------
-    # Pushed the observed signal through the saturation block
+    # Generate settings for the uniform sampler
+    samp.tS = TIME     # Time of the signal
+    samp.fR = FSMP     # The signal representation sampling freuqnecy
+    samp.Tg = 1e-6      # The sampling grid period
+    samp.fSamp = 40e3   # The average sampling frequency
 
     # Generate settings for the saturation block
-    dAcqConf = {}
-    dAcqConf['iMinAmp'] = -0.8  # Minimum amplitude
-    dAcqConf['iMaxAmp'] = 0.8   # Maximum amplitude
+    satur.iMinAmp = -0.8   # Minimum amplitude
+    satur.iMaxAmp = 0.8    # Maximum amplitude
 
-    # Run the saturation block
-    dObSigSatur = rxcs.acq.satur.main(dAcqConf, dObSig)
+    # -----------------------------------------------------------------
+    # Run the system
+    gen.run()                # Run the generator
+    samp.mSig = gen.mSig     # Connect the signal from the generator to the sampler
+    samp.run()               # Run the sampler
+
+    satur.mSig = samp.mObSig      # Connect the sampler output with the saturation input
+    satur.mPattsT = samp.mPattsT  # Connect the sampling pattern (ass time moments) to the saturation block 
+    satur.run()                   # Run the saturation block
 
     # -----------------------------------------------------------------
     # Plot the results of sampling
 
     # Get the original signal and its time vector
-    mSig = dSig['mSig']
-    vSig = mSig[0, :]
-    vT = dSig['vTSig']
+    vSig = gen.mSig[0, :]
+    vT = gen.vTSig
 
-    # Get the observed signal (uniformly sampled)
-    mObSig = dObSig['mObSig']  # the observed signal
-    vObSig = mObSig[0, :]
-    mPattsT = dObSig['mPattsT']  # the sampling moments
-    vPattsT = mPattsT[0, :]
-
+    # Get the observed signal (uniformly sampled) from the uniform sampler
+    vObSig = samp.mObSig[0, :]    # The observed signal
+    vPattsT = samp.mPattsT[0, :]  # The sampling moments
+    
     # Get the observed limited signal and saturation markers
-    mObSigSatur = dObSigSatur['mObSig']      # the observed signal
-    vObSigSatur = mObSigSatur[0, :]          # get the first observed signal (in fact there where only 1)
-    mSaturMark = dObSigSatur['mSaturMark']   # get the saturation markers
-    vSaturMark = mSaturMark[0, :]            # get the first set ot saturation markers
+    vObSigSatur = satur.mObSig[0, :]      # Get the observed signal
+    vSaturMark = satur.mSaturMark[0, :]   # Get the first set ot saturation markers (in fact, there where only 1)
 
-    # Get the observed signals with saturated sampled removed and sampling patterns with saturated samples removed
-    lObSigClean = dObSigSatur['lObSigClean']
-    vObSigClean = lObSigClean[0]
-    lPattsTClean = dObSigSatur['lPattsTClean']
-    vPattTClean = lPattsTClean[0]
+    vObSigClean = satur.lObSigClean[0]   #  Get the observed signal with saturated sampled removed
+    vPattTClean = satur.lPattsTClean[0]  #  Get the sampling pattern with saturated samples removed
 
     # ----------------------------------------
     hFig1 = plt.figure(1)
@@ -123,7 +112,6 @@ def _saturation_ex1():
 
     # ----------------------------------------
     hFig2 = plt.figure(2)
-
     hSubPlot1 = hFig2.add_subplot(311)
     hSubPlot1.grid(True)
     hSubPlot1.plot(vT, vSig, 'k-', label='original signal')
@@ -190,7 +178,6 @@ def _saturation_ex1():
 
     # -----------------------------------------------------------------
     plt.show(block=True)
-
 
 
 # =====================================================================

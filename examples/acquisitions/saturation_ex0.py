@@ -12,6 +12,7 @@ which limits the signal's minimum and maximum values. |br|
 
 *Version*:
     1.0  | 04-MAR-2015 : * Version 1.0 released. |br|
+    2.0  | 17-AUG-2015 : * Adjusted to saturation block v2.0 (objectified)  |br|
 
 *License*:
     BSD 2-Clause
@@ -22,51 +23,40 @@ import matplotlib.pyplot as plt
 
 def _saturation_ex0():
 
-    # -----------------------------------------------------------------
-    # Generate the signal
+    # Put the stuff on board
+    gen = rxcs.sig.randMult()    # Signal generator
+    satur = rxcs.acq.satur()     # Saturation block
 
-    # Generate settings for the generator
-    dSigConf = {}
-    dSigConf['tS'] = 1e-3     # Time of the signal is 1 ms
-    dSigConf['fR'] = 1e6      # The signal representation sampling frequency is 1 MHz
-    dSigConf['fMax'] = 10e3   # The highest possible frequency in the signal is 10 kHz
-    dSigConf['fRes'] = 1e3    # The signal spectrum resolution is 1 kHz
-
-    dSigConf['nTones'] = 3    # The number of tones
-
-    dSigConf['iMinAmp'] = 0.1  # Minimum amplitude of a single tone
-    dSigConf['iMaxAmp'] = 1.0  # Maximum amplitude of a single tone
-
-    dSigConf['nSigPack'] = 1  # The number of signals to be generated
-
-    # Generate the signal
-    dSig = rxcs.sig.sigRandMult.main(dSigConf)
-
-    # -----------------------------------------------------------------
-    # Pushed the observed signal through the saturation block
+    # General settings    
+    TIME = 1e-3  # Time of the signal is 1 ms    
+    FSMP = 1e6   # The signal representation sampling frequency is 1 MHz
+    
+    # Settings for the generator
+    gen.tS = TIME      # Time of the signal is 1 ms
+    gen.fR = FSMP      # The signal representation sampling frequency is 1 MHz
+    gen.fMax = 10e3    # The highest possible frequency in the signal is 10 kHz
+    gen.fRes = 1e3     # The signal spectrum resolution is 1 kHz
+    gen.nTones = 3     # The number of random tones
+    gen.iMinAmp = 0.1   # The minimum amplitude of a tone
+    gen.iMaxAmp = 1.0   # The maximum amplitude of a tone
+    gen.nSigPack = 1    # The number of signals to be generated
 
     # Generate settings for the saturation block
-    dAcqConf = {}
-    dAcqConf['iMinAmp'] = -0.8  # Minimum amplitude
-    dAcqConf['iMaxAmp'] = 0.8   # Maximum amplitude
+    satur.iMinAmp = -0.8   # Minimum amplitude
+    satur.iMaxAmp = 0.8    # Maximum amplitude
 
-    # Run the saturation block
-    dObSig = rxcs.acq.satur.main(dAcqConf, dSig)
+    # -----------------------------------------------------------------
+    # Run the multitone signal generator and the saturation block
+    gen.run()               # Run the generator
+    satur.mSig = gen.mSig   # Connect the generator output with the saturation input
+    satur.run()             # Run the saturation block
 
     # -----------------------------------------------------------------
     # Plot the results of sampling
-
-    # Get the original signal and its time vector
-    mSig = dSig['mSig']
-    vSig = mSig[0, :]
-    vT = dSig['vTSig']
-
-    # Get the observed limited signal and saturation markers
-    mObSig = dObSig['mObSig']  # the observed signal
-    vObSig = mObSig[0, :]      # get the first observed signal (in fact there where only 1)
-    mSaturMark = dObSig['mSaturMark']   # get the saturation markers
-    vSaturMark = mSaturMark[0,    :]   # get the first set ot saturation markers
-
+    vSig = gen.mSig[0, :]   # Get the original signal
+    vT = gen.vTSig          # ... and its time vector
+    vObSig = satur.mObSig[0, :]           # Get the observed signal
+    vSaturMark = satur.mSaturMark[0, :]   # Get the first set ot saturation markers
 
     hFig1 = plt.figure(1)
     # Plot the original signal and the saturated signal
@@ -85,7 +75,6 @@ def _saturation_ex0():
 
     # -----------------------------------------------------------------
     plt.show(block=True)
-
 
 
 # =====================================================================
