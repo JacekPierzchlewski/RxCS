@@ -18,5 +18,5 @@ import nonuniExtern
 import nonuniExternDummy
 
 # Import saturation block
-import satur
+from satur import satur
 
