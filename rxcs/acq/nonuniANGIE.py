@@ -19,6 +19,7 @@ available in arXiv: http://arxiv.org/abs/1409.1002
     1.1r1| 18-SEP-2014 : * Bug in checking time of patterns is fixed. |br|
     1.1r2| 28-JAN-2015 : * Patterns generator adjusted to Numpy indexing. |br|
     2.0  | 13-AUG-2015 : * Objectified version (2.0) |br|
+    2.1  | 17-AUG-2015 : * Observation matrices are gathered in list, not in 3D matrix |br|
 
 *License*:
     BSD 2-Clause 
@@ -376,23 +377,24 @@ class nonuniANGIE(rxcs._RxCSobject):
                 m3Phi (3D matrix): observation matrices
         """
 
-        nSmp = int(round(self.tS * self.fR))  # The number of representation samples in the input signals
-
-        # Allocate the observation matrices
-        m3Phi = np.zeros((self.nSigs, self.nK_s, nSmp))
+        nSmp = int(round(self.tS * self.fR))     # The number of representation samples in the input signals
+        lPhi = []                                # Start a list with observation matrices   
+        mPhiEmpty = np.zeros((self.nK_s, nSmp))  # Start an empty observation matrix
 
         # Generate the observation matrices
         for inxPat in np.arange(self.nSigs):  # <- loop over all observation matrices
 
             vPatts = self.mPattsRep[inxPat, :]    # Get the current pattern
-    
-            # Generate the current observation matrix
+            mPhi = mPhiEmpty.copy()     # Make a new empty observation matrix
+
+            # Fil up the current observation matrix
             inxRow = 0
             for iSamp in vPatts:    # <- loop over all samling points in pattern
-                m3Phi[inxPat, inxRow, iSamp] = 1
+                mPhi[inxRow, iSamp] = 1
                 inxRow = inxRow + 1
+            lPhi.append(mPhi)        # Add the current observation matrix to the list
 
-        self.m3Phi = m3Phi
+        self.lPhi = lPhi
         return
 
     def _angie_engine(self, nK_s, K_g, K_min, K_max, sigma):
