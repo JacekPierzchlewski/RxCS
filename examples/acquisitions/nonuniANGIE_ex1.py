@@ -20,7 +20,8 @@ plotted.
 
 *Version*:
     1.0    | 13-AUG-2015 : * Version 1.0 released. |br|
-  
+    2.1    | 17-AUG-2015 : * Adjusted to ANGIE sampler v2.1 (observation matrices in a list) |br|
+
 *License*:
     BSD 2-Clause
 """
@@ -87,11 +88,11 @@ def nonuniANGIE_ex1():
     # This part is to show how to use the observation matrix, if it is needed
     # (for example in compressed sensing systems)
 
-    mPhi1 = samp.m3Phi[iSigInx1, : ,:]    # Get the observation matrix for the 1st signal
-    vObSigPhi1 = np.dot(mPhi1, vSig1)      # Sample the 1st signal using the observation matrix
+    mPhi1 = samp.lPhi[iSigInx1]          # Get the observation matrix for the 1st signal
+    vObSigPhi1 = np.dot(mPhi1, vSig1)    # Sample the 1st signal using the observation matrix
 
-    mPhi2 = samp.m3Phi[iSigInx2, : ,:]    # Get the observation matrix for the 2nd signal
-    vObSigPhi2 = np.dot(mPhi2, vSig2)      # Sample the 2nd signal using the observation matrix
+    mPhi2 = samp.lPhi[iSigInx2]          # Get the observation matrix for the 2nd signal
+    vObSigPhi2 = np.dot(mPhi2, vSig2)    # Sample the 2nd signal using the observation matrix
 
     # Plot the 1st signal and the observed sampling points
     hFig3 = plt.figure(3)

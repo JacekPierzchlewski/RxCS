@@ -22,7 +22,8 @@ plotted.
     1.0    | 27-MAY-2014 : * Version 1.0 released. |br|
     2.0    | 11-AUG-2015 : * Version 2.0 released (adjusted to signal generator v2.0)  |br|
     2.0r1  | 11-AUG-2015 : * File name changed |br|
-    2.1    | 13-AUG-2015 : * Adjusted to ANGIE sampler v2.0  |br|
+    2.0r2  | 13-AUG-2015 : * Adjusted to ANGIE sampler v2.0  |br|
+    2.1    | 17-AUG-2015 : * Adjusted to ANGIE sampler v2.1 (observation matrices in a list) |br|
 
 
 *License*:
@@ -101,7 +102,7 @@ def nonuniANGIE_ex0():
     # This part is to show how to use the observation matrix, if it is needed
     # (for example in compressed sensing systems)
 
-    mPhi = samp.m3Phi[0, : ,:]      # get the observation matrix (1st page of the 3D m3Phi matrix)
+    mPhi = samp.lPhi[0]  # Get the observation matrix (1st element of the list with observation matrices)
     vObSigPhi = np.dot(mPhi, vSig)  # Sample the signal using the observation matrix
 
     # Plot the signal and the observed sampling points
