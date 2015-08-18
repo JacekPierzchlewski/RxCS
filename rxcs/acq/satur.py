@@ -7,8 +7,10 @@ The modules saturates the given signal. |br|
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 03-MAR-2015 : * Initial version. |br|
-    2.0  | 17-AUG-2015 : * Objectified version (2.0) |br|
+    1.0    | 03-MAR-2015 : * Initial version. |br|
+    2.0    | 17-AUG-2015 : * Objectified version (2.0) |br|
+    2.0r1  | 18-AUG-2015 : * Restricitons added onto input parameters |br|
+    2.0r2  | 18-AUG-2015 : * Adjusted to RxCSObject v1.0 |br|
 
 
 *License*:
@@ -65,37 +67,45 @@ class satur(rxcs._RxCSobject):
     def __inputOptSignals(self):
 
         # Signal time vector
-        self.paramAddOpt('vT', 'Signal time vector', noprint=1, default=np.empty(0))
+        self.paramAddOpt('vT', 'Signal time vector', noprint=1)
         self.paramType('vT', np.ndarray)      # Must be a Numpy array
         self.paramTypeEl('vT', (int, float))  # Elements must be of float or int type 
         self.paramNDimEq('vT', 1)             # Must be a 1 dimensional vector
+        self.paramDimEq('vT', 'mSig', 0, 'columns')  # Size of the vector must equal the number of columns in the matrix mSig
 
         # Sampling patterns (grid indices)
-        self.paramAddOpt('mPatts', 'Sampling patterns', noprint=1, default=np.empty((0, 0)))
-        self.paramType('mPatts', np.ndarray)      # Must be a Numpy array
-        self.paramTypeEl('mPatts', (int, float))  # Elements must be of float or int type 
+        self.paramAddOpt('mPatts', 'Sampling patterns', noprint=1)
+        self.paramType('mPatts', np.ndarray)         # Must be a Numpy array
+        self.paramTypeEl('mPatts', (int, float))     # Elements must be of float or int type 
+        self.paramNDimLE('mPatts', 2)                # Must be a 1, or 2 dimensional matrix
+        self.paramDimEq('mPatts', 'mSig', 'rows', 'rows')         # Must have shape equal to mSig 
+        self.paramDimEq('mPatts', 'mSig', 'columns', 'columns')   # ^
 
         # Sampling patterns (signal rep. sampling points)
-        self.paramAddOpt('mPattsRep', 'Sampling patterns  (signal rep. sampling points)', noprint=1, default=np.empty((0, 0)))
+        self.paramAddOpt('mPattsRep', 'Sampling patterns  (signal rep. sampling points)', noprint=1)
         self.paramType('mPattsRep', np.ndarray)      # Must be a Numpy array
         self.paramTypeEl('mPattsRep', (int, float))  # Elements must be of float or int type 
         self.paramNDimEq('mPattsRep', 2)             # Must be a 2 dimensional matrix
+        self.paramDimEq('mPattsRep', 'mSig', 'rows', 'rows')         # Must have shape equal to mSig 
+        self.paramDimEq('mPattsRep', 'mSig', 'columns', 'columns')   # ^
 
         # Sampling patterns (time moments)
-        self.paramAddOpt('mPattsT', 'Sampling patterns  (time moments)', noprint=1, default=np.empty((0, 0)))
+        self.paramAddOpt('mPattsT', 'Sampling patterns  (time moments)', noprint=1)
         self.paramType('mPattsT', np.ndarray)      # Must be a Numpy array
         self.paramTypeEl('mPattsT', (int, float))  # Elements must be of float or int type 
         self.paramNDimEq('mPattsT', 2)             # Must be a 2 dimensional matrix
+        self.paramDimEq('mPattsT', 'mSig', 'rows', 'rows')         # Must have shape equal to mSig 
+        self.paramDimEq('mPattsT', 'mSig', 'columns', 'columns')   # ^
 
         # Observation matrices
-        self.paramAddOpt('lPhi', 'Observation matrices', noprint=1, default=[])
-        self.paramType('lPhi', list)            # Must be a list
-        self.paramTypeEl('lPhi', np.ndarray)    # Elements of this list must be Numpy arrays
+        self.paramAddOpt('lPhi', 'Observation matrices', noprint=1)
+        self.paramType('lPhi', list)                  # Must be a list
+        self.paramTypeEl('lPhi', np.ndarray)          # Elements of this list must be Numpy arrays
+        self.paramDimEq('lPhi', 'mSig', 0, 'rows')    # The number of observation matrices must equal
+                                                      # the number of signals (rows in mSig)
 
     # Run
-    def run(self, *args):
-
-        self.parametersProcess(*args)  # Get parameters given directly to 'run' function
+    def run(self):
         self.parametersCheck()         # Check if all the needed partameters are in place and are correct
         self.parametersPrint()         # Print the values of parameters
         
@@ -117,9 +127,9 @@ class satur(rxcs._RxCSobject):
         self.lvTClean = self._cleanvT(self.vT, self.mSaturMark)
 
         # Generate 'clean' sampling patterns, with saturated samples removed
-        self.lPattsClean = self._cleanPattern(self.mPatts, self.mSaturMark)
-        self.lPattsTClean = self._cleanPattern(self.mPattsT, self.mSaturMark)
-        self.lPattsRepClean = self._cleanPattern(self.mPattsRep, self.mSaturMark)
+        self.lPattsClean = self._cleanPattern(self.mPatts, self.mSaturMark, 'mPatts')
+        self.lPattsTClean = self._cleanPattern(self.mPattsT, self.mSaturMark, 'mPattsT')
+        self.lPattsRepClean = self._cleanPattern(self.mPattsRep, self.mSaturMark, 'mPattsRep')
 
         # Clean observation matrices
         self.lPhiClean = self._cleanObserMat(self.lPhi, self.mSaturMark)        
@@ -173,7 +183,7 @@ class satur(rxcs._RxCSobject):
         lvTClean = []
 
         # If vT was not given, return from the function doing nothing         
-        if vT.size == 0:
+        if not self.wasParamGiven('vT'):
             return lvTClean
             
         for inxSig in np.arange(nSigs):
@@ -184,12 +194,12 @@ class satur(rxcs._RxCSobject):
 
         return lvTClean
 
-    def _cleanPattern(self, mPatterns, mSaturMark):
+    def _cleanPattern(self, mPatterns, mSaturMark, strVarName):
 
         # -----------------------------------------------------------------
         # Patterns (as grid indices):
         lPattsClean = []
-        if mPatterns.size > 0:
+        if self.wasParamGiven(strVarName):
             mPatterns_ = mPatterns.copy()                         # Create a working copy of an array with patterns
             mPatterns_ = mPatterns_.astype('float')               # Type of patterns must be float to include NaNs 
             (nPatts, _) = mPatterns_.shape                        # Get the number of patterns
@@ -202,7 +212,12 @@ class satur(rxcs._RxCSobject):
 
     def _cleanObserMat(self, lPhi, mSaturMark):
 
-        lPhiClean = []                            
+        lPhiClean = []       
+
+        # If lPhi was not given, return doing nothing
+        if not self.wasParamGiven('lPhi'):
+            return lPhiClean
+
         for inxObMat in np.arange(len(lPhi)):         # Loop over all observation matrices
             mPhi = lPhi[inxObMat]                     # Get the current original observation matrix...
             (nRows, nCols) = mPhi.shape               # ...and its shape
