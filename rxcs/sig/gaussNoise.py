@@ -108,12 +108,10 @@ class gaussNoise(rxcs._RxCSobject):
         self.paramAllowed('bMute',[0, 1])      # It can be either 1 or 0
 
 
-    def run(self, *args):
+    def run(self):
         """
         Run method, which starts the generator    
         """
-
-        self.parametersProcess(*args)  # Get parameters given directly to 'run' function
         self.parametersCheck()         # Check if all the needed partameters are in place and are correct
         self.parametersPrint()         # Print the values of parameters
 
