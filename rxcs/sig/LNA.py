@@ -14,7 +14,9 @@ Atributes of 'LNA' class after calling 'run' method:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 15-JUL-2014 : * Version 1.0 released. |br|
+    1.0    | 15-JUL-2014 : * Version 1.0 released. |br|
+    1.0r1  | 18-AUG-2015 : * Adjusted to RxCSobject v1.0 |br|
+
 
 *License*:
     BSD 2-Clause
@@ -35,11 +37,6 @@ class LNA(rxcs._RxCSobject):
 
         self.__inputDefine()           # Define the input signals
         self.__parametersDefine()      # Define the parameters
-
-        # If there are arguments given when the object was created, then run the engine  
-        if len(args) > 0:
-            self.run(*args)
-
 
     # Define input signals
     def __inputDefine(self):
@@ -70,9 +67,8 @@ class LNA(rxcs._RxCSobject):
 
 
     # Run
-    def run(self, *args):
+    def run(self):
         
-        self.parametersProcess(*args)  # Get parameters given directly to 'run' function
         self.parametersCheck()         # Check if all the needed partameters are in place and are correct
         self.parametersPrint()         # Print the values of parameters
         
