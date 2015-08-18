@@ -133,10 +133,6 @@ class randMult(rxcs._RxCSobject):
 
         self.__parametersDefine()      # Define the parameters
 
-        # If there are arguments given when the object was created, then run the engine  
-        if len(args) > 0:
-            self.run(*args)
-
     # Define parameters
     def __parametersDefine(self):
 
