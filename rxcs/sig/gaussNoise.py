@@ -16,7 +16,9 @@ Atributes of 'gaussNoise' class after calling 'run' method:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 15-JUL-2014 : * Version 1.0 released. |br|
+    1.0    | 15-JUL-2014 : * Version 1.0 released. |br|
+    1.0r1  | 18-AUG-2015 : * Adjusted to RxCSobject v1.0 |br|
+
 
 *License*:
     BSD 2-Clause
