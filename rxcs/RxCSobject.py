@@ -12,12 +12,13 @@
                     18 August 2015
 
             Versions:
-                0.1  | 20-JUL-2015 : * Initial version. |br|
-                1.0  | 18-AUG-2015 : * Version (1.0) is ready |br|
+                0.1   | 20-JUL-2015 : * Initial version. |br|
+                1.0   | 18-AUG-2015 : * Version (1.0) is ready |br|
+                1.01  | 19-AUG-2015 : * Function 'wasParamGivenVal' is added |br|
+                1.02  | 19-AUG-2015 : * Function 'makeArray2Dim' is added |br|
 
 
             List of functions in the module:
-
 
             Add parameters:
             paramAddMan    - Add a mandatory parameter to the object
@@ -77,7 +78,10 @@
             wasParamGivenVal    - check if a parameter was given (recommended only for optional parameters)
                                   In fact, this function checks if the parameter has the value different than NaN. 
                                   If so, it returns 1, otherwise 0
-
+                                  
+            makeArray2Dim       - make a 1Dimensional array a 2 dimensional
+            
+ 
             Paramters printing:
             parametersPrint     - print parameters of a module
             changeUnitPRefix    - change prefered unit prefix of a parameter
@@ -1014,6 +1018,26 @@ class _RxCSobject:
             if np.isnan(iVal):
                 return 0
         return 1
+
+    def makeArray2Dim(self, mArr):
+        """
+            Function changes a 1 dimensional Numpy array into a 2 dimensional.
+
+            Arguments:
+                    mArr:  [Numpy array]  1- or 2-dimensional Numpy array
+            
+            Output: 
+                    mArr:  [Numpy array 2D]  2 dimensional Numpy array
+
+            Author:
+                    Jacek Pierzchlewski jap@es.aau.dk
+        """
+
+        # Make a 1D Numpy array with signals 2 dim, if it is 1 dim
+        if mArr.ndim == 1:
+            mArr = self.mArr.copy()   
+            mArr.shape = (1, mArr.size)
+        return mArr
 
     def parametersPrint(self):
         """
