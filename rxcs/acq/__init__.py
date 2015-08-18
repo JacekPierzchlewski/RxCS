@@ -12,7 +12,7 @@ from nonuniJS import nonuniJS
 from nonuniANGIE import nonuniANGIE
 
 # Import nonuniform sampler with external scheme
-import nonuniExtern
+from nonuniExtern import nonuniExtern
 
 # Import dummy nonuniform sampler with external scheme
 import nonuniExternDummy

@@ -12,7 +12,7 @@ pattern may be uniform.
 *Version*:
     0.1  | 1-SEP-2014 : * Initial version. |br|
     1.0  | 12-SEP-2014 : * Version 1.0 is ready. |br|
-    2.0  | 18-AUG-2015 : * Version 2.0 is ready. |br|
+    2.0  | 19-AUG-2015 : * Version 2.0 is ready. |br|
 
 *License*:
     BSD 2-Clause
@@ -63,7 +63,8 @@ class nonuniExtern(rxcs._RxCSobject):
         self.paramType('mPatterns', np.ndarray)
         self.paramTypeEl('mPatterns', (int))
         self.paramNDimEq('mPatterns', 2)
-        self.paramDimSizH('mPatterns',0, 'rows')  # There must be at least one sampling pattern
+        self.paramDimH('mPatterns',0, 'rows')  # There must be at least one sampling pattern
+        self.paramH('mPatterns', 0)   # Patterns must not containt zeroes
 
         # Grid period of a sampling pattern
         self.paramAddMan('Tg', 'Grid period of sampling patterns')
@@ -74,10 +75,10 @@ class nonuniExtern(rxcs._RxCSobject):
         # Vector with indices of sampling patterns which should be used
         self.paramAddOpt('vPattInx', 'Vector with indices of sampling patterns which should be used', noprint=1)
         self.paramType('vPattInx', np.ndarray)
-        self.paramTypeEl('vPattInx', int)                    
+        self.paramTypeEl('vPattInx', int)
         self.paramNDimEq('vPattInx', 1)
-        self.paramDimSiqEq('vPattInx', 'mSig', 0, 'rows')   # The number of indices must equal the number of signals in mSig
-        self.pamramH('vPattInx', 0)  # All the indices must be higher than 0
+        self.paramDimEq('vPattInx', 'mSig', 0, 'rows')   # The number of indices must equal the number of signals in mSig
+        self.paramHE('vPattInx', 0)                      # All the indices must be higher or equal to 0
 
         # 'Mute the output' flag
         self.paramAddOpt('bMute', 'Mute the output', noprint=1, default=0)
@@ -86,26 +87,40 @@ class nonuniExtern(rxcs._RxCSobject):
 
     # Run
     def run(self):
-
+        
         self.parametersCheck()         # Check if all the needed partameters are in place and are correct
         self.parametersPrint()         # Print the values of parameters
-        
+
         self.engineStartsInfo()   # Info that the engine starts
         self.__engine()           # Run the engine
         self.engineStopsInfo()    # Info that the engine ends
         return self.__dict__      # Return dictionary with the parameters
-    
-    def __engine(self):
-        self._checkConf()       # Check configuration of sampling
-        self._sample()          # Sample the signals
-        
 
-    def _checkConf(self):
+    def __engine(self):
+
+        # Make the array with signals a 2 dimensional array 
+        self.mSig = self.makeArray2Dim(self.mSig)
+
+        # Check configuration of sampling
+        self._checkSampPatts(self.Tg, self.fR, self.tS, self.mPatterns, self.vPattInx)
+
+        # Sample the signals
+        (self.mObSig, self.mPattsRep, self.mPattsT, self.vPattInx) = self._sampleSignals(self.Tg, self.fR, self.tS, self.mPatterns, self.mSig, self.vPattInx)
+
+        # Generate the observation matrices
+        self.lPhi = self._generObser(self.fR, self.tS, self.mPattsRep, self.mSig, self.vPattInx)
+        return        
+
+    def _checkSampPatts(self, Tg, fR, tS, mPatterns, vPattInx):
         """
-        This function checks configuration of sampling
+        This function checks the parameters of sampling patterns given to the sampler.
 
         Args:
-            none
+            Tg:           [number]           Sampling gird period
+            fR:           [number]           Signal representation sampling frequency 
+            tS:           [number]           Signal time
+            mPatterns:    [Numpy array 2D]   Sampling patterns
+            vPattInx:     [Numpy array 1D]   Indices of sampling patterns which should be used
     
         Returns:
             none
@@ -114,7 +129,7 @@ class nonuniExtern(rxcs._RxCSobject):
         # -----------------------------------------------------------------
         # Check if the signal representation sampling frequency is compatible
         # with the sampling period
-        if np.abs(np.round(self.Tg * self.fR) - (self.Tg * self.fR)) > (1e-9*(self.Tg * self.fR)):
+        if np.abs(np.round(Tg * fR) - (Tg * fR)) > (1e-9*(Tg * fR)):
             strError = ('The sampling grid period of pattern is incompatible with')
             strError = strError + (' the signals representation sampling ')
             strError = strError + ('frequency')
@@ -123,20 +138,108 @@ class nonuniExtern(rxcs._RxCSobject):
         # -----------------------------------------------------------------
         # Check if the sampling patterns are not sampling outside the time
         # of signals
-        tMax = np.max(self.mPatterns) * self.Tg 
-        if tMax > self.tS:
-            strError = 
+        tMax = np.max(mPatterns) * Tg 
+        if tMax > tS:
+            strError = ('Patterns contain sampling points which sample outside the time range of signals!')
             raise ValueError(strError)
-    
+
         # -----------------------------------------------------------------
         # Check if the indices od samplin patterns which should be used are 
         # not higher than the number of sampling patterns
-        #nPatts = 
+        if self.wasParamGivenVal(vPattInx):
+            (nPatts, _) = mPatterns.shape   # Get the number of given sampling patterns
+            if vPattInx[vPattInx > (nPatts - 1)].size > 0:
+                strError = ('The vector with indices of sampling patterns contain indices which are higher than the number of patterns!')
+                raise ValueError(strError)
+            
+        return
 
+    # Sample the signals
+    def _sampleSignals(self, Tg, fR, tS, mPatterns, mSig, vPattInx):
+        """
+        This function samples signals using the previously generated
+        sampling patterns.
+    
+        Args:
+            Tg:           [number]           Sampling gird period
+            fR:           [number]           Signal representation sampling frequency 
+            tS:           [number]           Signal time
+            mPatterns:    [Numpy array 2D]   Sampling patterns
+            mSig:         [Numpy array 2D]   Signals to be sampled
+            vPattInx:     [Numpy array 1D]   Indices of sampling patterns which should be used
+            
+        Returns:
+            mObSig:       [Numpy array 2D]   Observed signals
+            mPattsRep:    [Numpy array 2D]   Sampling patterns as indices of signal representation sampling points
+            mPattsT:      [Numpy array 2D]   Sampling patterns as time moments 
+            vPattInx:     [Numpy array 1D]   Indices of sampling patterns which were used           
+        """
 
+        # Compute the patterns as signals representation grid 
+        mPattsRep = mPatterns * np.round(Tg * fR)
+        mPattsRep = mPattsRep.astype(int)
 
+        # Recalculate the patterns to the time moments
+        vTSig = (1 / fR) * np.arange(int(np.round(tS * fR)))   # The time vector of the input signal
+        mPattsRep_ = mPattsRep.copy()                    
+        (iTPoints, ) = vTSig.shape                        # Get the number of points in the time vector
+        mPattsRep_[np.isnan(mPattsRep)] = iTPoints - 1    # Change nan into pointer to nan          
+        mPattsT = vTSig[mPattsRep]
+                
+        # Construct vector with indices for sampling patterns,
+        # if such a vector was not yet given
+        if not self.wasParamGivenVal(vPattInx):
+            (nPatts, iMaxPat) = mPatterns.shape   # Get the number of given sampling patterns and the maximum size of a pattern
+            (nSigs, _) = mSig.shape               # Get the number of signals
+            vPattInx = np.random.randint(0, nPatts, nSigs)
 
+        mObSig = np.nan * np.zeros((nSigs, iMaxPat))  # Allocate an array for the observed signals
+
+        # Loop over all the signals
+        for inxSig in range(nSigs):
+             vPatt = mPattsRep[vPattInx[inxSig], :]      # Take the current pattern   
+             vPatt = vPatt[np.invert(np.isnan(vPatt))]   # Clean the pattern
+             vObSig = mSig[inxSig, vPatt]                # Create the current observed signal
+
+             # Store the observed signal in the array for the observed signals
+             mObSig[inxSig, np.arange(vObSig.size)] = vObSig
+            
+        return (mObSig, mPattsRep, mPattsT, vPattInx)
     
+    # Generate the observation matrices    
+    def _generObser(self, fR, tS, mPattsRep, mSig, vPattInx):
+        """
+        This function generates the observation matrices.
     
+        Args:
+            fR:           [number]           Signal representation sampling frequency 
+            tS:           [number]           Signal time
+            mPattsRep:    [Numpy array 2D]   Sampling patterns as indices of signal representation sampling points
+            mSig:         [Numpy array 2D]   Signals to be sampled
+            vPattInx:     [Numpy array 1D]   Indices of sampling patterns which were used
+
+        Returns:
+            lPhi:     [list]    List with observation matrices for all the signals
+        """
+        # Get the number of signals and the number of representation samples 
+        # in the input signals
+        (nSigs, nSmp ) = mSig.shape
+
+        lPhi = []    # Start the list with the observation matrices
+
+        # Generate the observation matrices
+        for inxSig in np.arange(nSigs):  # <- loop over all observation matrices
     
+            vPatt = mPattsRep[vPattInx[inxSig], :]     # Take the current pattern   
+            vPatt = vPatt[np.invert(np.isnan(vPatt))]  # Clean the pattern
+            nPatSiz  = vPatt.size          # Size of the pattern
     
+            # Generate the observation matrix for the current sampling pattern
+            mPhi = np.zeros((nPatSiz, nSmp))  # Allocat the observation matrix
+            inxRow = 0                        # Reset index of a row
+            for inxCol in vPatt:   # <- loop over all sampling points in a pattern
+                mPhi[inxRow, int(inxCol)] = 1
+                inxRow = inxRow + 1
+            lPhi.append(mPhi.copy())   # Add the matrix to the list
+    
+        return lPhi
