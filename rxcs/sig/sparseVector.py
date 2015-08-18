@@ -27,8 +27,9 @@ There are two functions which should be used by user:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 22-JAN-2014 : * Version 1.0 released. |br|
-    2.0  | 15-JUL-2015 : * Version 2.0 released. |br|
+    1.0    | 22-JAN-2014 : * Version 1.0 released. |br|
+    2.0    | 15-JUL-2015 : * Version 2.0 released. |br|
+    2.0r1  | 18-AUG-2015 : * Adjusted to RxCSobject v1.0 |br|
 
 *License*:
     BSD 2-Clause
@@ -49,11 +50,6 @@ class sparseVector(rxcs._RxCSobject):
         self.strModuleName = 'Sparse vectors generator'  # Module name
 
         self.__parametersDefine()      # Define the parameters
-
-        # If there are arguments given when the object was created, then run the engine
-        if len(args) > 0:
-            self.run(*args)
-
 
     def __parametersDefine(self):
         """
@@ -84,12 +80,10 @@ class sparseVector(rxcs._RxCSobject):
         self.paramAllowed('bMute',[0, 1])     # It can be either 1 or 0
 
 
-    def run(self, *args):
+    def run(self):
         """
         Run method, which starts the generator    
         """
-
-        self.parametersProcess(*args)  # Get parameters given directly to 'run' function
         self.parametersCheck()         # Check if all the needed partameters are in place and are correct
         self.parametersPrint()         # Print the values of parameters
 
