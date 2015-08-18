@@ -12,11 +12,12 @@
                     18 August 2015
 
             Versions:
-                0.1   | 20-JUL-2015 : * Initial version. |br|
-                1.0   | 18-AUG-2015 : * Version (1.0) is ready |br|
-                1.01  | 19-AUG-2015 : * Function 'wasParamGivenVal' is added |br|
-                1.02  | 19-AUG-2015 : * Function 'makeArray2Dim' is added |br|
-
+                0.1     | 20-JUL-2015 : * Initial version. |br|
+                1.0     | 18-AUG-2015 : * Version (1.0) is ready |br|
+                1.01    | 19-AUG-2015 : * Function 'wasParamGivenVal' is added |br|
+                1.02    | 19-AUG-2015 : * Function 'makeArray2Dim' is added |br|
+                1.02r1  | 19-AUG-2015 : * Bug in checking the values of the Numpy arrays is fixed, |br|
+                                          (devectorization of the arrays)
 
             List of functions in the module:
 
@@ -2107,7 +2108,7 @@ class _RxCSobject:
         self.__checkRelVal_atl_lenParRef(strParName, refVal, strRefName, iLen, iLenRef)
 
         # Vectorize the parameter and the reference
-        (parVal, refVal) = self.__checkRelVal_atl_vectorize(parVal, refVal)
+        (parVal, refVal, tparValShape, trefValShape) = self.__checkRelVal_atl_vectorize(parVal, refVal)
 
         # Check the restriction:
         if isinstance(refVal, (int, float)):
@@ -2119,6 +2120,9 @@ class _RxCSobject:
             # Check for tuple, list, numpy array reference
             self.__checkRelVal_atl_refAtl(strParName, strDesc, parVal, strRefName, refVal, lCoef,
                                           strErrNote, strRelation, bNaNAllowedEl)
+
+        # Devectorize the parameter and the reference
+        (parVal, refVal) = self.__checkRelVal_atl_devectorize(parVal, refVal, tparValShape, trefValShape)
 
         return
 
@@ -2193,21 +2197,55 @@ class _RxCSobject:
                     refVal               reference
 
             Output:
-                    parVal:              parameter to be checked (vectorized, if it was neccessary)
-                    refVal               reference (vectorized, if it was neccessary)
+                    parVal:               parameter to be checked (vectorized, if it was neccessary)
+                    refVal:               reference (vectorized, if it was neccessary)
+                    tParValShape:         tuple with the orignal shape of the parameter to tbe checked
+                    tRefValShape:         tuple with the orignal shape of the reference
 
             Author:
                     Jacek Pierzchlewski jap@es.aau.dk
         """
 
         # Vectorize the parameter, if it is a numpy array
+        tParValShape = np.nan        
         if isinstance(parVal, np.ndarray):
+            tParValShape = parVal.shape
             parVal.shape = (parVal.size, )
 
         # Vectorize the reference, if it is a numpy array
+        tRefValShape = np.nan
         if isinstance(refVal, np.ndarray):
+            tRefValShape = refVal.shape
             refVal.shape = (refVal.size, )
 
+        return (parVal, refVal, tParValShape, tRefValShape)
+
+    def __checkRelVal_atl_devectorize(self, parVal, refVal, tParValShape, tRefValShape):
+        """
+            Function devectorizes checked parameter and a reference, if
+            these variables are Numpy arrays.
+
+            Arguments:
+                    parVal:               parameter to be checked
+                    refVal                reference
+                    tParValShape:         tuple with the orignal shape of the parameter to tbe checked
+                    tRefValShape:         tuple with the orignal shape of the reference
+
+            Output:
+                    parVal:               parameter to be checked (vectorized, if it was neccessary)
+                    refVal:               reference (vectorized, if it was neccessary)
+
+            Author:
+                    Jacek Pierzchlewski jap@es.aau.dk
+        """
+
+        # Devectorize the parameter, if it is a numpy array
+        if isinstance(parVal, np.ndarray):
+            parVal.shape = tParValShape
+
+        # Devectorize the reference, if it is a numpy array
+        if isinstance(refVal, np.ndarray):
+            refVal.shape = tRefValShape
         return (parVal, refVal)
 
     def __checkRelVal_atl_refNum(self, strParName, strDesc, parVal, strRefName, refVal, lCoef, strErrNote, strRelation, bNaNAllowedEl):
