@@ -8,7 +8,7 @@
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    19 June 2015
+                    18 August 2015
 """
 import numpy as np
 
@@ -73,7 +73,6 @@ class RxCS_object_tester1():
     def __defined_parameters(self):
 
         print('TESTS ON DEFINED PARAMETERS:')
-        self.__mandatory_after_optional()
         self.__mandatory_is_not_given()
         self.__mandatory_is_given()
         self.__optional_is_not_given()
@@ -305,28 +304,6 @@ class RxCS_object_tester1():
         print('TESTS VALUE PROPAGATION ONTO OPTIONAL PARAMETERS')
         self.__Opt_value_depends_on_another_correct()
         print('')
-
-
-    def __mandatory_after_optional(self):
-        """
-            Test of mandatory/optional parameter check.
-            Wanted output: RuntimeError
-        """
-
-        strTestName = 'Mandatory parameter cannot be defined after optional (incorrect)'
-        RxCSObject = _RxCSobject()
-
-        self._iNTests = self._iNTests + 1
-        strTestIndex = 'Test #%d:  ' % (self._iNTests)
-
-        try:
-            RxCSObject.paramAddOpt('iOpt', 'Temporary optional parameter')
-            RxCSObject.paramAddMan('iMan', 'Temporary optional parameter')
-
-        except RuntimeError:
-            print(strTestIndex + strTestName + (self.iMaxCols - len(strTestName) - len(strTestIndex)) * '.' + 'Test ok!')
-        except:
-            print(strTestIndex + strTestName + (self.iMaxCols - len(strTestName) - len(strTestIndex)) * '.' + 'Test failed!')
 
     def __mandatory_is_not_given(self):
         """
