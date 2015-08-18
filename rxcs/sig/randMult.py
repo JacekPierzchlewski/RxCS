@@ -111,7 +111,7 @@ Available atributes of 'randMult' class after calling 'run' method:
     1.0r4  | 27-MAY-2014 : * Error in the number of given frqs is fixed. |br|
     1.0r5  | 27-MAY-2014 : * Error in the vector with signal time is fixed. |br|
     2.0    | 21-JUL-2015 : * Objectified version (2.0) |br|
-    2.0r1  | 18-AUG-2015 : * Adjusted to RxCSObject v1.0 |br|
+    2.0r1  | 18-AUG-2015 : * Adjusted to RxCSobject v1.0 |br|
 
 
 *License*:
