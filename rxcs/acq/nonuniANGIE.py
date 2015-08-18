@@ -12,14 +12,16 @@ available in arXiv: http://arxiv.org/abs/1409.1002
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    0.1  | 26-MAY-2014 : * Initial version. |br|
-    0.2  | 27-MAY-2014 : * Docstrings added. |br|
-    1.0  | 27-MAY-2014 : * Version 1.0 is ready. |br|
-    1.1  | 11-JUN-2014 : * Observation matrices added to the output. |br|
-    1.1r1| 18-SEP-2014 : * Bug in checking time of patterns is fixed. |br|
-    1.1r2| 28-JAN-2015 : * Patterns generator adjusted to Numpy indexing. |br|
-    2.0  | 13-AUG-2015 : * Objectified version (2.0) |br|
-    2.1  | 17-AUG-2015 : * Observation matrices are gathered in list, not in 3D matrix |br|
+    0.1    | 26-MAY-2014 :  * Initial version. |br|
+    0.2    | 27-MAY-2014 :  * Docstrings added. |br|
+    1.0    | 27-MAY-2014 :  * Version 1.0 is ready. |br|
+    1.1    | 11-JUN-2014 :  * Observation matrices added to the output. |br|
+    1.1r1  | 18-SEP-2014 :  * Bug in checking time of patterns is fixed. |br|
+    1.1r2  | 28-JAN-2015 :  * Patterns generator adjusted to Numpy indexing. |br|
+    2.0    | 13-AUG-2015 :  * Objectified version (2.0) |br|
+    2.1    | 17-AUG-2015 :  * Observation matrices are gathered in list, not in 3D matrix |br|
+    2.1r1  | 18-AUG-2015 :  * Adjusted to RxCSObject v1.0 |br|
+
 
 *License*:
     BSD 2-Clause 
@@ -41,10 +43,6 @@ class nonuniANGIE(rxcs._RxCSobject):
 
         self.__inputSignals()          # Define input signals
         self.__parametersDefine()      # Define the parameters
-
-        # If there are arguments given when the object was created, then run the engine  
-        if len(args) > 0:
-            self.run(*args)
 
     # Input signals
     def __inputSignals(self):
@@ -107,9 +105,8 @@ class nonuniANGIE(rxcs._RxCSobject):
 
 
     # Run
-    def run(self, *args):
+    def run(self):
 
-        self.parametersProcess(*args)  # Get parameters given directly to 'run' function
         self.parametersCheck()         # Check if all the needed partameters are in place and are correct
         self.parametersPrint()         # Print the values of parameters
         

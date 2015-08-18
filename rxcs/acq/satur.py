@@ -32,11 +32,6 @@ class satur(rxcs._RxCSobject):
         self.__parametersDefine()      # Define the parameters
         self.__inputOptSignals()       # Define optional input signals
 
-        # If there are arguments given when the object was created, then run the engine  
-        if len(args) > 0:
-            self.run(*args)
-
-
     # Input signals
     def __inputSignals(self):
 

@@ -12,9 +12,11 @@ available in arXiv: http://arxiv.org/abs/1409.1002
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 29-JAN-2015 :  * Initial version. |br|
-    1.1  | 9-MAR-2015  :  * Observation matrices are grouped in a list, not in a 3D Numpy array |br|
-    2.0  | 14-AUG-2015 :  * Objectified version (2.0) |br|
+    1.0    | 29-JAN-2015 :  * Initial version. |br|
+    1.1    | 9-MAR-2015  :  * Observation matrices are grouped in a list, not in a 3D Numpy array |br|
+    2.0    | 14-AUG-2015 :  * Objectified version (2.0) |br|
+    2.0r1  | 18-AUG-2015 :  * Adjusted to RxCSObject v1.0 |br|
+
 
 *License*:
     BSD 2-Clause
@@ -36,10 +38,6 @@ class nonuniJS(rxcs._RxCSobject):
 
         self.__inputSignals()          # Define input signals
         self.__parametersDefine()      # Define the parameters
-
-        # If there are arguments given when the object was created, then run the engine  
-        if len(args) > 0:
-            self.run(*args)
 
 
     # Input signals
@@ -92,9 +90,8 @@ class nonuniJS(rxcs._RxCSobject):
 
 
     # Run
-    def run(self, *args):
+    def run(self):
 
-        self.parametersProcess(*args)  # Get parameters given directly to 'run' function
         self.parametersCheck()         # Check if all the needed partameters are in place and are correct
         self.parametersPrint()         # Print the values of parameters
         
