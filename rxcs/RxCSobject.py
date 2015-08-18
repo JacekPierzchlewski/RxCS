@@ -953,31 +953,6 @@ class _RxCSobject:
         """
         self.__paramAddUniqueRestriction(strName, errnote)
         
-
-    def parametersProcess(self, *args):
-        """
-            Process parameters given to a module as arguments for 'run' function.
-
-            Arguments:
-                    args:   [list]    list of argments
-
-            Output:
-                    none
-
-            Author:
-                    Jacek Pierzchlewski jap@es.aau.dk
-        """
-
-        if len(args) == 0:
-            return
-
-        firstArg = self.__NthInTuple(0, args)  # Get the first argument
-        if isinstance(firstArg, dict):
-            self.__parametersGetDict(firstArg)
-        else:
-            self.__parametersGetArgs(*args)
-        return
-
     def parametersCheck(self):
         """
             Function checks if all parameters of a module are correct.
