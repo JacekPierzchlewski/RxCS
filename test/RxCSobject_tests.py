@@ -12,19 +12,18 @@
 """
 import numpy as np
 
-# Import the main tested object
-from rxcs.RxCSobject import _RxCSobject
+from rxcs import _RxCSobject
 
 # Import errors
-from rxcs.RxCSobject import ParameterMissingError
-from rxcs.RxCSobject import ParameterTypeError
-from rxcs.RxCSobject import ElementTypeError
-from rxcs.RxCSobject import AllowedValuesError
-from rxcs.RxCSobject import RelationalError
-from rxcs.RxCSobject import SizeError
-from rxcs.RxCSobject import NDimError
-from rxcs.RxCSobject import DimSizError
-from rxcs.RxCSobject import UniqnessError
+from rxcs import ParameterMissingError
+from rxcs import ParameterTypeError
+from rxcs import ElementTypeError
+from rxcs import AllowedValuesError
+from rxcs import RelationalError
+from rxcs import SizeError
+from rxcs import NDimError
+from rxcs import DimSizError
+from rxcs import UniqnessError
 
 
 class RxCS_object_tester1():
