@@ -69,9 +69,14 @@
 
             Get and check the parameters given to the module:
             parametersCheck     - check if all parameters of a module are correct
+
             wasParamGiven       - check if a parameter was given (recommended only for optional parameters)
                                   In fact, this function checks if the parameter exists, and if it has the value 
                                   different than NaN. If so, it returns 1, otherwise 0
+
+            wasParamGivenVal    - check if a parameter was given (recommended only for optional parameters)
+                                  In fact, this function checks if the parameter has the value different than NaN. 
+                                  If so, it returns 1, otherwise 0
 
             Paramters printing:
             parametersPrint     - print parameters of a module
@@ -991,6 +996,24 @@ class _RxCSobject:
                 return 0
         return 1
         
+    def wasParamGivenVal(self, iVal):
+        """
+            Function checks if a parameter was given, or
+            if it still has the default value.
+
+            Arguments:
+                    iVal:   value of the parameter
+            Output:
+                    0 - parameter was not given
+                    1 - parameter was given
+
+            Author:
+                    Jacek Pierzchlewski jap@es.aau.dk
+        """
+        if isinstance(iVal, float):
+            if np.isnan(iVal):
+                return 0
+        return 1
 
     def parametersPrint(self):
         """
