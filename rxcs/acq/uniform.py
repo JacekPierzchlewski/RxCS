@@ -82,7 +82,7 @@ class uniform(rxcs._RxCSobject):
         self.paramAllowed('bMute',[0, 1])      # It can be either 1 or 0
 
     # Run
-    def run(self:
+    def run(self):
 
         self.parametersCheck()         # Check if all the needed partameters are in place and are correct
         self.parametersPrint()         # Print the values of parameters
