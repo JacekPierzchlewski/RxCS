@@ -347,12 +347,11 @@ class RxCS_object_tester1():
             Wanted output: correct
         """
 
-        strTestName = 'Mandatory parameter is given (incorrect)'
+        strTestName = 'Mandatory parameter is given (correct)'
         RxCSObject = _RxCSobject()
 
         RxCSObject.paramAddMan('mandatory_parameter', 'Mandatory parameter')
         RxCSObject.mandatory_parameter = 1
-
         self.__parametersCheck_error(RxCSObject, 'correct', strTestName)
 
     def __optional_is_not_given(self):
