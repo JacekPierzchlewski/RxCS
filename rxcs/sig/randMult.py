@@ -98,19 +98,21 @@ Available atributes of 'randMult' class after calling 'run' method:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    0.1  | 15-MAY-2014 : * Initial version. |br|
-    0.2  | 16-MAY-2014 : * Docstrings added. |br|
-    0.3  | 19-MAY-2014 : * The main func. divided into smaller functions. |br|
-    0.4  | 20-MAY-2014 : * Errors are served by 'raise'. |br|
-    0.5  | 20-MAY-2014 : * Docstrings are added to the internal functions. |br|
-    0.5r1| 20-MAY-2014 : * Order of the internal functions was changed. |br|
-    1.0  | 20-MAY-2014 : * Version 1.0 released. |br|
-    1.0r1| 21-MAY-2014 : * Error in progress printing is fixed. |br|
-    1.0r2| 21-MAY-2014 : * Error in default random amplitude is fixed. |br|
-    1.0r3| 21-MAY-2014 : * Error in progress printing (if muted) is fixed. |br|
-    1.0r4| 27-MAY-2014 : * Error in the number of given frqs is fixed. |br|
-    1.0r5| 27-MAY-2014 : * Error in the vector with signal time is fixed. |br|
-    2.0  | 21-JUL-2015 : * Objectified version (2.0) |br|
+    0.1    | 15-MAY-2014 : * Initial version. |br|
+    0.2    | 16-MAY-2014 : * Docstrings added. |br|
+    0.3    | 19-MAY-2014 : * The main func. divided into smaller functions. |br|
+    0.4    | 20-MAY-2014 : * Errors are served by 'raise'. |br|
+    0.5    | 20-MAY-2014 : * Docstrings are added to the internal functions. |br|
+    0.5r1  | 20-MAY-2014 : * Order of the internal functions was changed. |br|
+    1.0    | 20-MAY-2014 : * Version 1.0 released. |br|
+    1.0r1  | 21-MAY-2014 : * Error in progress printing is fixed. |br|
+    1.0r2  | 21-MAY-2014 : * Error in default random amplitude is fixed. |br|
+    1.0r3  | 21-MAY-2014 : * Error in progress printing (if muted) is fixed. |br|
+    1.0r4  | 27-MAY-2014 : * Error in the number of given frqs is fixed. |br|
+    1.0r5  | 27-MAY-2014 : * Error in the vector with signal time is fixed. |br|
+    2.0    | 21-JUL-2015 : * Objectified version (2.0) |br|
+    2.0r1  | 18-AUG-2015 : * Adjusted to RxCSObject v1.0 |br|
+
 
 *License*:
     BSD 2-Clause
@@ -264,9 +266,8 @@ class randMult(rxcs._RxCSobject):
 
 
     # Run
-    def run(self, *args):
+    def run(self):
 
-        self.parametersProcess(*args)  # Get parameters given directly to 'run' function
         self.parametersCheck()         # Check if all the needed partameters are in place and are correct
         self.parametersPrint()         # Print the values of parameters
         
