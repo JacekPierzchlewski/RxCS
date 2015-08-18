@@ -3,11 +3,15 @@
 from RxCSobject import _RxCSobject
 
 # Errors from RxCSobject
+from RxCSobject import ParameterMissingError
 from RxCSobject import ParameterTypeError
 from RxCSobject import ElementTypeError
-from RxCSobject import ParameterMissingError
 from RxCSobject import AllowedValuesError
 from RxCSobject import RelationalError
+from RxCSobject import SizeError
+from RxCSobject import NDimError
+from RxCSobject import DimSizError
+from RxCSobject import UniqnessError
 
 # Import signal generators
 import sig
