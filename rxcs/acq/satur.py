@@ -3,6 +3,101 @@ This is a saturation block. |br|
 
 The modules saturates the given signal. |br|
 
+Beside of the saturated signal, the function returns stauration markers
+**mSaturMark** which inform if samples in the input signals were saturated.
+The saturation markers are:
+0:  not saturated, 1:  saturated by higher limit, -1: saturated by lower limit.
+
+Additionally, the module is able to modify the input signal time vector so that
+the saturated moments are removed.
+
+The sampling patterns can be modified so that the saturated sampling
+points are removed.
+
+Observation matrices can be modified so that the rows which correspond to 
+the saturated sampling points are removed.
+
+*Examples*:
+    Please go to the *examples/acquisitions* directory for examples on how to 
+    use the saturation module. |br|
+
+*Settings*:
+    Parameters of the saturation module are described below.
+
+    Take a look on '__parametersDefine' function for more info on the 
+    parameters.
+
+    Parameters of the saturation module are attributes of the class which 
+    must/can be set before the saturation module is run.
+
+    Required parameters:
+
+    - a. **mSig** (*Numpy array 2D*): Input signals
+
+    - b. **iMinAmp** (*float*): minimum allowed amplitude of a signal
+
+    - c. **iMinAmp** (*float*): maximum allowed amplitude of a signal
+
+
+    Optional parameters:
+
+    - d. **vT** (*Numpy array 1D*):  Time vector for input signals
+                                     [default = not given]
+
+    - e. **mPatts** (*Numpy array 2D*):  sampling patterns (as grid indices)
+                                         [default = not given]
+
+    - f. **mPattsRep** (*Numpy array 2D*): sampling patterns
+                                           (as signal representaion points)
+                                           [default = not given]
+
+    - g. **mPattsT** (*Numpy array 2D*): sampling patterns (as time moments)
+                                         [default = not given]    
+                                         
+    - h. **lPhi** (*list*): list with observation matrices
+                            [default = not given]
+
+    - i. **bMute** (*int*):    mute the console output from the saturation 
+                               module [default = 0]
+
+
+*Output*:
+    Description of the saturation module output is below. 
+    This is the list of attributes of the saturation module class which are 
+    available after calling the 'run' method:
+
+    Observed signals:
+    - a. **mSig** (*Numpy array 2D*): observed saturated signals
+
+    - b. **mSaturMark** (*Numpy array 2D*): saturation markers   
+
+    - c. **lObSigClean** (list):  observed signals with saturated samples 
+                                  removed
+    
+    - d. **lvTClean** (list):  time vector for signals with time momens which
+                               correspond to saturated samples removed
+
+
+    Sampling patterns:
+    - e. **lPattsClean** (*list*): Sampling patterns (as grid indices)
+                                   with saturated sampling moments removed.
+                                   [only if **mPatts** was given]
+
+    - f. **lPattsRepClean** (*list*):  Sampling patterns (as signal representaion points)
+                                       with saturated sampling moments removed.
+                                       [only if **mPattsRep** was given]
+
+
+    - g. **lPattsTClean** (*list*):   Sampling patterns (as time moments)
+                                      with saturated sampling moments removed.
+                                      [only if **mPattsT** was given]
+             
+    Observation matrices:
+     
+    - h. **lPhiClean** (*list*)    Observation matrices with rows which 
+                                   correspond to saturated sampled removed.
+                                   [only if **lPhi** was given]
+                              
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 

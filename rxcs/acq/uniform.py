@@ -3,6 +3,77 @@ This is a uniform signal sampler. |br|
 
 The modules samples the given signals uniformly. |br|
 
+*Examples*:
+    Please go to the *examples/acquisitions* directory for examples on how to 
+    use the sampler. |br|
+
+*Settings*:
+    Parameters of the sampler are described below.
+
+    Take a look on '__parametersDefine' function for more info on the 
+    parameters.
+
+    Parameters of the sampler are attributes of the class which must/can
+    be set before the sampler is run.
+
+    Required parameters:
+
+    - a. **mSig** (*Numpy array 2D*): Input signals
+
+    - b. **tS** (*float*): time of input signals
+
+    - d. **fR** (*float*): input signals' representation sampling frequency
+
+    - d. **Tg** (*float*): patterns sampling grid
+
+    - e. **fSamp** (*float*): the requested average sampling frequency of the sampling patterns
+
+
+    Optional parameters:
+
+    - f. **iAlpha** (*float*):  the alpha parameter (0 < iAlpha < 1). 
+                                It defines where to put the first sample as a fraction
+                                of the sampling period.
+                                [default = 0.5]
+
+    - g. **bMute** (*int*):    mute the console output from the sampler [default = 0]
+
+
+*Output*:
+    Description of the sampler output is below. 
+    This is the list of attributes of the sampler class which are available 
+    after calling the 'run' method:
+
+    Observed signals:
+    - a. **mObSig** (*Numpy array 2D*): The observed sampled signals
+    
+    Sampling patterns:
+    - b. **mPatts** (*Numpy array 2D*): Sampling patterns (as grid indices)
+
+    - c. **mPattsRep** (*Numpy array 2D*):  Sampling patterns 
+                                            (as signal representaion points)
+
+    - d. **mPattsT** (*Numpy array 2D*):   Sampling patterns (as time moments)
+
+
+    Observation matrices:
+    - e. **lPhi** (list)   List with observation matrices.
+                           One matrix p. signal.
+
+
+    Additional parameters of sampling patterns:
+    - f. **nK_g**  (*int*): the number of grid points in the sampling pattern
+    
+    - g. **tTau_real** (*float*):   the real time of sampling patterns
+    
+    - h. **nK_s** (*int*):   the expected number of sampling points in a pattern     
+    
+    - i. **f_s** (*float*):  the expected sampling frequency
+    
+    - j. **nT** (*int*):   the expected ampling period (as grid pts)
+    
+    - k  **tT_s**. (*float*):   the expected sampling period
+
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
@@ -72,9 +143,9 @@ class uniform(rxcs._RxCSobject):
 
         # Alpha parameter
         self.paramAddOpt('iAlpha', 'Alpha parameter', default=0.5)
-        self.paramType('iAlpha', (int, float))   # Must be of int or float type
-        self.paramHE('iAlpha', 0)                # Variance must be higher or equal to zero
-        self.paramLE('iAlpha', 1)                # ...and lower or equal to one
+        self.paramType('iAlpha', (int, float))  # Must be of int or float type
+        self.paramH('iAlpha', 0)                # The alpha parameter must he higher than zero
+        self.paramL('iAlpha', 1)                # ...and lower than one
 
         # 'Mute the output' flag
         self.paramAddOpt('bMute', 'Mute the output', noprint=1, default=0)
@@ -305,7 +376,7 @@ class uniform(rxcs._RxCSobject):
                 none
                 
                 List of variables added by function to the object:                
-                m3Phi (3D matrix): observation matrices
+                lPhi (list): list with the observation matrices
         """
 
         nSmp = int(round(self.tS * self.fR))  # The number of representation samples in the input signals

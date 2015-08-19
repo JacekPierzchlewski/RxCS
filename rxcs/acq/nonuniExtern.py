@@ -1,10 +1,86 @@
 """
-This a nonuniform sampler with externally acquired sampling scheme. |br|
+This a nonuniform sampler with externally acquired sampling patterns. |br|
 
-The module samples the given signals nonuniformly. |br|
-The sampling patterns are taken from a file with sampling patterns
-or from a dictionary given to the sampler. In particular the sampling
-pattern may be uniform.
+The module samples the given signals. 
+The sampling patterns are taken from a Numpy array with sampling 
+patterns (**mPatterns**). |br|
+
+Parameter **vPattInx** defines which random sampling pattern will be applied
+on every signal.
+The number of elements in **vPattInx** must be equal to the number of signals 
+in **mSig** array.
+
+Example:  **vPattInx** = [3, 0] means that a sampling pattern form the row 
+          with index 3 (4th row) will be applied on the first signal, 
+          and a sampling pattern from the row with index 0 (1st row ) will 
+          be applied on the second signal.
+         
+If **vPattInx** is not given, than a random sampling pattern from **mPatterns** 
+is applied on every signal.  |br|
+
+
+*Examples*:
+    Please go to the *examples/acquisitions* directory for examples on how to 
+    use the sampler. |br|
+
+*Settings*:
+    Parameters of the sampler are described below.
+
+    Take a look on '__parametersDefine' function for more info on the 
+    parameters.
+
+    Parameters of the sampler are attributes of the class which must/can
+    be set before the sampler is run.
+
+    Required parameters:
+
+    - a. **mSig** (*Numpy array 2D*): Input signals
+
+    - b. **tS** (*float*): time of input signals
+
+    - c. **fR** (*float*): input signals' representation sampling frequency
+
+    - d. **mPatterns** (*Numpy array 2D*): Numpy array 2D with pattern
+
+    - e. **Tg** (*float*): patterns sampling grid
+
+
+    Optional parameters:
+
+    - f. **vPattInx** (*Numpy array 1D*):  Indices of sampling patterns 
+                                           applied on signals.
+                                           It must have the same lenght as  
+                                           the mumber of input signals.
+                                           [default = not given]
+
+    - g. **bMute** (*int*):    mute the console output from the sampler 
+                               [default = 0]
+
+
+*Output*:
+    Description of the sampler output is below. 
+    This is the list of attributes of the sampler class which are available 
+    after calling the 'run' method:
+
+    Observed signals:
+    - a. **mObSig** (*Numpy array 2D*): Observed sampled signals
+    
+    Sampling patterns:
+    - b. **mPatts** (*Numpy array 2D*): Sampling patterns (as grid indices)
+
+    - c. **mPattsRep** (*Numpy array 2D*):  Sampling patterns 
+                                            (as signal representaion points)
+
+    - d. **mPattsT** (*Numpy array 2D*):   Sampling patterns
+                                           (as time moments)
+    
+    - e **vPattInx** (*Numpy array 1D*):   Indices of sampling patterns used
+                                           on signals.    
+    
+    Observation matrices:                         
+    - f. **lPhi** (list)   List with observation matrices.
+                           One matrix p. signal.
+
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
@@ -43,16 +119,16 @@ class nonuniExtern(rxcs._RxCSobject):
         self.paramTypeEl('mSig', (int, float))
         self.paramNDimLE('mSig', 2)
 
-        # Input signals representation sampling frequency
-        self.paramAddMan('fR', 'Input signals representation sampling frequency', unit='Hz')
-        self.paramType('fR', (int, float))
-        self.paramH('fR', 0)
-        self.paramL('fR', np.inf)
-
         # Time of input signals
         self.paramAddMan('tS', 'Time of input signals', unit='s')
         self.paramType('tS', (int, float))
         self.paramH('tS', 0)
+        self.paramL('fR', np.inf)
+
+        # Input signals representation sampling frequency
+        self.paramAddMan('fR', 'Input signals representation sampling frequency', unit='Hz')
+        self.paramType('fR', (int, float))
+        self.paramH('fR', 0)
         self.paramL('fR', np.inf)
 
     # Define parameters

@@ -13,7 +13,7 @@ available in arXiv: http://arxiv.org/abs/1409.1002
     use the sampler. |br|
 
 *Settings*:
-    Parameters of the sampler described below.
+    Parameters of the sampler are described below.
 
     Take a look on '__parametersDefine' function for more info on the 
     parameters.
@@ -37,6 +37,7 @@ available in arXiv: http://arxiv.org/abs/1409.1002
     Optional parameters:
 
     - f. **iSigma** (*float*):  variance of Gaussian random process
+                                [default = 1]
 
     - g. **tMin** (*float*):    minimum allowed time between the sampling moments
                                 [default = minium time not set]
@@ -52,24 +53,24 @@ available in arXiv: http://arxiv.org/abs/1409.1002
     This is the list of attributes of the sampler class which are available 
     after calling the 'run' method:
 
-    - a. **mObSig** (*Numpy array 2D*): Matrix with observed sampled signals
+    Observed signals:
+    - a. **mObSig** (*Numpy array 2D*): Observed sampled signals
     
     Sampling patterns:
-    - b. **mPatts** (*Numpy array 2D*): Matrix with sampling patterns (as grid indices)
+    - b. **mPatts** (*Numpy array 2D*): Sampling patterns (as grid indices)
 
-    - c. **mPattsRep** (*Numpy array 2D*):  Matrix with sampling patterns 
+    - c. **mPattsRep** (*Numpy array 2D*):  Sampling patterns 
                                             (as signal representaion points)
 
-    - d. **mPattsT** (*Numpy array 2D*):   Marix with sampling patterns
+    - d. **mPattsT** (*Numpy array 2D*):   Sampling patterns
                                            (as time moments)
     
-                         
+    Observation matrices:                         
     - e. **lPhi** (list)   List with observation matrices.
                            One matrix p. signal.
 
 
-    Additional parameters of sampling patterns:
-    
+    Additional parameters of sampling patterns:    
     - f. **nK_g**  (*int*): the number of grid points in the sampling pattern
     
     - g. **tTau_real** (*float*):   the real time of sampling patterns

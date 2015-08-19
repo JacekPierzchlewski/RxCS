@@ -8,6 +8,74 @@ The used ARS patterns generator is described further in
 "Generation and Analysis of Constrained Random Sampling Patterns",
 available in arXiv: http://arxiv.org/abs/1409.1002
 
+*Examples*:
+    Please go to the *examples/acquisitions* directory for examples on how to 
+    use the sampler. |br|
+
+*Settings*:
+    Parameters of the sampler are described below.
+
+    Take a look on '__parametersDefine' function for more info on the 
+    parameters.
+
+    Parameters of the sampler are attributes of the class which must/can
+    be set before the sampler is run.
+
+    Required parameters:
+
+    - a. **mSig** (*Numpy array 2D*): Input signals
+
+    - b. **tS** (*float*): time of input signals
+
+    - d. **fR** (*float*): input signals' representation sampling frequency
+
+    - d. **Tg** (*float*): patterns sampling grid
+
+    - e. **fSamp** (*float*): the requested average sampling frequency of the sampling patterns
+
+
+    Optional parameters:
+
+    - f. **iSigma** (*float*):  variance of Gaussian random process [default = 1]
+
+    - g. **bMute** (*int*):    mute the console output from the sampler [default = 0]
+
+
+*Output*:
+    Description of the sampler output is below. 
+    This is the list of attributes of the sampler class which are available 
+    after calling the 'run' method:
+
+    Observed signals:    
+    - a. **mObSig** (*Numpy array 2D*): Observed sampled signals
+    
+    Sampling patterns:    
+    - b. **mPatts** (*Numpy array 2D*): Sampling patterns (as grid indices)
+
+    - c. **mPattsRep** (*Numpy array 2D*):  Sampling patterns 
+                                            (as signal representaion points)
+
+    - d. **mPattsT** (*Numpy array 2D*):   Sampling patterns
+                                           (as time moments)
+
+    Observation matrices:                         
+    - e. **lPhi** (list)   List with observation matrices.
+                           One matrix p. signal.
+
+
+    Additional parameters of sampling patterns:    
+    - f. **nK_g**  (*int*): the number of grid points in the sampling pattern
+    
+    - g. **tTau_real** (*float*):   the real time of sampling patterns
+    
+    - h. **nK_s** (*int*):   the expected number of sampling points in a pattern     
+    
+    - i. **f_s** (*float*):  the expected average sampling frequency
+    
+    - j. **nT** (*int*):   the expected average sampling period (as grid pts)
+    
+    - k  **tT_s**. (*float*):   the expected average sampling period
+    
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
@@ -48,16 +116,16 @@ class nonuniARS(rxcs._RxCSobject):
         self.paramTypeEl('mSig', (int, float))
         self.paramNDimLE('mSig', 2)
 
-        # Input signals representation sampling frequency
-        self.paramAddMan('fR', 'Input signals representation sampling frequency', unit='Hz')
-        self.paramType('fR', (int, float))
-        self.paramH('fR', 0)
-        self.paramL('fR', np.inf)
-
         # Time of input signals
         self.paramAddMan('tS', 'Time of input signals', unit='s')
         self.paramType('tS', (int, float))
         self.paramH('tS', 0)
+        self.paramL('fR', np.inf)
+
+        # Input signals representation sampling frequency
+        self.paramAddMan('fR', 'Input signals representation sampling frequency', unit='Hz')
+        self.paramType('fR', (int, float))
+        self.paramH('fR', 0)
         self.paramL('fR', np.inf)
 
 
