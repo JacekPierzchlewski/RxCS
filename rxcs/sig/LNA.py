@@ -11,16 +11,16 @@ The output signal of the amplifier is:
 
 *Examples*:
     Please go to the *examples/signals* directory for examples on how to use 
-    the generator. |br|
+    the LNA. |br|
 
 *Settings*:
-    Parameters of the generator described below.
+    Parameters of the LNA described below.
 
     Take a look on '__parametersDefine' function for more info on the 
     parameters.
 
-    Parameters of the generator are attributes of the class which must/can
-    be set before the generator run.
+    Parameters of the LNA are attributes of the class which must/can
+    be set before the LNA run.
 
     Required parameters:
 
@@ -31,12 +31,12 @@ The output signal of the amplifier is:
 
     Optional parameters:
 
-     - c. **bMute** (*int*):  mute the console output from the generator [default = 0]
+     - c. **bMute** (*int*):  mute the console output from the LNA [default = 0]
 
 
 *Output*:
-    Description of the generator output is below. 
-    This is the list of attributes of the generator class which are available 
+    Description of the LNA output is below. 
+    This is the list of attributes of the LNA class which are available 
     after calling the 'run' method:
 
     - a. **mSig** (*Numpy array 2D*): Matrix with output signals
