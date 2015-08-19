@@ -57,7 +57,8 @@ The generator is able to generate N random signals with a given bandwidth. |br|
     This is the list of attributes of the generator class which are available 
     after calling the 'run' method:
 
-    - a. **mSig** (*Numpy array 2D*): Matrix with output signals
+    - a. **mSig** (*Numpy array 2D*): Matrix with output signals, 
+                                      one signal p. row
 
     - b. **nSmp** (*int*): The number of samples in the signals
  
@@ -181,7 +182,7 @@ class gaussNoise(rxcs._RxCSobject):
         # ---------------------------------------------------------------------
         # Generate the base signal
         self.nSmp = round(self.fs * self.tS)  # The number of samples in the output signal
-        self.mSig = np.random.randn(self.nSigs, self.nSig)   # Generate the noise
+        self.mSig = np.random.randn(self.nSigs, self.nSmp)   # Generate the noise
 
         # ---------------------------------------------------------------------
         # Filter the signal with a low pass filter, if it is needed
@@ -193,5 +194,4 @@ class gaussNoise(rxcs._RxCSobject):
                                        rs=self.iRs, rp=self.iRp)
             # Apply the filter
             self.mSig = scsig.lfilter(vN, vD, self.mSig)
-            self.mSig = self.mSig.T  # The output matrix should be column wise, not row wise
         return

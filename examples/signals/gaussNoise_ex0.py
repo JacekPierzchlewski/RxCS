@@ -32,8 +32,8 @@ def _gaussNoise_ex0():
     gaussNoise.tS = 1      # Time [1 sec]
     gaussNoise.fB = 200e3  # Bandwidth [200 kHz]
 
-    gaussNoise.run()             # ... and run it!
-    vSig = gaussNoise.mSig[:,0]  # take the generated signal
+    gaussNoise.run()              # ... and run it!
+    vSig = gaussNoise.mSig[0, :]  # take the generated signal
 
     # -----------------------------------------------------------------
     # Analyze the signal and plot it
