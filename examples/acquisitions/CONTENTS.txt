@@ -10,24 +10,42 @@ contents:
     3. Makefile                 - local Makefile
 
 
-    # Nonuniform sampler examples:
+    # Nonuniform sampler examples (ANGIE sampling scheme):
 
-    4. samp_RMSG_ANGIE_ex0.py   - example #0 on how to use the ANGIE sampler - the simplest example
+    4. nonuniANGIE_ex0.py   - example #0 on how to use the ANGIE sampler - the simplest example
 
-    5. samp_RMSG_ARS_ex0.py     - example #0 on how to use the ARS sampler - the simplest example
+    5. nonuniANGIE_ex1.py   - example #0 on how to use the ANGIE sampler
 
-    6. samp_RMSG_JS_ex0.py      - example #0 on how to use the JS sampler - the simplest example
+
+    # Nonuniform sampler examples (ARS sampling scheme):
+
+    6. nonuniARS_ex0.py     - example #0 on how to use the ARS sampler - the simplest example
+
+
+    # Nonuniform sampler examples (JS sampling scheme):
+
+    7. nonuniJS_ex0.py      - example #0 on how to use the JS sampler - the simplest example
+
+
+    # Nonuniform sampler examples (external sampling scheme):
+
+    8. nonuniExtern_ex0.py   - example #0 on how to use the sampler with the external sampling scheme
+
+    9. nonuniExtern_ex1.py   - example #1 on how to use the sampler with the external sampling scheme
+
+    10. nonuniExtern_ex2.py  - example #2 on how to use the sampler with the external sampling scheme
 
 
     # Uniform sampler examples:
 
-    7. samp_RMSG_uniform_ex0.py - example #0 on how to use the uniform sampler - the simplest example
+    11. uniform_ex0.py - example #0 on how to use the uniform sampler - the simplest example
 
 
     # Saturation block examples:
 
-    8. saturation_ex0.py        - example #0 on how to use the saturation block - the simplest example
+    12. saturation_ex0.py        - example #0 on how to use the saturation block - the simplest example
 
-    9. saturation_ex1.py        - example #1 on how to use the saturation block - the signal is uniformly sampled and
-                                  then pushed through the saturation block
+    13. saturation_ex1.py        - example #1 on how to use the saturation block - the signal is uniformly sampled and
+                                   then pushed through the saturation block
 
+    13. saturation_ex2.py        - example #2 on how to use the saturation block
