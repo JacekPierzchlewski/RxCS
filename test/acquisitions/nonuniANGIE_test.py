@@ -18,8 +18,8 @@ To start the test run this module directly as a script:
 
     :bash:`$ python nonuniANGIE_test.py`
 
-when in *rxcs/test* directory. The results are then printed to the console.
-|br|
+when in *rxcs/test/acquisitions* directory. 
+The results are then printed to the console. |br|
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>

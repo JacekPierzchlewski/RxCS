@@ -57,7 +57,7 @@ To start the test run this module directly as a script:
 
     :bash:`$ python randMultTest.py`
 
-when in *rxcs/test* directory. The results are then printed to the console.
+when in *rxcs/test/signals* directory. The results are then printed to the console.
 |br|
 
 *Author*:
