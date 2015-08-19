@@ -1,7 +1,30 @@
+"""
+.. role:: bash(code)
+    :language: bash
+
+This is a test module for the low-noise nonlinear amplifier (LNA). |br|
+
+It tests the LNA with a number of test cases, and analyzes
+all the generated signals vs. the expected output signals. |br|
+
+To start the test run this module directly as a script:
+
+    :bash:`$ python randMultTest.py`
+
+when in *rxcs/test* directory. The results are then printed to the console.
+|br|
+
+*Author*:
+    Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
+
+*Version*:
+    1.0  | 19-AUG-2015 : * Version 1.0 released. |br|
+
+*License*:
+    BSD 2-Clause
+"""
 import numpy as np
 import rxcs
-
-
 
 def _LNA_test():
     """
