@@ -2,11 +2,94 @@
 This a nonuniform sampler with ANGIE sampling scheme. |br|
 
 The modules samples the given signals nonuniformly. |br|
-The sampling aptterns are generated using ANGIE scheme.
+The sampling patterns are generated using ANGIE scheme.
 
 The used ANGIE patterns generator is described further in
 "Generation and Analysis of Constrained Random Sampling Patterns",
 available in arXiv: http://arxiv.org/abs/1409.1002
+
+*Examples*:
+    Please go to the *examples/acquisitions* directory for examples on how to 
+    use the sampler. |br|
+
+*Settings*:
+    Parameters of the sampler described below.
+
+    Take a look on '__parametersDefine' function for more info on the 
+    parameters.
+
+    Parameters of the sampler are attributes of the class which must/can
+    be set before the sampler is run.
+
+    Required parameters:
+
+    - a. **mSig** (*Numpy array 2D*): Input signals
+
+    - b. **tS** (*float*): time of input signals
+
+    - d. **fR** (*float*): input signals' representation sampling frequency
+
+    - d. **Tg** (*float*): patterns sampling grid
+
+    - e. **fSamp** (*float*): the requested average sampling frequency of the sampling patterns
+
+
+    Optional parameters:
+
+    - f. **iSigma** (*float*):  variance of Gaussian random process
+
+    - g. **tMin** (*float*):    minimum allowed time between the sampling moments
+                                [default = minium time not set]
+
+    - h. **tMax** (*float*):    maximum allowed time between the sampling moments
+                                [default = maximum time not set]
+
+    - i. **bMute** (*int*):    mute the console output from the sampler [default = 0]
+
+
+*Output*:
+    Description of the sampler output is below. 
+    This is the list of attributes of the sampler class which are available 
+    after calling the 'run' method:
+
+    - a. **mObSig** (*Numpy array 2D*): Matrix with observed sampled signals
+    
+    Sampling patterns:
+    - b. **mPatts** (*Numpy array 2D*): Matrix with sampling patterns (as grid indices)
+
+    - c. **mPattsRep** (*Numpy array 2D*):  Matrix with sampling patterns 
+                                            (as signal representaion points)
+
+    - d. **mPattsT** (*Numpy array 2D*):   Marix with sampling patterns
+                                           (as time moments)
+    
+                         
+    - e. **lPhi** (list)   List with observation matrices.
+                           One matrix p. signal.
+
+
+    Additional parameters of sampling patterns:
+    
+    - f. **nK_g**  (*int*): the number of grid points in the sampling pattern
+    
+    - g. **tTau_real** (*float*):   the real time of sampling patterns
+    
+    - h. **nK_s** (*int*):   the expected number of sampling points in a pattern     
+    
+    - i. **f_s** (*float*):  the expected average sampling frequency
+    
+    - j. **nT** (*int*):   the expected average sampling period (as grid pts)
+    
+    - k  **tT_s**. (*float*):   the expected average sampling period
+    
+    - l. **nK_min** (*int*):   min t between the samp pts as the number of grid pts
+    
+    - m. **nK_max** (*int*):   max t between the samp pts as the number of grid pts
+    
+    - n. **tMin_real** (*float*):   the real minimum time between sampling points
+
+    - o. **tMax_real** (*float*):   the real maximum time between sampling points
+
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
@@ -53,16 +136,16 @@ class nonuniANGIE(rxcs._RxCSobject):
         self.paramTypeEl('mSig', (int, float))
         self.paramNDimLE('mSig', 2)
 
-        # Input signals representation sampling frequency
-        self.paramAddMan('fR', 'Input signals representation sampling frequency', unit='Hz')
-        self.paramType('fR', (int, float))
-        self.paramH('fR', 0)
-        self.paramL('fR', np.inf)
-
         # Time of input signals
         self.paramAddMan('tS', 'Time of input signals', unit='s')
         self.paramType('tS', (int, float))
         self.paramH('tS', 0)
+        self.paramL('fR', np.inf)
+
+        # Input signals representation sampling frequency
+        self.paramAddMan('fR', 'Input signals representation sampling frequency', unit='Hz')
+        self.paramType('fR', (int, float))
+        self.paramH('fR', 0)
         self.paramL('fR', np.inf)
 
 
@@ -371,7 +454,7 @@ class nonuniANGIE(rxcs._RxCSobject):
                 none
                 
                 List of variables added by function to the object:                
-                m3Phi (3D matrix): observation matrices
+                lPhi (list): observation matrices
         """
 
         nSmp = int(round(self.tS * self.fR))     # The number of representation samples in the input signals
