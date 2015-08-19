@@ -1,14 +1,46 @@
 """
 This is a model of a low-noise nonlinear amplifier (LNA). |br|
 
-For description of parameters of the amplifier, take a look on '__parametersDefine' function.
-For examples of usage, go to examples/signals directory. |br|
+The output signal of the amplifier is:
+   y(t)  =  a_1 * x(t) + a_2 * x(t)^2 + ... + a_n * x(t)^n
 
-Atributes of 'LNA' class after calling 'run' method:
+   where: 
+     x(t) is the input signal,
+     a_1, a_2, ..., a_n are the amplifier coefficients.
 
-    - mSig [Numpy array (2D)] - matrix with generated signals, one signal p. column
 
-|br|
+*Examples*:
+    Please go to the *examples/signals* directory for examples on how to use 
+    the generator. |br|
+
+*Settings*:
+    Parameters of the generator described below.
+
+    Take a look on '__parametersDefine' function for more info on the 
+    parameters.
+
+    Parameters of the generator are attributes of the class which must/can
+    be set before the generator run.
+
+    Required parameters:
+
+    - a. **mSig** (*Numpy array 2D*): Input signals
+                                       
+    - b. **vCoef** (*Numpy array 1D*):  Amplifier coefficients, 
+                                        a_k = vCoef[k]
+
+    Optional parameters:
+
+     - c. **bMute** (*int*):  mute the console output from the generator [default = 0]
+
+
+*Output*:
+    Description of the generator output is below. 
+    This is the list of attributes of the generator class which are available 
+    after calling the 'run' method:
+
+    - a. **mSig** (*Numpy array 2D*): Matrix with output signals
+ 
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>

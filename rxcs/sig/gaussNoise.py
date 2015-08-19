@@ -3,14 +3,64 @@ This is a random gaussian noise generator module. |br|
 
 The generator is able to generate N random signals with a given bandwidth. |br|
 
-For description of parameters of the generator, take a look on '__parametersDefine' function.
-For examples of usage, go to examples/signals directory. |br|
+*Examples*:
+    Please go to the *examples/signals* directory for examples on how to use 
+    the generator. |br|
 
-Atributes of 'gaussNoise' class after calling 'run' method:
+*Settings*:
+    Parameters of the generator described below.
 
-    - mSig [Numpy array (2D)] - matrix with generated signals, one signal p. column
+    Take a look on '__parametersDefine' function for more info on the 
+    parameters.
 
-|br|
+    Parameters of the generator are attributes of the class which must/can
+    be set before the generator run.
+
+    Required parameters:
+
+    - a. **tS** (*float*): time of a signals
+
+    - b. **fR** (*float*): signals' representation sampling frequency
+
+
+    Optional parameters:
+
+    - c. **fB** (*float*): signals' baseband   [default = **fR** / 2]
+  
+    - d. **iP** (*float*): signals' power  [default = 1W]
+
+    - e. **nSigs** (*int*): the number of signals to be generated  [default = 1]
+
+     Parameters given below are optional filter parameters.
+     There parameters describe the filter which limits the signals' baseband.
+     The filter is applied only if **fB** (the signal bandwidth) is given by user.
+
+     - f. **strFilt**  (*string*):  filter type. The allowed values are:
+                                    'butter', 'cheby1', 'cheby2', 'ellip', 'bessel'.
+                                    [default = 'butter']
+
+     - g. **nFiltOrd** (*int*):  the fitler order  [default = 10]
+     
+     - h. **iRp** (*float*):  max ripple in the filter's pass band.
+                              Applicable to Chebyshev and elliptic filters only.
+                              [default = 0.1]
+     
+     - i. **iRs** (*float*):  min attenuation in the filter's stopband
+                              Applicable to Chebyshev and elliptic filters only.
+                              [default = 60]
+
+     - j. **bMute** (*int*):  mute the console output from the generator [default = 0]
+
+
+*Output*:
+    Description of the generator output is below. 
+    This is the list of attributes of the generator class which are available 
+    after calling the 'run' method:
+
+    - a. **mSig** (*Numpy array 2D*): Matrix with output signals
+
+    - b. **nSmp** (*int*): The number of samples in the signals
+ 
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
@@ -43,7 +93,7 @@ class gaussNoise(rxcs._RxCSobject):
 
     def __parametersDefine(self):
         """
-        Internal method which defines the parameters    
+            Internal method which defines the parameters    
         """
 
         # Representation sampling frequency
@@ -63,7 +113,6 @@ class gaussNoise(rxcs._RxCSobject):
         self.paramType('fB', (float, int))
         self.paramHE('fB', 0)                           # Signal baseband must be higher or equal to zero
                                                         # (if it is equal to zero, the baseband is defined by fs)
-        self.paramL('fB', np.inf)                       # ...and lower than infinity
         self.paramLE('fB', 'fs', mul=0.5)               # Signal baseband must be lower or equal to half the rep. sampling
                                                         # frequency
         # Power of a signal
@@ -112,12 +161,15 @@ class gaussNoise(rxcs._RxCSobject):
 
     def run(self):
         """
-        Run method, which starts the generator    
+            Run method, which starts the generator    
         """
         self.parametersCheck()         # Check if all the needed partameters are in place and are correct
         self.parametersPrint()         # Print the values of parameters
 
-        self.__engine()                # Run the engine
+        self.engineStartsInfo()   # Info that the engine starts
+        self.__engine()           # Run the engine
+        self.engineStopsInfo()    # Info that the engine ends
+
         return self.__dict__           # Return dictionary with the parameters
 
 
@@ -125,13 +177,11 @@ class gaussNoise(rxcs._RxCSobject):
         """
             Engine of the function    
         """
-
-        self.engineStartsInfo()  # Info that the engine starts
-
+        
         # ---------------------------------------------------------------------
         # Generate the base signal
-        self.nSigSamp = round(self.fs * self.tS)     # The number of samples in the output signal
-        self.mSig = np.random.randn(self.nSigs, self.nSigSamp)   # Generate the noise
+        self.nSmp = round(self.fs * self.tS)  # The number of samples in the output signal
+        self.mSig = np.random.randn(self.nSigs, self.nSig)   # Generate the noise
 
         # ---------------------------------------------------------------------
         # Filter the signal with a low pass filter, if it is needed
@@ -144,6 +194,4 @@ class gaussNoise(rxcs._RxCSobject):
             # Apply the filter
             self.mSig = scsig.lfilter(vN, vD, self.mSig)
             self.mSig = self.mSig.T  # The output matrix should be column wise, not row wise
-
-        self.engineStopsInfo()   # Info that the engine ends
-
+        return

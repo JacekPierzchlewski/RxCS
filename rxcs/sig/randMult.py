@@ -4,16 +4,24 @@ This a Random Multitone Signal Generator module. |br|
 It is able to generate *N* multitone random signals according to settings
 given by a user. |br|
 
-Please go to the *examples* directory for examples on how to use the
-generator. |br|
+*Examples*:
+    Please go to the *examples/signals* directory for examples on how to use 
+    the generator. |br|
 
-Parameters of the generator (attributes of the class which must/can be set before the generator run):
+*Settings*:
+    Parameters of the generator described below.
+
+    Take a look on '__parametersDefine' function for more info on the 
+    parameters.
+
+    Parameters of the generator are attributes of the class which must/can
+    be set before the generator run.
 
     Required parameters:
 
     - a. **tS** (*float*): time of a signals
 
-    - b. **fR** (*float*): signals representation frequency
+    - b. **fR** (*float*): signals' representation sampling frequency
 
     - c. **fMax** (*float*): maximum frequency present in signals
 
@@ -31,11 +39,11 @@ Parameters of the generator (attributes of the class which must/can be set befor
     - h. **iP** (*float*): requested power of signals  [default = do not regulate the power]
 
 
-    - i. **vFrqs** (*Numpy array vector*): vector with requested frequencies of tones  [default = empty vector]
+    - i. **vFrqs** (*Numpy array 1D*): vector with requested frequencies of tones  [default = empty]
 
-    - j. **vAmps** (*Numpy array vector*): vector with requested amplitudes of tones   [default = empty vector]
+    - j. **vAmps** (*Numpy array 1D*): vector with requested amplitudes of tones   [default = empty]
 
-    - k. **vPhs** (*Numpy array vector*): vector with requested phases of tones        [default = empty vector]
+    - k. **vPhs** (*Numpy array 1D*): vector with requested phases of tones        [default = empty]
 
     
     - l. **nTones** (*int*): the number of additional tones    [default = 0]
@@ -56,43 +64,34 @@ Parameters of the generator (attributes of the class which must/can be set befor
     - s. **bMute** (*int*): mute the console output from the generator [default = 0]
 
 
-Available atributes of 'randMult' class after calling 'run' method:
+*Output*:
+    Description of the generator output is below. 
+    This is the list of attributes of the generator class which are available 
+    after calling the 'run' method:
 
-    Fields in the output dictionary:
+    - a. **mSig** (*Numpy array 2D*): Matrix with output signals
 
-    - a. **mSig** (*int*): Matrix with output signals
+    - b. **mSigNN** (*Numpy array 2D*): Matrix with nonnoisy output signals
 
-    - b. **mSigNN** (*float*): Matrix with nonnoisy output signals
+    - c. **nSmp** (*int*): The number of samples in the signals
 
-    - c. **nSigs** (*float*): The number of generated signals
+    - d. **vTSig** (*Numpy array 1D*): The time vector for the generated signals (name alias vT is available)
 
-    - d. **fR** (*float*): Signal representation sampling frequency
+    - e. **vP** (*Numpy array 1D*): Power of the signals
 
-    - e. **tS** (*float*): The time of the signals [s]
+    - f. **vPNN** (*Numpy array 1D*): Power of the non noisy signals
 
-    - f. **nSmp** (*float*): The number of samples in the signals
+    - g. **vPCoef** (*Numpy array 1D*): Power adjustment coefficients
 
-    - g. **vTSig** (*float*): The time vector for the generated signals (name alias vT is available)
+    - h. **mFrqs** (*Numpy array 2D*): Frequencies of tones in the signals
 
-    - h. **iSNR** (*vector*): Signal 2 noise ratio
+    - i. **mAmps** (*Numpy array 2D*): Amplitudes of tones in the signals
 
-    - i. **iP** (*vector*): Requested power of the signals
+    - j. **mPhs** (*Numpy array 2D*): Phases of tones in the signals
 
-    - j. **vP** (*vector*): Power of the signals
+    - k. **mAmPh** (*Numpy array 2D*): Complex matrix with amplitudes/phases of tones
 
-    - k. **vPNN** (*vector*): Power of the non noisy signals
-
-    - l. **vPCoef** (*vector*): Power adjustment coefficients
-
-    - m. **mFrqs** (*matrix*): Frequencies of tones in the signals
-
-    - n. **mAmps** (*matrix*): Amplitudes of tones in the signals
-
-    - o. **mPhs** (*matrix*): Phases of tones in the signals
-
-    - p. **mAmPh** (*matrix*): Complex matrix with amplitudes/phases of tones
-
-    - q. **fFFTR** (*float*): Signal FFT frequency resolution
+    - l. **fFFTR** (*float*): Signal FFT frequency resolution
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>

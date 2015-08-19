@@ -1,27 +1,43 @@
 """
-This a sparse vector generator module. |br|
+This a sparse vectors generator module. |br|
 
 It is able to generate *N* random sparse vectors according to settings
 given by a user. |br|
 
-For description of parameters of the generator, take a look on '__parametersDefine' function.
-For examples of usage, go to examples/signals directory. |br|
+*Examples*:
+    Please go to the *examples/signals* directory for examples on how to use 
+    the generator. |br|
 
-Atributes of 'sparseVector' class after calling 'run' method:
+*Settings*:
+    Parameters of the generator described below.
 
-    - mVects [Numpy array (2D)] - matrix with generated vectors, one vector p. column
+    Take a look on '__parametersDefine' function for more info on the 
+    parameters.
 
-|br|
+    Parameters of the generator are attributes of the class which must/can
+    be set before the generator run.
 
-There are two functions which should be used by user:
+    Required parameters:
 
-        - run() - this functions generate N sparse vectors
-                  according to settings in dSigConf dictionary
-                  Look at 'vect_sparse_ex0.py' in examples/sig 
-                  directory for an example of usage.
+    - a. **iVectSiz** (*int*):  size of a single vector
 
-        - generate(iN, iNs) - this function generate one vector of a size iN,
-                              with with iNs non-zero elements.
+    - b. **iS** (*float*):      sparsity of a single vector (0 <= iS <= 1)
+
+    - c. **iNVect** (*int):     the number of vectors to be generated
+
+
+    Optional parameters:
+
+     - d. **bMute** (*int*):  mute the console output from the generator [default = 0]
+
+
+*Output*:
+    Description of the generator output is below. 
+    This is the list of attributes of the generator class which are available 
+    after calling the 'run' method:
+
+    - a. **mVects** (*Numpy array 2D*):   Numpy array with the generated vectors
+
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
@@ -65,7 +81,7 @@ class sparseVector(rxcs._RxCSobject):
         # The sparsity parameter
         self.paramAddMan('iS', 'Sparsity parameter', unit='', unitprefix=' ')
         self.paramType('iS', (int, float))
-        self.paramH('iS', 0)           # The sparsity parameter must be higher than zero
+        self.paramHE('iS', 0)          # The sparsity parameter must be higher or equal to zero
         self.paramLE('iS', 1)          # ...and lower or equal to one
 
         # The number of vectors to be generated
@@ -87,7 +103,10 @@ class sparseVector(rxcs._RxCSobject):
         self.parametersCheck()         # Check if all the needed partameters are in place and are correct
         self.parametersPrint()         # Print the values of parameters
 
-        self.__engine()                # Run the engine
+        self.engineStartsInfo()    # Info that the engine starts
+        self.__engine()            # Run the engine
+        self.engineStopsInfo()     # Info that the engine ends
+        
         return self.__dict__           # Return dictionary with the parameters
 
 
@@ -108,7 +127,7 @@ class sparseVector(rxcs._RxCSobject):
             vVect = self._generate(self.iVectSiz, iNs)   # Generate a sparse vector
             vVect.shape = (vVect.size, )                 # Store the vector
             self.mVects[:, inxVect] = vVect              # ^
-
+        return
 
     def _generate(self, iN, iNs):
         """
@@ -131,43 +150,4 @@ class sparseVector(rxcs._RxCSobject):
         for inxEl in np.arange(iNs):        # Put the non-zero elements into the vector x
             vX[vInx[inxEl]] = vXel[inxEl]   # ^
 
-        return vX
-
-    def generate(self, iN, iNs):
-        """
-        This function generates one sparse vector.
-        It can be accessed by user.
-        
-        Args:
-            iN  (int):  size of the vector
-            iNs (int):  the number of non-zero elements
-    
-        Returns:
-            vX (numpy array):   generated sparse vector
-        """
-    
-        # Check the input parameters
-        # ----------------------------------------------------------------------
-        if not (isinstance(iN, int)  and iN > 0 ):    
-            strError = ("Size of the vector must be an interger higher than 0")        
-            raise ValueError(strError)
-    
-        if not (isinstance(iNs, int)  and iNs > 0 ):    
-            strError = ("The number of non-zero  must be an interger higher than 0")        
-            raise ValueError(strError)
-    
-        if (iNs > iN):
-            strError = ("Size of the vector must be an interger higher than 0")        
-            raise ValueError(strError)
-    
-        # ----------------------------------------------------------------------
-        vX = np.zeros((iN,1))               # Allocate X vector
-        
-        vInx = np.random.permutation(iN)    # Draw indices on non-zero elements 
-        vInx = vInx[0:iNs]                  # ^
-    
-        vXel = np.random.rand(iNs,1)        # Draw the non-zero elements of the vector x
-        for inxEl in np.arange(iNs):        # Put the non-zero elements into the vector x
-            vX[vInx[inxEl]] = vXel[inxEl]   # ^
-    
         return vX
