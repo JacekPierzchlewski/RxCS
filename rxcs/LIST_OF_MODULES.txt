@@ -17,15 +17,14 @@ Acquistions modules (2):
     # Nonuniform samplers:
     2.1. nonuniANGIE.py        - nonuniform sampler with ANGIE sampling scheme
     2.2. nonuniExtern.py       - nonuniform sampler with an external sampling scheme
-    2.3. nonuniExternDummy.py  - dummy nonuniform sampler with an external sampling scheme ('dummy', because it does not sample the signal, only generates the observation matrix)
-    2.4. nonuniARS.py          - nonuniform sampler with ARS sampling scheme
-    2.5. nonuniJS.py           - nonuniform sampler with JS sampling scheme
+    2.3. nonuniARS.py          - nonuniform sampler with ARS sampling scheme
+    2.4. nonuniJS.py           - nonuniform sampler with JS sampling scheme
 
     # Uniform samplers:
-    2.6. uniform.py      - a uniform sampler
+    2.5. uniform.py      - a uniform sampler
 
     # Additional acquisition modules:
-    2.7. satur.py      - saturation block
+    2.6. satur.py      - saturation block
 
 
 Compresed Sensing modules (3):

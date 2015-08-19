@@ -17,22 +17,18 @@ contents:
 
     6. nonuniExtern.py        - nonuniform sampler with an external sampling scheme
 
-    7. nonuniExternDummy.py   - dummy nonuniform sampler with an external sampling scheme
-                                The sampler is 'dummy', because it does not sample the signal,
-                                it only generates the observation matrix.
+    7. nonuniARS.py           - nonuniform sampler with ARS sampling scheme
 
-    8. nonuniARS.py           - nonuniform sampler with ARS sampling scheme
-
-    9. nonuniJS.py            - nonuniform sampler with JS sampling scheme
+    8. nonuniJS.py            - nonuniform sampler with JS sampling scheme
 
 
     # Uniform samplers:
 
-   10. uniform.py      - a uniform sampler
+    9. uniform.py      - a uniform sampler
 
 
     # Additional modules:
 
-   11. satur.py      - saturation block
+   10. satur.py      - saturation block
 
 

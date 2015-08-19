@@ -14,9 +14,6 @@ from nonuniANGIE import nonuniANGIE
 # Import nonuniform sampler with external scheme
 from nonuniExtern import nonuniExtern
 
-# Import dummy nonuniform sampler with external scheme
-import nonuniExternDummy
-
 # Import saturation block
 from satur import satur
 
