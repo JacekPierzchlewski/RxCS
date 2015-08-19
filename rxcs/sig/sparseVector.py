@@ -36,8 +36,8 @@ given by a user. |br|
     This is the list of attributes of the generator class which are available 
     after calling the 'run' method:
 
-    - a. **mVects** (*Numpy array 2D*):   Numpy array with the generated vectors
-
+    - a. **mVects** (*Numpy array 2D*):   Numpy array with the generated vectors.
+                                          One vector p. row.
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
@@ -122,11 +122,10 @@ class sparseVector(rxcs._RxCSobject):
         iNs = np.ceil(self.iS * self.iVectSiz)
 
         # Loop over all vectors
-        self.mVects = np.zeros((self.iVectSiz, self.iNVect))  # Allocate matrix for all the vectors
+        self.mVects = np.zeros((self.iNVect, self.iVectSiz,))  # Allocate matrix for all the vectors
         for inxVect in np.arange(self.iNVect):
             vVect = self._generate(self.iVectSiz, iNs)   # Generate a sparse vector
-            vVect.shape = (vVect.size, )                 # Store the vector
-            self.mVects[:, inxVect] = vVect              # ^
+            self.mVects[inxVect, :] = vVect              # Store the vector
         return
 
     def _generate(self, iN, iNs):
@@ -140,9 +139,9 @@ class sparseVector(rxcs._RxCSobject):
         Returns:
             vX (numpy vectors):    generated sparse vector
         """
-    
-        vX = np.zeros((iN,1))               # Allocate X vector
-        
+
+        vX = np.zeros((iN))                 # Allocate X vector
+
         vInx = np.random.permutation(iN)    # Draw indices on non-zero elements
         vInx = vInx[0:iNs]                  # ^
     
