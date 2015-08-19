@@ -25,11 +25,13 @@ The generator is able to generate N random signals with a given bandwidth. |br|
 
     Optional parameters:
 
-    - c. **fB** (*float*): signals' baseband   [default = **fR** / 2]
+    - c. **fB** (*float*): signals' baseband   
+                           [default = baseband not regulated]
   
     - d. **iP** (*float*): signals' power  [default = 1W]
 
-    - e. **nSigs** (*int*): the number of signals to be generated  [default = 1]
+    - e. **nSigs** (*int*):  the number of signals to be generated  
+                             [default = 1]
 
      Parameters given below are optional filter parameters.
      There parameters describe the filter which limits the signals' baseband.
@@ -42,14 +44,15 @@ The generator is able to generate N random signals with a given bandwidth. |br|
      - g. **nFiltOrd** (*int*):  the fitler order  [default = 10]
      
      - h. **iRp** (*float*):  max ripple in the filter's pass band.
-                              Applicable to Chebyshev and elliptic filters only.
+                              Applicable to Chebyshev and elliptic filt. only.
                               [default = 0.1]
      
      - i. **iRs** (*float*):  min attenuation in the filter's stopband
-                              Applicable to Chebyshev and elliptic filters only.
+                              Applicable to Chebyshev and elliptic filt. only.
                               [default = 60]
 
-     - j. **bMute** (*int*):  mute the console output from the generator [default = 0]
+     - j. **bMute** (*int*):  mute the console output from the generator
+                              [default = 0]
 
 
 *Output*:
@@ -69,7 +72,7 @@ The generator is able to generate N random signals with a given bandwidth. |br|
 *Version*:
     1.0    | 15-JUL-2014 : * Version 1.0 released. |br|
     1.0r1  | 18-AUG-2015 : * Adjusted to RxCSobject v1.0 |br|
-
+    1.0r2  | 19-AUG-2015 : * Bug in bandwith regulation is fixed |br|
 
 *License*:
     BSD 2-Clause
@@ -186,7 +189,7 @@ class gaussNoise(rxcs._RxCSobject):
 
         # ---------------------------------------------------------------------
         # Filter the signal with a low pass filter, if it is needed
-        if (self.fB > 0):
+        if self.wasParamGiven('fB'):
 
             # Design a iir low pass filter
             iCFP = self.fB/(0.5*self.fs)   # Compute the filter parameter
