@@ -2,25 +2,28 @@
 This script is an example on how to use the Inverse Discrete Fourier Transform
 (IDFT) Dictionary module. |br|
 
-In this example a IDFT dictionary is generated. There is a frequency shift (100kHz) in a spectrum
-represented by the dictionary.
+In this example a IDFT dictionary is generated.
+The dictionary spans spectrum 10 kHz ---> 20 kHz.
 Then, a signal with 1 tone is generated using the dictionary. |br|
 
-After the generation, the signal is plotted in the time domain.
+The signals is generated using the lowest avaialble frequency in 
+the dictionary. |br|
 
+
+After the generation, the signal is plotted in the time domain.
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
     1.0      | 18-NOV-2014 : * Version 1.0 released. |br|
-    1.0-r1   | 23-FEB-2015 : * Header is added
+    1.0-r1   | 23-FEB-2015 : * Header is added.
+    2.0      | 20-AUG-2015 : * Version 2.0 released 
+                               (adjusted to v2.0 of the dictionary generator) |br|
 
 *License*:
     BSD 2-Clause
 """
-
-
 from __future__ import division
 import rxcs
 import numpy as np
@@ -28,58 +31,43 @@ import matplotlib.pyplot as plt
 
 def _dict_IDFT_ex2():
 
-    # -----------------------------------------------------------------
-    # Generate settings for the IDFT dictionary
+    # Things on the table:
+    IDFT = rxcs.cs.dict.IDFT() # IDFT dictionary generator
 
-    # Start the configuration dictionary
-    dCSConf = {}
+    # Configure the IDF generator
+    IDFT.tS = 1e-3     # Time of the dictionary
+    IDFT.fR = 1e7      # Representation sampling frequency 
+    IDFT.fDelta = 1e3    # The frequency separation between tones
+    IDFT.nTones = 11     # The number of tones in the dictionary
+    IDFT.fFirst = 10e3   # The first frequency in the spectrum
 
-    # Time of the dictionary is 1 ms
-    dCSConf['tS'] = 1e-3
-
-    # Time start is 10 us
-    #dCSConf['tStart'] = 10e-6
-
-    # The signal representation sampling frequency is 10 MHz
-    dCSConf['fR'] = 1e7
-
-    # The first frequency in the spectrum
-    dCSConf['fFirst'] = 100e3
-
-    # The frequency separation between tones
-    dCSConf['fDelta'] = 1e3
-
-    # The number of tones in the dictionary
-    dCSConf['nTones'] = 101
-
-    # -----------------------------------------------------------------
-    # Generate the IDFT dictionary
-    (mIDFT, dDict) = rxcs.cs.dict.IDFToNoDC.main(dCSConf)
+    IDFT.run()   # Generate the dictionary
 
     # -----------------------------------------------------------------
     # Generate the signal using the dictionary
 
     # Vector with Fourier coefficients
-    vFcoef = np.zeros((1,202)).astype(complex)
-    vFcoef[0, 0] = -1j                         # 100 kHz
-    vFcoef[0, 201] = 1j                        # 100 kHz
+    vFcoef = np.zeros((1,22)).astype(complex)
+    vFcoef[0, 0] = -1j
+    vFcoef[0, 21] = 1j
+     
+    # Get the dictionary matrix
+    mIDFT = IDFT.mDict
 
-    # Generate a signal and change its shape to a signle vector
-    vSig = np.real(np.dot(vFcoef,mIDFT))
+    # Generate a signal and change its shape to a single vector
+    vSig = np.real(np.dot(vFcoef, mIDFT))
     vSig.shape = (vSig.size,)
-
-    # Get the signal time vector
-    vT = dDict['vT']
 
     # -----------------------------------------------------------------
     # Plot signal in the time domain
+    vT = IDFT.vT            # Get the time vector
     hFig1 = plt.figure(1)
     hSubPlot1 = hFig1.add_subplot(111)
     hSubPlot1.grid(True)
     hSubPlot1.set_title('Signal')
     hSubPlot1.set_xlabel('Time [s]')
     hSubPlot1.plot(vT, vSig)
-    hSubPlot1.set_xlim(min(vT), min(vT) + 1/(100e3))
+    hSubPlot1.set_xlim(min(vT), max(vT))
     hSubPlot1.set_ylim(-1.1, 1.1)
     plt.show(block=True)
 

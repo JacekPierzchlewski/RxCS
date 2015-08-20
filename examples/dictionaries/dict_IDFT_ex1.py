@@ -14,13 +14,13 @@ After the generation, the signal is plotted in the time domain.
 
 *Version*:
     1.0      | 30-MAY-2014 : * Version 1.0 released. |br|
-    1.0-r1   | 23-FEB-2015 : * Header is added
+    1.0-r1   | 23-FEB-2015 : * Header is added.  |br|
+    2.0      | 20-AUG-2015 : * Version 2.0 released 
+                               (adjusted to v2.0 of the dictionary generator) |br|
 
 *License*:
     BSD 2-Clause
 """
-
-
 from __future__ import division
 import rxcs
 import numpy as np
@@ -28,30 +28,17 @@ import matplotlib.pyplot as plt
 
 def _dict_IDFT_ex1():
 
-    # -----------------------------------------------------------------
-    # Generate settings for the IDFT dictionary
+    # Things on the table:
+    IDFT = rxcs.cs.dict.IDFT() # IDFT dictionary generator
 
-    # Start the configuration dictionary
-    dCSConf = {}
+    # Configure the IDF generator
+    IDFT.tS = 1e-3     # Time of the dictionary is 1 ms
+    IDFT.fR = 1e6      # Representation sampling frequency is 1 MHz
+    IDFT.fDelta = 1e3     # The frequency separation between tones
+    IDFT.nTones = 100     # The number of tones in the dictionary
+    IDFT.tStart = 10e-6   # Time start is 10 us
 
-    # Time of the dictionary is 1 ms
-    dCSConf['tS'] = 1e-3
-
-    # Time start is 10 us
-    dCSConf['tStart'] = 10e-6
-
-    # The signal representation sampling frequency is 1 MHz
-    dCSConf['fR'] = 1e6
-
-    # The frequency separation between tones
-    dCSConf['fDelta'] = 1e3
-
-    # The number of tones in the dictionary
-    dCSConf['nTones'] = 100
-
-    # -----------------------------------------------------------------
-    # Generate the IDFT dictionary
-    (mIDFT, dDict) = rxcs.cs.dict.IDFToNoDC.main(dCSConf)
+    IDFT.run()   # Generate the dictionary
 
     # -----------------------------------------------------------------
     # Generate the signal using the dictionary
@@ -59,17 +46,18 @@ def _dict_IDFT_ex1():
     # Vector with Fourier coefficients
     vFcoef = np.zeros((1,200)).astype(complex)
     vFcoef[0, 1] = -1j
-    vFcoef[0, 18] = 1j
+    vFcoef[0, 198] = 1j
 
-    # Generate a signal and change its shape to a signle vector
+    # Get the dictionary matrix 
+    mIDFT = IDFT.mDict   
+
+    # Generate a signal and change its shape to a single vector
     vSig = np.real(np.dot(vFcoef,mIDFT))
     vSig.shape = (vSig.size,)
 
-    # Get the signal time vector
-    vT = dDict['vT']
-
     # -----------------------------------------------------------------
     # Plot signal in the time domain
+    vT = IDFT.vT         # Get the time vector
     hFig1 = plt.figure(1)
     hSubPlot1 = hFig1.add_subplot(111)
     hSubPlot1.grid(True)
@@ -78,8 +66,8 @@ def _dict_IDFT_ex1():
     hSubPlot1.plot(vT, vSig)
     hSubPlot1.set_xlim(min(vT), max(vT))
     hSubPlot1.set_ylim(-1.1, 1.1)
-
     plt.show(block=True)
+
 
 # =====================================================================
 # Trigger when start as a script
