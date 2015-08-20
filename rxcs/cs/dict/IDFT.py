@@ -1,591 +1,248 @@
 """
-This module generates Inverse Discrete Fourier Transform matrix. |br|
+This module generates Inverse Discrete Fourier Transform matrix (IDFT). |br|
 
-Frequencies represented by the rows of the matrix:
+Frequencies represented by the rows of the generated IDFT matrix:
 
 
   freq.
-    ^        /
-    |       /
-    |      /   
-    |     /
-    |    / 
-    |   /
-    |  /
-    | /
-    |----------------------->  indices of columns
-    |                 /
-    |                /
-    |               /
-    |              /
-    |             / 
-    |            /
-    |           /
-                    
+    ^        /.
+    |       / .
+    |      /  .  
+    |     /   .
+    |    /    .
+    |   /     .
+    |  /      .
+    | /       . N+1
+    |/        . .     
+    |1-------N---------2N---->  indices of columns
+    |           .      /
+    |           .     /
+    |           .    /
+    |           .   /
+    |           .  / 
+    |           . /
+    |           ./
+
+where N is the number of tones in the dictionary.
+
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
     1.0    |  8-SEP-2014 : * Initial version. |br|
-    1.0r1  | 15-JAN-2015 :  Improvements in code comments |br|
+    1.0r1  | 15-JAN-2015 : * Improvements in code comments |br|
     1.0r2  | 20-AUG-2015 : * File name changed |br|
-    
-
+    2,0    | 20-AUG-2015 : * Version 2.0 released |br|
 
 *License*:
     BSD 2-Clause
 
 """
 from __future__ import division
-import time
 import rxcs
 import numpy as np
 
+class IDFT(rxcs._RxCSobject):
+
+    def __init__(self, *args):
+        rxcs._RxCSobject.__init__(self)    # Make it a RxCS object 
+        
+        self.strRxCSgroup = 'Dictionary generator'  # Name of group of RxCS modules
+        self.strModuleName = 'IDFT'                 # Module name
+
+        self.__parametersDefine()      # Define the parameters
+
+    # Define parameters
+    def __parametersDefine(self):
+
+        # Time of the signal [s]
+        self.paramAddMan('tS', 'Time of the signal', unit='s')
+        self.paramType('tS', (int, float))
+        self.paramH('tS', 0)
+        self.paramL('tS', np.inf)
+        
+        # The dictionary representation sampling freuqency [Hz]
+        self.paramAddMan('fR', 'The dictionary representation sampling freuqency', unit='Hz')
+        self.paramType('fR', (int, float))
+        self.paramH('fR', 0)
+        self.paramL('fR', np.inf)
+
+        # The optional time shift of starting time point
+        self.paramAddOpt('tStart', 'The time shift of starting time point', unit='s', default=0)
+        self.paramType('tStart', (int, float))
+        self.paramH('tStart', -np.inf)
+        self.paramL('tStart', np.inf)
+
+        # The frequency separation between tones [Hz]
+        self.paramAddMan('fDelta', 'The frequency separation between tones', unit='Hz')
+        self.paramType('fDelta', (int, float))
+        self.paramH('fDelta', 0)
+        self.paramL('fDelta', np.inf)
+
+        # The number of tones
+        self.paramAddMan('nTones', 'The number of tones')
+        self.paramType('nTones', int)
+        self.paramH('nTones', 0)
+        self.paramL('nTones', np.inf)
+
+        # The first frequency in the spectrum
+        self.paramAddOpt('fFirst', 'The first frequency in the spectrum', unit='Hz', default='$$fDelta')
+        self.paramType('fFirst', (int, float))
+        self.paramH('fFirst', 0)
+        self.paramL('fFirst', np.inf)
+
+        # 'Mute the output' flag
+        self.paramAddOpt('bMute', 'Mute the output', noprint=1, default=0)
+        self.paramType('bMute', int)           # Must be of int type
+        self.paramAllowed('bMute',[0, 1])      # It can be either 1 or 0
+
+    # Run
+    def run(self):
+ 
+        self.parametersCheck()         # Check if all the needed partameters are in place and are correct
+        self.parametersPrint()         # Print the values of parameters        
+
+        self.__engine()          # Run the engine
+        return self.__dict__     # Return dictionary with the parameters
+
+    # Engine of the function
+    def __engine(self):
+
+        # Check of the configuration make sense
+        self._checkConf()
+
+        # Compute time and frequency parameters of dictionaries
+        (self.Tg, self.nSamp, self.tEnd) = self._computeParamT(self.tS, self.fR, self.tStart)
+        (self.fFirstHigh, self.fHigh) = self._computeParamF(self.fDelta, self.nTones, self.fFirst)
+
+        # Print some additional time and frequency parameters of the dictionary
+        self._printExtraParam()
+
+        self.engineStartsInfo()      # Info that the engine starts
+        self.vF = self._generateFVector(self.fFirstHigh, self.fDelta, self.fHigh)   # Frequency vector
+        self.vT = self._generateTVector(self.Tg, self.nSamp, self.tStart)           # Time vector
+        self.mDict = self._generateIDFT(self.vT, self.vF)   # The dicionary matrix
+        self.engineStopsInfo()       # Info that the engine ends
+        return
+
+    # Check configuration
+    def _checkConf(self):
+        """
+        """
+
+        # Check if the first frequency in the spectrum is compatible with the 
+        # frequency separation between tones
+        nTonesStart = self.fFirst / self.fDelta
+        if not self.isequal(nTonesStart, np.round(nTonesStart), 1e-6):
+            strE = 'The first frequency in the spectrum (fFirst) is '
+            strE = strE + 'incompatible with the frequency separation between tones (fDelta)!'
+            raise ValueError(strE)
+
+        # Check if the time represented by dictionary is compatible
+        # with the representation sampling period
+        nSmp = self.tS * self.fR  # The number of signal samples
+        if not self.isequal(nSmp, np.round(nSmp), 1e-6):
+            strE = 'Time represented by dictionary (tS) is incompatible with '
+            strE = strE + 'the dictionary representation sampling freuqency (fS)!'
+            raise ValueError(strE)
+
+        # Check if the optional time shift of starting time point is compatible
+        # with the representation sampling period
+        nSmptStart = self.tStart * self.fR
+        if not self.isequal(nSmptStart, np.round(nSmptStart), 1e-6):
+            strE = 'Time shift of starting time point (tS) is incompatible with '
+            strE = strE + 'the dictionary representation sampling frequency (fS)!'
+            raise ValueError(strE)
+
+        # Check Nyquist
+        fMax = self.fFirst + self.fDelta * (self.nTones - 1)
+        if not (self.fR > 2 * fMax):
+            strW = 'WARNING!  The representation sampling frequency (fR) is to low! '
+            strW = strW + '(Ever heard about Nyqist principle?)'
+            rxcs.console.newline()
+            rxcs.console.warning(strW)
+
+        # -----------------------------------------------------------------
+        return
+        
+    # Compute time parameters of dictionaries
+    def _computeParamT(self, tS, fR, tStart):
+        """
+        """
+        # The signal representation period
+        Tg = 1/fR
+
+        # The number of signal samples
+        nSamp = int(np.round(tS / Tg))
+
+        # Signal time end
+        tEnd = tStart + tS
+        
+        return (Tg, nSamp, tEnd)
+
+    # Compute frequency parameters of dictionaries
+    def _computeParamF(self, fDelta, nTones, fFirst):
+        """
+        """
+        # The positive low frequency limit of the dictionary
+        fFirstHigh = np.floor(fFirst/fDelta) * fDelta
+
+        # The positive high frequency limit of the dictionary
+        fHigh = fFirstHigh + fDelta * (nTones - 1)
+
+        return (fFirstHigh, fHigh)
+
+    # Print some additional time parameters of the dictionary
+    def _printExtraParam(self):
+        """
+        """
+        rxcs.console.bullet_param('The last time moment represented by the dictionary',
+                                   self.tEnd, '-', 'seconds')
+
+        rxcs.console.bullet_param('The signal representation sampling period',
+                                  self.Tg, '-', 'seconds')
+
+        rxcs.console.param('The number of signal samples', self.nSamp, '-', 'samples')
+
+        rxcs.console.bullet_param('The maximum frequency represented by the dictionary',
+                                  self.fHigh, '-', 'Hz')
+        return
 
-def main(dCSConf):
-
-    # =================================================================
-    # Check the configuration and print it to the console
-    # =================================================================
-
-    # Print the configuration to the console
-    tStart = _printConf(dCSConf)
-
-    # - - - - - - - - - - - - - - - - - - -
-
-    # Check if the configuration for the dictionary make sense
-    _checkConf(dCSConf)
-
-    # - - - - - - - - - - - - - - - - - - -
-
-    # =================================================================
-    # Generate the IDFT dictionary matrix
-    # =================================================================
-    (mDict, vF, vT) = _generateIDFToNoDC(dCSConf)
-
-    # =================================================================
-    # Generate the output dictionary
-    # =================================================================
-    dDict = _generateOutput(dCSConf, mDict, vF, vT)
-
-    # =================================================================
-    # Signal sampling is done!
-    # =================================================================
-    if not np.isnan(tStart):   # <-tStart is nan = console output is off
-        rxcs.console.module_progress_done(tStart)
-
-    return (mDict, dDict)
-
-
-# =================================================================
-# Print the configuration to the console
-# =================================================================
-def _printConf(dCSConf):
-    """
-    This function prints all the parameters of the dicitonary to the console,
-    if only the bMute flag is not set.
-
-    Args:
-        dCSConf (dictionary)
-
-    Returns:
-        tStart (time )
-
-    """
-
-    # -----------------------------------------------------------------
-    # Check and get the configuration from the configuration dictionary
-
-    # bMute     -  mute the conole output flag
-    # tS        -  time length covered by the dictionary
-    # tStart    -  optional time shift
-    # fR        -  signal representation sampling frequency
-    # fDelta    -  frequency distance between tones
-    # nTones    -  the number of tones
-    (bMute, tS, tStart, fR, _, fDelta, nTones) = _getConf(dCSConf)
-
-    # -----------------------------------------------------------------
-    # Compute the parameters of the dictionary
-
-    # Tg           - the signal representation period
-    # tStart_real  - signal time start represented by the dictionary
-    # tS_real      - correct signal time length represented by the dict.
-    # tEnd         - signal time end represented by the dictionary
-    # nSamp        - the number of signal samples represented by the dict.
-    # fLow         - the negative frequency limit of the dictionary
-    # fFirstLow,   - the negative low frequency limit of the dictionary
-    # fFirstHigh,  - the positive high frequency limit of the dictionary
-    # fHigh        - the positive frequency limit of the dictionary
-    (Tg,
-     tStart_real, tS_real, tEnd, nSamp,
-     fLow, fFirstLow, fFirstHigh, fHigh) = _computeParam(dCSConf)
-
-    #----------------------------------------------------------------------
-    # Print the configuration if the 'mute' flag is not set
-    if bMute == 0:
-
-        # Print out the header of the dictionary matrix generator
-        rxcs.console.progress('Signal dictionary', 'IDFT')
-
-        # - - - - - - - - - - - - - - - - - - -
-
-        # Print the time parameters
-        _printConfT(Tg, tS, tStart, tStart_real, tS_real, tEnd, nSamp)
-
-        # Print the frequency parameters
-        _printConfF(fDelta, nTones, fFirstHigh, fHigh)
-
-        # Check for Nyquist and print a warning if needed
-        _checkNyquist(fR, fHigh)
-
-        # - - - - - - - - - - - - - - - - - - -
-        # Information about the computations start
-        tStart = rxcs.console.module_progress('dict. generation starts!!!')
-
-    #----------------------------------------------------------------------
-    else:   # <- the output was muted, no time stamp of the start is required
-        tStart = np.nan
-
-    #----------------------------------------------------------------------
-    return tStart
-
-
-# =================================================================
-# Print the time parameters of the dictionary
-# =================================================================
-def _printConfT(Tg, tS, tStart, tStart_real, tS_real, tEnd, nSamp):
-
-    # Signal time length represented by the dictionary
-    rxcs.console.bullet_param('Signal time length represented by the dict',
-                              tS_real, '-', 'seconds')
-
-    if not _isequal(tS_real, tS, 1e-12*tS_real):
-        rxcs.console.param('the requested signal time length',
-                            tS, '-', 'seconds')
-
-    #----------------------------------------------------------------------
-    # The time start and the time end, if time start different than zero
-
-    if (tStart_real != 0) or (tStart != 0):
-
-        rxcs.console.param('the time start represented by the dictionary',
-                        tStart_real, '-', 'seconds')
-
-        if not _isequal(tStart, tStart_real, 1e-6*tStart):
-            rxcs.console.param('requested time start',
-                        tStart, '-', 'seconds')
-
-        rxcs.console.param('the time end represented by the dictionary',
-                        tEnd, '-', 'seconds')
-
-    #----------------------------------------------------------------------
-    # The signal representation sampling frequency and period
-    rxcs.console.bullet_param('the signal representation sampling frequency',
-                              1/Tg, '-', 'Hz')
-    rxcs.console.param('the signal representation sampling period',
-                              Tg, '-', 'seconds')
-    rxcs.console.param('the number of signal samples',
-                              nSamp, '-', 'samples')
-
-    #----------------------------------------------------------------------
-    return
-
-
-# =================================================================
-# Print the frequency parameters of the dictionary
-# =================================================================
-def _printConfF(fDelta, nTones, fFirstHigh, fHigh):
-
-    rxcs.console.bullet_param('the first frequency in the dictionary',
-                              fFirstHigh, '-', 'Hz')
-
-    rxcs.console.param('the number of tones in the dictionary',
-                              nTones, '-', '')
-
-    rxcs.console.param('frequency separation between the tones',
-                              fDelta, '-', 'Hz')
-
-    rxcs.console.param('max frequency of a tone in the dictionary',
-                              fHigh, '-', 'Hz')
-
-    #----------------------------------------------------------------------
-    return
-
-
-# =================================================================
-# Check the highest frequency represented by the dictionary vs.
-# the signal representation sampling frequency
-# =================================================================
-def _checkNyquist(fR, fHigh):
-
-    #----------------------------------------------------------------------
-    # Check the highest frequency represented by the dictionary vs.
-    # the signal representation sampling frequency
-    if not fR > 2*fHigh:
-        strWarn = ('The signal representation frequency is too small ')
-        strWarn = strWarn + ('to represent max frequency in the dictionary')
-        rxcs.console.warning(strWarn)
-
-    #----------------------------------------------------------------------
-    return
-
-
-# =================================================================
-# Check the configuration dict. and get the configuration from it
-# =================================================================
-def _getConf(dCSConf):
-
-    # -----------------------------------------------------------------
-    # Get the mute flag
-    if not 'bMute' in dCSConf:
-        bMute = 0
-    else:
-        bMute = dCSConf['bMute']
-
-    # -----------------------------------------------------------------
-    # Get the time length covered by the dictionary
-    if not 'tS' in dCSConf:
-        strError = ('The time covered by the dictionary (tS) ')
-        strError = strError + ('is not given in the configuration')
-        raise NameError(strError)
-    else:
-        tS = dCSConf['tS']
-
-    # -----------------------------------------------------------------
-    # Get the optional time shift
-    if not 'tStart' in dCSConf:
-        tStart = 0
-    else:
-        tStart = dCSConf['tStart']
-
-    # -----------------------------------------------------------------
-    # Get the signal representation sampling frequency
-    if not 'fR' in dCSConf:
-        strError = ('The signal representation sampling frequency (fR) ')
-        strError = strError + ('is not given in the configuration')
-        raise NameError(strError)
-    else:
-        fR = dCSConf['fR']
-
-    # -----------------------------------------------------------------
-    # Get the frequency separation between tones
-    if not 'fDelta' in dCSConf:
-        strError = ('The frequency separation between tones (fDelta) ')
-        strError = strError + ('is not given in the configuration')
-        raise NameError(strError)
-    else:
-        fDelta = dCSConf['fDelta']
-
-    # -----------------------------------------------------------------
-    # Get the first frequency in the spectrum
-    if not 'fFirst' in dCSConf:
-	fFirst = fDelta
-    else:
-        fFirst = dCSConf['fFirst']
-
-    # -----------------------------------------------------------------
-    # Get the number of tones
-    if not 'nTones' in dCSConf:
-        strError = ('The number of tones (nTones) is not given ')
-        strError = strError + ('is not given in the configuration')
-        raise NameError(strError)
-    else:
-        nTones = dCSConf['nTones']
-
-    # -----------------------------------------------------------------
-    return (bMute,     # mute the conole output flag
-            tS,        # time length covered by the dictionary
-            tStart,    # optional time shift
-            fR,        # signal representation sampling frequency
-            fFirst,    # first frequency in the spectrum
-            fDelta,    # frequency distance between tones
-            nTones)    # the number of tones
-
-
-# =================================================================
-# Compute the parameters of the dictionary
-# =================================================================
-def _computeParam(dCSConf):
-
-    # -----------------------------------------------------------------
-    # Check and get the configuration from the configuration dictionary
-
-    # tS        -  time length covered by the dictionary
-    # tStart    -  optional time shift
-    # fR        -  signal representation sampling frequency
-    # fFirst    -  first frequency in the spectrum
-    # fDelta    -  frequency distance between tones
-    # nTones    -  the number of tones
-    (_, tS, tStart, fR, fFirst, fDelta, nTones) = _getConf(dCSConf)
-
-    # -----------------------------------------------------------------
-    # Compute the time parameters of the dictionary
-    (Tg, tStart_real, tS_real, tEnd, nSamp) = _computeParamT(tS, fR, tStart)
-
-    # -----------------------------------------------------------------
-    # Compute the negative and positive frequency limits of the dictionary
-    (fLow, fFirstLow, fFirstHigh, fHigh) = _computeParamF(fFirst, fDelta, nTones)
-
-    # -----------------------------------------------------------------
-    return (Tg,           # the signal representation period
-            tStart_real,  # signal time start represented by the dictionary
-            tS_real,      # correct signal time length represented by the dict.
-            tEnd,         # signal time end represented by the dictionary
-            nSamp,        # the numb. of signal samples represented by the dict.
-            fLow,         # the negative frequency limit of the dictionary
-            fFirstLow,    # the negative low frequency limit of the dictionary
-            fFirstHigh,   # the positive high frequency limit of the dictionary
-            fHigh)        # the positive frequency limit of the dictionary
-
-
-# =================================================================
-# Compute the parameters of the dictionary
-# =================================================================
-def _computeParamT(tS, fR, tS_shift):
-
-    # Compute the signal representation period
-    Tg = 1/fR
-
-    # Signal time start represented by the dictionary
-    tStart_real = np.round(tS_shift / Tg)*Tg
-
-    # The number of signal samples represented by the dictionary
-    nSamp = int(np.round(tS / Tg))
-
-    # Correct ssignal time length represented by the dictionary
-    tS_real = nSamp * Tg
-
-    # Signal time end represented by the dictionary
-    tEnd = tStart_real + tS_real
-
-    # -----------------------------------------------------------------
-    return (Tg, tStart_real, tS_real, tEnd, nSamp)
-
-
-# =================================================================
-# Compute the negative and positive frequency limits of the dict.
-# =================================================================
-def _computeParamF(fFirst, fDelta, nTones):
-
-    # The positive low frequency limit of the dictionary
-    fFirstHigh = np.floor(fFirst/fDelta) * fDelta
-
-    # The positive high frequency limit of the dictionary
-    fHigh = fFirstHigh + fDelta * (nTones - 1)
-
-    # The negative low frequency limit of the dictionary
-    fFirstLow = -fFirstHigh
-
-    # The negative frequency limit of the dictionary
-    fLow = -fHigh
-
-    # -------------------------------------------------------------
-    return (fLow, fFirstLow, fFirstHigh, fHigh)
-
-
-# =================================================================
-# Check if the configuration parameters make sense
-# =================================================================
-def _checkConf(dCSConf):
-
-    # -----------------------------------------------------------------
-    # Check the given configuration
-
-    # tS        -  time length covered by the dictionary
-    # fR        -  signal representation sampling frequency
-    # fFirst    -  first frequency in the spectrum    
-    # fDelta    -  frequency separation between tones
-    # nTones    -  the number of tones
-    (_, tS, _, fR, fFirst, fDelta, nTones) = _getConf(dCSConf)
-
-    if not tS > 0:
-        strErr = ('The time covered by the dictionary (tS) ')
-        strErr = strErr + ('must be higher than zero')
-        raise ValueError(strErr)
-
-    if not fR > 0:
-        strErr = ('The signal representation sampling frequency (fR) ')
-        strErr = strErr + ('must be higher than zero')
-        raise ValueError(strErr)
-
-    if not fFirst > 0:
-        strErr = ('The first frequency in the spectrum (fFirst) ')
-        strErr = strErr + ('must be higher than zero')
-        raise ValueError(strErr)
-
-    if not fDelta > 0:
-        strErr = ('The frequency separation between tones (fDelta) ')
-        strErr = strErr + ('must be higher than zero')
-        raise ValueError(strErr)
-
-    if not nTones > 0:
-        strErr = ('The number of tones (nTones) ')
-        strErr = strErr + ('must be higher than zero')
-        raise ValueError(strErr)
-
-    # -----------------------------------------------------------------
-    # Check the signal time covered by the dictionary after correction
-
-    # tS_real      - correct signal time length represented by the dict.
-    (_, _, tS_real, _, _, _, _, _, _) = _computeParam(dCSConf)
-
-    if not tS_real > 0:
-        strErr = ('The time covered by the dictionary ')
-        strErr = strErr + ('must be higher than zero')
-        raise ValueError(strErr)
-
-    return
-
-
-# =====================================================================
-# This function compares two values.
-# The function allows for a very small error margin
-# =====================================================================
-def _isequal(iX, iY, iMargin):
-    """
-    This function checks if a difference between two values is in the
-    given allowed margin.
-
-    Args:
-        iX: the first value |br|
-        iY: the second value |br|
-        iMargin: the allowed margin |br|
-
-    Returns:
-        1: if the difference between the given values does not exceed the
-           given margin |br|
-        0: if the difference between the given values does exceed the
-           given margin |br|
-    """
-
-    if iX < 1e-12:  # <- very small values will create problems due to
-                    #    floating point representation problems
-        return 1
-
-    if (abs(iX - iY) <= np.abs(iMargin)):
-        return 1
-    else:
-        return 0
-
-
-# =================================================================
-# ENGINE: generate the matrix with dictionary
-# =================================================================
-def _generateIDFToNoDC(dCSConf):
-
-    # -----------------------------------------------------------------
-    # Check and get the configuration from the configuration dictionary
-
-    # fFirst    -  first frequency in the spectrum
-    # fDelta    -  frequency distance between tones
-    # nTones    -  the number of tones
-    (_, _, _, _, fFirst, fDelta, nTones) = _getConf(dCSConf)
-
-    # Tg           - the signal representation period
-    # tStart_real  - signal time start represented by the dictionary
-    # nSamp        - the number of signal samples represented by the dict.
-    # fFirstHigh   - the positive high frequency limit of the dictionary
-    # fHigh        - the positive frequency limit of the dictionary
-
-    (Tg, tStart_real, _, _, nSamp, _, _, fFirstHigh, fHigh) = _computeParam(dCSConf)
-
-    # -----------------------------------------------------------------
-    # Generate the time vector
-    vT =  Tg * np.arange(nSamp) + tStart_real
-    vT.shape = (1,vT.size)
-
-    # -----------------------------------------------------------------
     # Generate the frequency vector
-    vF_pos = np.arange((fFirstHigh/fDelta), (fHigh/fDelta)+1)  # positive freqs
-    vF_neg = -1 * vF_pos                                       # negative freqs
-    vF_neg.sort()
-    vF = fDelta * np.concatenate( (vF_pos, vF_neg) )
-    vF.shape = (vF.size, 1)
+    def _generateFVector(self, fFirstHigh, fDelta, fHigh):
 
-    # -----------------------------------------------------------------
-    # Generate the Dictionary matrix
-    d = (1j*2*np.pi)   # d coefficient
-    mDict = 0.5*np.e**np.dot(vF,(d*vT) )
+        # -----------------------------------------------------------------
+        # Generate the frequency vector
+        vF_pos = np.arange((fFirstHigh/fDelta), (fHigh/fDelta)+1)  # positive freqs
+        vF_neg = -1 * vF_pos                                       # negative freqs
+        vF_neg.sort()
+        vF = fDelta * np.concatenate( (vF_pos, vF_neg) )
+        vF.shape = (vF.size, )
+        return vF
 
-    # -----------------------------------------------------------------
-    vF.shape = (vF.size, )
-    vT.shape = (vT.size, )
-    return (mDict, vF, vT)
+    # Generate the time vector
+    def _generateTVector(self, Tg, nSamp, tStart):
 
+        # -----------------------------------------------------------------
+        # Generate the time vector
+        vT =  Tg * np.arange(nSamp) + tStart
+        vT.shape = (vT.size, )
+        return vT
 
-# =================================================================
-# Generate the output dictionary
-# =================================================================
-def _generateOutput(dCSConf, mDict, vF, vT):
+    # Generate the IDFT dictionary
+    def _generateIDFT(self, vT, vF):
+        
+        # Change shape of the vectors, so that they can be multiplies
+        vT.shape = (1, vT.size)
+        vF.shape = (vF.size, 1)
 
-    # -----------------------------------------------------------------
-    # Get the frequency configuration from the configuration dictionary
+        # -----------------------------------------------------------------
+        # Generate the Dictionary matrix
+        d = (1j * 2 * np.pi)   # d coefficient
+        mDict = 0.5 * np.e**np.dot(vF, (d * vT))
 
-    # fFirst    -  first frequency in the spectrum
-    # fDelta    -  frequency separation between tones
-    # nTones    -  the number of tones
-    (_, _, _, _, fFirst, fDelta, nTones) = _getConf(dCSConf)
-
-    # -----------------------------------------------------------------
-    # Compute the parameters of the dictionary
-
-    # Tg           - the signal representation period
-    # tStart_real  - signal time start represented by the dictionary
-    # tS_real      - correct signal time length represented by the dict.
-    # tEnd         - signal time end represented by the dictionary
-    # nSamp        - the number of signal samples represented by the dict.
-    # fLow         - the negative frequency limit of the dictionary
-    # fFirstLow    - the negative low frequency limit of the dictionary
-    # fFirstHigh   - the positive high frequency limit of the dictionary
-    # fHigh        - the positive frequency limit of the dictionary
-    (Tg,
-     tStart_real, tS_real, tEnd, nSamp,
-     fLow, fFirstLow, fFirstHigh, fHigh) = _computeParam(dCSConf)
-
-    # -----------------------------------------------------------------
-    # Initialize the output dictionary
-    dDict = {}
-
-    # - - - - - - - - - - - - - - - - - -
-
-    dDict['mDict'] = mDict   # <- matrix with the dictionary
-
-    dDict['vF'] = vF   # <- vector with frequencies represented by the dict.
-
-    dDict['vT'] = vT   # <- vector with time samples represented by the dict.
-
-    # - - - - - - - - - - - - - - - - - -
-
-    dDict['Tg'] = Tg   # <- the signal representation period
-
-    dDict['tS_real'] = tS_real   # <- correct signal time length represented
-                                 # by the dictionary
-
-    dDict['tStart_real'] = tStart_real   # <- signal time start represented by
-                                         # the dictionary
-
-    dDict['tEnd'] = tEnd   # <- signal time end represented by the dictionary
-
-    dDict['nSamp'] = nSamp   # <- the number of signal samples represented by
-                             # the dictionary
-
-    # - - - - - - - - - - - - - - - - - -
-
-    dDict['fDelta'] = fDelta   # <- frequency separation between tones
-
-    dDict['nTones'] = nTones   # <- the number of tones in the dictionary
-
-    dDict['fLow'] = fLow   # <- the negative frequency limit of the dictionary
-
-    dDict['fFirstLow'] = fFirstLow   # <- the negative low frequency limit of 
-                                     # the dictionary
-    
-    dDict['fFirstHigh'] = fFirstHigh   # <- the positive low frequency limit of 
-                                       # the dictionary
-
-    dDict['fHigh'] = fHigh   # <- the positive frequency limit of the
-                             #    dict,
-
-    # -----------------------------------------------------------------
-    return dDict
+        # -----------------------------------------------------------------
+        vT.shape = (vT.size, )
+        vF.shape = (vF.size, )
+        return (mDict)
