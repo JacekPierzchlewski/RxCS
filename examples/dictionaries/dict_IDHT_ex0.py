@@ -4,14 +4,16 @@ This script is an example of how to use the Inverse Discrete Hartley Transform
 
 In this example signal with 1 cosine tone is generated. |br|
 
-
 After the generation, the signal is plotted in the time domain.
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 13-JAN-2014 : * Version 1.0 released. |br|
+    1.0      | 13-JAN-2015 : * Version 1.0 released. |br|
+    2.0      | 20-AUG-2015 : * Version 2.0 released 
+                               (adjusted to v2.0 of the dictionary generator) |br|
+
 
 *License*:
     BSD 2-Clause
@@ -24,42 +26,34 @@ import matplotlib.pyplot as plt
 
 def _dict_IDHT_ex0():
 
-    # -----------------------------------------------------------------
-    # Generate settings for the IDHT dictionary
+    # Things on the table:
+    IDHT = rxcs.cs.dict.IDHT() # IDHT dictionary generator
 
-    # Start the configuration dictionary
-    dCSConf = {}
+    # Configure the IDF generator
+    IDHT.tS = 10e-3  # Time of the dictionary is 10 ms
+    IDHT.fR = 40e3  # Representation sampling frequency is 40 kHz
+    IDHT.fDelta = 100  # The frequency separation between tones is 100 Hz
+    IDHT.nTones = 10   # The number of tones in the dictionary
 
-    # Time of the dictionary is 10 ms
-    dCSConf['tS'] = 10e-3
-
-    # The signal representation sampling frequency is 10 kHz
-    dCSConf['fR'] = 10e3
-
-    # The frequency separation between tones is 100 Hz
-    dCSConf['fDelta'] = 100
-
-    # The number of tones in the dictionary 
-    dCSConf['nTones'] = 10
-
-    # -----------------------------------------------------------------
-    # Generate the IDFT dictionary
-    (mIDHT, dDict) = rxcs.cs.dict.IDHT.main(dCSConf)
+    IDHT.run()   # Generate the dictionary
 
     # -----------------------------------------------------------------
     # Generate the signal using the dictionary
 
+    # Get the dictionary matrix from the generator
+    mDict = IDHT.mDict   
+
     # Vector with Fourier coefficients
-    vFcoef = np.zeros((1,2*dCSConf['nTones'])).astype(complex)
+    vFcoef = np.zeros((1,2 * IDHT.nTones)).astype(complex)
     vFcoef[0, 0] = 1     # Cosine 100Hz
 
     # Generate a signal and change its shape to a single vector
-    vSig = np.real(np.dot(vFcoef, mIDHT))
+    vSig = np.real(np.dot(vFcoef, mDict))
     vSig.shape = (vSig.size,)
 
     # -----------------------------------------------------------------
     # Plot signal in the time domain
-    vT = dDict['vT']          # Get the signal time vector from the dictionary
+    vT = IDHT.vT             # Get the time vector
     hFig1 = plt.figure(1)
     hSubPlot1 = hFig1.add_subplot(111)
     hSubPlot1.grid(True)
