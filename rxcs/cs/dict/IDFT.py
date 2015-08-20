@@ -29,6 +29,9 @@ Frequencies represented by the rows of the matrix:
 *Version*:
     1.0    |  8-SEP-2014 : * Initial version. |br|
     1.0r1  | 15-JAN-2015 :  Improvements in code comments |br|
+    1.0r2  | 20-AUG-2015 : * File name changed |br|
+    
+
 
 *License*:
     BSD 2-Clause
