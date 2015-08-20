@@ -1,9 +1,6 @@
 
-# Import the generator of oversampeld IDFT dictionary without DC
-import IDFToNoDC
+# Import the generator of oversampeld IDFT dictionary
+from IDFT import IDFT
 
 # Import the generator of oversampeld IDHT dictionary
-import IDHT
-
-
-
+from IDHT import IDHT
