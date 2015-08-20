@@ -18,6 +18,8 @@
                 1.02    | 19-AUG-2015 : * Function 'makeArray2Dim' is added |br|
                 1.02r1  | 19-AUG-2015 : * Bug in checking the values of the Numpy arrays is fixed, |br|
                                           (devectorization of the arrays)
+                1.03    | 20--AUG-2015 : * Function 'isequal' is added |br|
+
 
             List of functions in the module:
 
@@ -173,6 +175,7 @@
                                     automatically regulate the number of digits after the comma
             __NthInTuple          - takes Nth element of a tuple
             __strOnlyNumb         - check if a given string contains only a number
+            isequal               - check if two values are equal, with a given allowed margin
 
 """
 from __future__ import division
@@ -1076,6 +1079,7 @@ class _RxCSobject:
                         console.bullet_info(strDesc, 'NaN')
                     else:
                         console.bullet_param(strDesc, par, strUnitPrefix, strUnit)
+
                 elif isinstance(par, str):
                     console.bullet_info(strDesc, par)
         return
@@ -3906,6 +3910,34 @@ class _RxCSobject:
             else:
                 return 0
         return 1
+        
+    def isequal(self, iX, iY, iMargin):
+        """
+        This function checks if a difference between two values is in the
+        given allowed margin.
+
+        Args:
+            iX: the first value |br|
+            iY: the second value |br|
+            iMargin: the allowed margin |br|
+    
+        Returns:
+            1: if the difference between the given values does not exceed the
+               given margin |br|
+            0: if the difference between the given values does exceed the
+               given margin |br|
+        """
+        
+        iTSM = 1e-21  # Too small margin 
+        bTooSmall = (iY < iTSM) or (iY < iTSM) or (iY < iTSM) 
+        if bTooSmall == 1:  # <- very small values may create problems due to
+                            #    floating point representation problems
+            return 1
+       
+        if (abs(iX - iY) <= abs(iMargin)):
+            return 1
+        else:
+            return 0
         
 
 
