@@ -127,8 +127,8 @@ class randMult(rxcs._RxCSobject):
     def __init__(self, *args):
         rxcs._RxCSobject.__init__(self)    # Make it a RxCS object 
         
-        self.strRxCSgroup = 'Signal generator'     # Name of group of RxCS modules
-        self.strModuleName = 'Random multitone'    # Module name        
+        self.strRxCSgroup = 'Dictionary generator'  # Name of group of RxCS modules
+        self.strModuleName = 'Random multitone'     # Module name        
 
         self.__parametersDefine()      # Define the parameters
 
@@ -141,8 +141,8 @@ class randMult(rxcs._RxCSobject):
         self.paramH('tS', 0)
         self.paramL('tS', np.inf)       
 
-        # The signal representation sampling freuqency [Hz]
-        self.paramAddMan('fR', 'The signal representation sampling freuqency', unit='Hz')
+        # The signal representation sampling frequency [Hz]
+        self.paramAddMan('fR', 'The signal representation sampling frequency', unit='Hz')
         self.paramType('fR', (int, float))
         self.paramH('fR', 0)
         self.paramL('fR', np.inf)
