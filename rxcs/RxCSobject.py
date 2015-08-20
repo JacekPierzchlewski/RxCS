@@ -1132,7 +1132,7 @@ class _RxCSobject:
 
         if self.bMute == 0:
             strName = ('%s: \'%s\' is starting') % (self.strRxCSgroup, self.strModuleName)
-            self.tStart = console.module_progress(strName)
+            self.__tStartOfModuleRxCSobject = console.module_progress(strName)
 
     def engineStopsInfo(self):
         """
@@ -1151,7 +1151,7 @@ class _RxCSobject:
         if self.bMute == 0:
             strName = ('%s: \'%s\'.............') % (self.strRxCSgroup, self.strModuleName)
             console.module_progress(strName)
-            console.module_progress_done(self.tStart)
+            console.module_progress_done(self.__tStartOfModuleRxCSobject)
 
     # ##-----------------------------------------------------------------------
     # ## INTERNAL FUNCTIONS:
@@ -3928,8 +3928,8 @@ class _RxCSobject:
                given margin |br|
         """
         
-        iTSM = 1e-21  # Too small margin 
-        bTooSmall = (iY < iTSM) or (iY < iTSM) or (iY < iTSM) 
+        iTSM = 1e-21  # Too small margin
+        bTooSmall = (0 < iX < iTSM) or (0 < iY < iTSM) or (0 < iMargin < iTSM)
         if bTooSmall == 1:  # <- very small values may create problems due to
                             #    floating point representation problems
             return 1
@@ -3939,7 +3939,6 @@ class _RxCSobject:
         else:
             return 0
         
-
 
 class ErrorTemplate(Exception):
     """
