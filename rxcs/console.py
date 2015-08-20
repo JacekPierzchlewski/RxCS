@@ -11,6 +11,7 @@ from this module.
     0.2  | 15-MAY-2014 : * Docstrings added.
     0.21 | 15-MAY-2014 : * New colors ('PARAM' + 'OK') added to the dictionary
     0.22 | 14-AUG-2015 : * New function (progress_doneNL) is added 
+    0.23 | 20-AUG-2015 : * New function (newline) is added 
 
 
 *License*:
@@ -24,6 +25,13 @@ import time
 
 
 # =====================================================================
+# Print a new line
+# =====================================================================
+def newline():
+    sys.stdout.write('\n')
+    return
+
+# =====================================================================
 # Print signal pack header
 # =====================================================================
 def pack(inxPack):
@@ -31,7 +39,7 @@ def pack(inxPack):
     .. role:: bash(code)
       :language: bash
 
-    Function prints header of the signal pack processed by RxCS frames. |br|
+    Function prints header of the signal pack processed by RxCS. |br|
 
     The function takes care of the proper coloring of the console output. |br|
 
