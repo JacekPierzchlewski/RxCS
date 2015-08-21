@@ -1,3 +1,3 @@
 
 # Import SNR evaluation of the reconstructed signal
-import SNR
+from SNR import SNR

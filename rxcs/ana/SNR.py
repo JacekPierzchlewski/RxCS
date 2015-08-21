@@ -12,6 +12,7 @@ This module contains SNR evaluation function of the reconstructed signals. |br|
     0.4  | 21-MAY-2014 : * Configuration with a dictionary |br|
     0.5  | 21-MAY-2014 : * Progress and results printing |br|
     1.0  | 21-MAY-2014 : * Version 1.0 released. |br|
+    2,0  | 21-AUG-2015 : * Version 2,0 (objectified version) is released. |br|
 
 *License*:
     BSD 2-Clause
@@ -21,233 +22,89 @@ import numpy as np
 import rxcs
 
 
-def main(dSigOrig, dSigRecon, dAna, dAnaConf):
-    """
-    This the main function of the generator and the only one which should be
-    accessed by a user. |br|
+class SNR(rxcs._RxCSobject):
 
-    The function computes a noise of reconstrucion for every signal;
-    this noise is equal to the difference between the reconstructed and
-    the original signals.
-    Afterwards the function computes the signal-to-noise ratio of
-    the reconstruction for every signal.
-    The ratio is computed as: SNR = 10log10(iPs/iPn),
-    where:
+    def __init__(self, *args):
+        rxcs._RxCSobject.__init__(self)    # Make it a RxCS object 
+        
+        self.strRxCSgroup = 'Analysis'  # Name of group of RxCS modules
+        self.strModuleName = 'SNR'      # Module name
 
-            iPs - power of the original signal
-
-            iPn - power of noise
-
-    The function computes also the average signal-to-noise ratio of the
-    reconstruction. |br|
-
-    Additionally. the function computes the success ratio, which is equal to
-    the ratio of reconstructed signal with reconstruction SNR higher than
-    success threshold. |br|
-
-    Args:
-        dSigOrig (dict): dict. with the original signals
-        dSigRecon (dict): dict. with the reconstructed signals
-        dAna (dict): dict. with results of system analysis
-        dAnaConf (dict): dict. with configuration for system analysis
+        self.__inputSignals()      # Define the parameters
 
 
-    Returns:
-        dAna (dict): dict. with results of system analysis
-    """
+    # Define parameters
+    def __inputSignals(self):
 
-    # -------------------------------------------------------------------
-    # Get the signals
-    (mSig_orig, mSig_recon, nSigs_orig, iSiz_orig) = \
-        _getSignals(dSigOrig, dSigRecon)
+        # Signal under test
+        self.paramAddMan('mSig', 'Signal under test', noprint=1)
+        self.paramType('mSig', np.ndarray)         # Must be a Numpy array
+        self.paramTypeEl('mSig', (int, float))     # Elements must be of float or int type
+        self.paramNDimLE('mSig', 2)                # Must be a 1, or 2 dimensional matrix
 
-    # Get the configuration
-    # bMute        -  'mute the console output' flag
-    # iSNRSuccess  -  success threshold
-    (bMute,
-     iSNRSuccess) = _getConf(dAnaConf)
-
-    # -------------------------------------------------------------------
-    # Print out the header of the SNR analysis
-    if bMute == 0:
-        rxcs.console.progress('System analysis',
-                              'SNR of the reconstructed signal')
-        tStart = rxcs.console.module_progress('SNR analysis starts!!!')
-
-    # -------------------------------------------------------------------
-    # Compute the SNR
-
-    # Compute the noise
-    mNoise = np.abs(mSig_orig - mSig_recon)
-    (_, iSizNoise) = mNoise.shape  # Size of the noise
-
-    # Compute the power of noise
-    vNoiseP = (np.sum(mNoise * mNoise, axis=1) / iSizNoise)
-
-    # Compute the power of orignal signals
-    vSigP = (np.sum(mSig_orig * mSig_orig, axis=1) / iSiz_orig)
-
-    # Compute the SNR for every reconstructed signal and the average SNR
-    vSNR = 10 * np.log10(vSigP / vNoiseP)
-    iSNR = vSNR.mean()
-
-    # -------------------------------------------------------------------
-    # Compute the success ratio
-    iSR = (vSNR >= iSNRSuccess).mean()
-
-    # -------------------------------------------------------------------
-    # Add the vector with computed SNR to the dictionary with system
-    # analysis results
-    dAna['vSNR'] = vSNR
-
-    # Add the average SNR to the dictionary with system analysis results
-    dAna['iSNR'] = iSNR
-
-    # Add the success ratio to the dictionary with system analysis results
-    dAna['iSR'] = iSR
-
-    # -------------------------------------------------------------------
-    # SNR analysis is done
-    if bMute == 0:
-        rxcs.console.module_progress_done(tStart)
-
-    # -------------------------------------------------------------------
-    # Print results
-    _printResults(iSNR, iSR, iSNRSuccess, bMute)
-
-    # -------------------------------------------------------------------
-    return dAna
+        # Reference signal
+        self.paramAddMan('mSigRef', 'Reference signal', noprint=1)
+        self.paramType('mSigRef', np.ndarray)         # Must be a Numpy array
+        self.paramTypeEl('mSigRef', (int, float))     # Elements must be of float or int type
+        self.paramNDimLE('mSigRef', 2)                # Must be a 1, or 2 dimensional matrix
+        self.paramDimEq('mSigRef', 'mSig', 'rows', 'rows')         # Must have shape equal to mSig
+        self.paramDimEq('mSigRef', 'mSig', 'columns', 'columns')   # ^
 
 
-# =================================================================
-# Get the signals
-# =================================================================
-def _getSignals(dSigOrig, dSigRecon):
-    """
-    This function gets the reconstructed and the original signals from
-    the data dicionaries.
+    # Define parameters
+    def __parametersDefine(self):
 
-    The function checks if:
+        # Success threshold
+        self.paramAddOpt('iSNRSuccess', 'Success threshold')
+        self.paramType('iSNRSuccess', (int, float))   # Must be a Numpy array
+        self.paramH('iSNRSuccess', -np.inf)
+        self.paramL('iSNRSuccess', np.inf)
 
-        - the signals are present in the dictionaries
+    # Run
+    def run(self):
+        self.parametersCheck()    # Check if all the needed partameters are in place and are correct
+        self.parametersPrint()         # Print the values of parameters
 
-        - the signals have the same length
+        self.engineStartsInfo()  # Info that the engine starts
+        self.__engine()          # Run the engine
+        self.engineStopsInfo()   # Info that the engine ends
+        return self.__dict__     # Return dictionary with the parameters
 
-        - there is the same number of signals
+    # Engine - compute the noise and the success rate
+    def __engine(self):
 
-    Args:
-        dSigOrig (dict): dict. with the original signals
-        dSigRecon (dict): dict. with the reconstructed signals
+        # Get the number of signals and the size of signals
+        (nSigs, iSizSig) = self.mSig.shape  # Size of the noise
 
-    Returns:
-        mSig_orig (matrix): the original non noisy signal
-        mSig_recon (matrix): the reconstructed signal
-        nSigs (float): the number of signals
-        iSigSiz (float): the length of signals
-    """
+        # Compute the noise
+        mNoise = np.abs(self.mSig - self.mSigRef)
+        (_, iSizNoise) = mNoise.shape  # Size of the noise
 
-    # -------------------------------------------------------------------
-    # Get the original non noisy signals, the number of orignal signals
-    # and their length
-    strErr = 'The original signals (mSigNN) are missing in the "dSigOrig"'
-    if not 'mSigNN' in dSigOrig:
-        raise NameError(strErr)
+        # Compute the power of noise
+        vNoiseP = (np.sum(mNoise**2, axis=1) / iSizSig)
 
-    mSig_orig = dSigOrig['mSigNN']
-    (nSigs_orig, iSiz_orig) = mSig_orig.shape
+        # Compute the power of reference signals
+        vSigP = (np.sum(self.mSigRef**2, axis=1) / iSizSig)
 
-    # -------------------------------------------------------------------
-    # Get the reconstructed signals, the number of reconstructed signals,
-    # and their length
-    strErr = 'The reconstructed signals (mSig) are missing in the "dSigRecon"'
-    if not 'mSig' in dSigRecon:
-        raise NameError(strErr)
+        # Compute the SNR for every reconstructed signal and the average SNR
+        self.vSNR = 10 * np.log10(vSigP / vNoiseP)
+        self.iSNR = self.vSNR.mean()
 
-    mSig_recon = dSigRecon['mSig']
-    (nSigs_recon, iSiz_recon) = mSig_orig.shape
+        # Compute the success for every reconstructed signal and the success ratio
+        self.vSuccessBits = (self.vSNR >= self.iSNRSuccess)
+        self.iSR = self.vSuccessBits.mean()
 
-    # -------------------------------------------------------------------
-    # Check if the original and the reconstructed signals have the same
-    # length
-    strErr = 'The original and reconstructed signals must have the same length'
-    if iSiz_orig != iSiz_recon:
-        raise ValueError(strErr)
+        # -------------------------------------------------------------------
+        # Print results
+        if self.bMute == 0:
+            self._printResults(self.iSNR, self.iSR, self.iSNRSuccess)
 
-    # -------------------------------------------------------------------
-    # Check if there is the same number of original and reconstructed
-    # signals
-    strErr = 'There are more original signals than reconstructed signals!'
-    if nSigs_orig > nSigs_recon:
-        raise ValueError(strErr)
-    strErr = 'There are more reconstructed signals than original signals!'
-    if nSigs_recon > nSigs_orig:
-        raise ValueError(strErr)
+        return
 
-    # -------------------------------------------------------------------
-    nSigs = nSigs_orig
-    iSigSiz = iSiz_orig
-    return (mSig_orig, mSig_recon, nSigs, iSigSiz)
-
-
-# =================================================================
-# Get the configuration
-# =================================================================
-def _getConf(dAnaConf):
-    """
-    This function gets the configuration of the module from the
-    system analysis configuration dictionary.
-
-    The function checks if the correct configuration fields are given in
-    the configuration dictionary. If not, the default values are assigned to
-    the configuration values.
-
-    Args:
-        dAnaConf (dict): dict. with the system analysis configuration
-
-    Returns:
-        bMute (float): 'mute the console output' flag
-        iSNRSuccess (float): success threshold
-    """
-
-    # -------------------------------------------------------------------
-    # Get the mute flag
-    if not 'bMute' in dAnaConf:
-        bMute = 0
-    else:
-        bMute = dAnaConf['bMute']
-
-    # -------------------------------------------------------------------
-    # Get the success threshold
-    if not 'iSNRSuccess' in dAnaConf:
-        iSNRSuccess = 20
-    else:
-        iSNRSuccess = dAnaConf['iSNRSuccess']
-
-    return (bMute, iSNRSuccess)
-
-
-# =================================================================
-# Print results of the analysis
-# =================================================================
-def _printResults(iSNR, iSR, iSNRSuccess, bMute):
-    """
-    This function print the results of the SNR analysis to the console,
-    if the 'mute' flag is not set.
-
-    Args:
-        iSNR (float): the measured average SNR of the reconstrucion
-        iSR (float): success ratio
-        iSNRSuccess (float): success threshold
-        bMute (float): 'mute the console output' flag
-
-    Returns:
-        nothing
-
-    """
-
-    if bMute == 0:
+    # Print the results of analysis
+    def _printResults(self, iSNR, iSR, iSNRSuccess):
         rxcs.console.bullet_param('The average SNR of the reconstruction',
                                   iSNR, '-', 'dB')
         rxcs.console.bullet_param('The Success Ratio', iSR, ' ', '')
         rxcs.console.param('(success threshold)', iSNRSuccess, '-', 'dB')
-    return
+        return
