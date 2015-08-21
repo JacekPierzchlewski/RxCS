@@ -60,6 +60,11 @@ class SNR(rxcs._RxCSobject):
         self.paramH('iSNRSuccess', -np.inf)
         self.paramL('iSNRSuccess', np.inf)
 
+        # 'Mute the output' flag
+        self.paramAddOpt('bMute', 'Mute the output', noprint=1, default=0)
+        self.paramType('bMute', int)           # Must be of int type
+        self.paramAllowed('bMute',[0, 1])      # It can be either 1 or 0
+
     # Run
     def run(self):
         self.parametersCheck()    # Check if all the needed partameters are in place and are correct
