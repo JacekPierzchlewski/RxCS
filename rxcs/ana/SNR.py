@@ -78,6 +78,10 @@ class SNR(rxcs._RxCSobject):
     # Engine - compute the noise and the success rate
     def __engine(self):
 
+        # Make the 2D matrces with signals under test and observed signals
+        self.mSig = self.makeArray2Dim(self.mSig)
+        self.mSigRef = self.makeArray2Dim(self.mSigRef)
+
         # Get the number of signals and the size of signals
         (nSigs, iSizSig) = self.mSig.shape  # Size of the noise
 
