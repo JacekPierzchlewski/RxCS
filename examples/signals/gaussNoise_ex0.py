@@ -28,7 +28,7 @@ def _gaussNoise_ex0():
     gaussNoise = rxcs.sig.gaussNoise() # Gaussian noise generator
 
     # Configure the generator...
-    gaussNoise.fs = 1e6    # Representation sampling frequency [1 MHz]
+    gaussNoise.fR = 1e6    # Representation sampling frequency [1 MHz]
     gaussNoise.tS = 1      # Time [1 sec]
     gaussNoise.fB = 200e3  # Bandwidth [200 kHz]
 

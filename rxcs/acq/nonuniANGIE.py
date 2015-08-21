@@ -141,7 +141,7 @@ class nonuniANGIE(rxcs._RxCSobject):
         self.paramAddMan('tS', 'Time of input signals', unit='s')
         self.paramType('tS', (int, float))
         self.paramH('tS', 0)
-        self.paramL('fR', np.inf)
+        self.paramL('tS', np.inf)
 
         # Input signals representation sampling frequency
         self.paramAddMan('fR', 'Input signals representation sampling frequency', unit='Hz')

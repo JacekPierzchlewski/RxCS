@@ -101,7 +101,7 @@ class gaussNoise(rxcs._RxCSobject):
         """
 
         # Representation sampling frequency
-        self.paramAddMan('fs', 'Representation sampling frequency', unit='Hz')
+        self.paramAddMan('fR', 'Representation sampling frequency', unit='Hz')
         self.paramType('fs', (int, float))
         self.paramH('fs', 0)                  # Rep. samp. freq. must be higher than zero
         self.paramL('fs', np.inf)             # ...and lower than infinity
@@ -184,7 +184,7 @@ class gaussNoise(rxcs._RxCSobject):
         
         # ---------------------------------------------------------------------
         # Generate the base signal
-        self.nSmp = round(self.fs * self.tS)  # The number of samples in the output signal
+        self.nSmp = round(self.fR * self.tS)  # The number of samples in the output signal
         self.mSig = np.random.randn(self.nSigs, self.nSmp)   # Generate the noise
 
         # ---------------------------------------------------------------------
@@ -192,7 +192,7 @@ class gaussNoise(rxcs._RxCSobject):
         if self.wasParamGiven('fB'):
 
             # Design a iir low pass filter
-            iCFP = self.fB/(0.5*self.fs)   # Compute the filter parameter
+            iCFP = self.fB/(0.5*self.fR)   # Compute the filter parameter
             (vN, vD) = scsig.iirfilter(self.nFiltOrd, iCFP, btype='lowpass', ftype=self.strFilt,
                                        rs=self.iRs, rp=self.iRp)
             # Apply the filter

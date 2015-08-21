@@ -126,7 +126,7 @@ class nonuniJS(rxcs._RxCSobject):
         self.paramAddMan('tS', 'Time of input signals', unit='s')
         self.paramType('tS', (int, float))
         self.paramH('tS', 0)
-        self.paramL('fR', np.inf)
+        self.paramL('tS', np.inf)
 
 
     # Define parameters
