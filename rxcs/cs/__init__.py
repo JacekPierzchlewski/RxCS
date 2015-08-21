@@ -13,7 +13,7 @@ except ImportError:
     cvxoptOK = 0
     
 if cvxoptOK == 1:
-    import cvxoptL1
+    from cvxoptL1 import cvxoptL1
 
 
 # Import irls L1 reconstruction
