@@ -100,11 +100,11 @@ class SNR(rxcs._RxCSobject):
         self.iSNR = self.vSNR.mean()
 
         # Compute the success for every reconstructed signal and the success ratio
+        self.iSR = np.nan        
         if self.wasParamGiven('iSNRSuccess'):
             self.vSuccessBits = (self.vSNR >= self.iSNRSuccess)
             self.iSR = self.vSuccessBits.mean()
 
-        # -------------------------------------------------------------------
         # Print results
         if self.bMute == 0:
             self._printResults(self.iSNR, self.iSR, self.iSNRSuccess)
@@ -113,8 +113,11 @@ class SNR(rxcs._RxCSobject):
 
     # Print the results of analysis
     def _printResults(self, iSNR, iSR, iSNRSuccess):
+
         rxcs.console.bullet_param('The average SNR of the reconstruction',
-                                  iSNR, '-', 'dB')
-        rxcs.console.bullet_param('The Success Ratio', iSR, ' ', '')
-        rxcs.console.param('(success threshold)', iSNRSuccess, '-', 'dB')
+                                  self.iSNR, '-', 'dB')
+        if self.wasParamGivenVal(self.iSR):
+            rxcs.console.param('The Success Ratio', iSR, ' ', '')
+            rxcs.console.param('(success threshold)', iSNRSuccess, '-', 'dB')
+
         return
