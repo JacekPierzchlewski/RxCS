@@ -30,8 +30,8 @@ class SNR(rxcs._RxCSobject):
         self.strRxCSgroup = 'Analysis'  # Name of group of RxCS modules
         self.strModuleName = 'SNR'      # Module name
 
-        self.__inputSignals()      # Define the parameters
-
+        self.__inputSignals()      # Define the input signals
+        self.__parametersDefine()  # Define the parameters
 
     # Define parameters
     def __inputSignals(self):
@@ -91,8 +91,9 @@ class SNR(rxcs._RxCSobject):
         self.iSNR = self.vSNR.mean()
 
         # Compute the success for every reconstructed signal and the success ratio
-        self.vSuccessBits = (self.vSNR >= self.iSNRSuccess)
-        self.iSR = self.vSuccessBits.mean()
+        if self.wasParamGiven('iSNRSuccess'):
+            self.vSuccessBits = (self.vSNR >= self.iSNRSuccess)
+            self.iSR = self.vSuccessBits.mean()
 
         # -------------------------------------------------------------------
         # Print results
