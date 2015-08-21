@@ -1039,7 +1039,7 @@ class _RxCSobject:
 
         # Make a 1D Numpy array with signals 2 dim, if it is 1 dim
         if mArr.ndim == 1:
-            mArr = self.mArr.copy()   
+            mArr = mArr.copy()   
             mArr.shape = (1, mArr.size)
         return mArr
 
