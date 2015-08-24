@@ -54,57 +54,66 @@ available in arXiv: http://arxiv.org/abs/1409.1002
     after calling the 'run' method:
 
     Observed signals:
-    - a. **mObSig** (*Numpy array 2D*): Observed sampled signals
+    - a. **mObSig** (*Numpy array 2D*): Observed sampled signals, one signal p. row
+    - b. **lObSig** (List with Numpy arrays 1D)  Observed sampled signals, one signal p. list item. 
+                                                 Identical as mObSig.
     
     Sampling patterns:
     - b. **mPatts** (*Numpy array 2D*): Sampling patterns (as grid indices)
+    - c. **lPatts** (*list with Numpy arrays 1D*):  List with sampling patterns (as grid indices).
+                                                    One pattern p. list item
 
-    - c. **mPattsRep** (*Numpy array 2D*):  Sampling patterns 
-                                            (as signal representaion points)
+    - d. **mPattsRep** (*Numpy array 2D*):  Sampling patterns (as signal representaion points)
+    - e. **lPattsRep** (*list with Numpy arrays 1D*):  List with sampling patterns (as signal representaion points).
+                                                       One pattern p. list item
+                                            
 
-    - d. **mPattsT** (*Numpy array 2D*):   Sampling patterns
-                                           (as time moments)
+    - f. **mPattsT** (*Numpy array 2D*):   Sampling patterns (as time moments)
+    - g. **lPattsT** (*list with Numpy arrays 1D*):  List with sampling patterns (as time moments).
+                                                     One pattern p. list item
+                                 
     
     Observation matrices:                         
-    - e. **lPhi** (list)   List with observation matrices.
+    - h. **lPhi** (list)   List with observation matrices. One matrix p. 
                            One matrix p. signal.
 
 
     Additional parameters of sampling patterns:    
-    - f. **nK_g**  (*int*): the number of grid points in the sampling pattern
+    - i. **nK_g**  (*int*): the number of grid points in the sampling pattern
     
-    - g. **tTau_real** (*float*):   the real time of sampling patterns
+    - j. **tTau_real** (*float*):   the real time of sampling patterns
     
-    - h. **nK_s** (*int*):   the expected number of sampling points in a pattern     
+    - k. **nK_s** (*int*):   the expected number of sampling points in a pattern     
     
-    - i. **f_s** (*float*):  the expected average sampling frequency
+    - l. **f_s** (*float*):  the expected average sampling frequency
     
-    - j. **nT** (*int*):   the expected average sampling period (as grid pts)
+    - m. **nT** (*int*):   the expected average sampling period (as grid pts)
     
-    - k  **tT_s**. (*float*):   the expected average sampling period
+    - n  **tT_s**. (*float*):  the expected average sampling period
     
-    - l. **nK_min** (*int*):   min t between the samp pts as the number of grid pts
+    - o. **nK_min** (*int*):   min t between the samp pts as the number of grid pts
     
-    - m. **nK_max** (*int*):   max t between the samp pts as the number of grid pts
+    - q. **nK_max** (*int*):   max t between the samp pts as the number of grid pts
     
-    - n. **tMin_real** (*float*):   the real minimum time between sampling points
+    - r. **tMin_real** (*float*):   the real minimum time between sampling points
 
-    - o. **tMax_real** (*float*):   the real maximum time between sampling points
+    - s. **tMax_real** (*float*):   the real maximum time between sampling points
 
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    0.1    | 26-MAY-2014 :  * Initial version. |br|
-    0.2    | 27-MAY-2014 :  * Docstrings added. |br|
-    1.0    | 27-MAY-2014 :  * Version 1.0 is ready. |br|
-    1.1    | 11-JUN-2014 :  * Observation matrices added to the output. |br|
-    1.1r1  | 18-SEP-2014 :  * Bug in checking time of patterns is fixed. |br|
-    1.1r2  | 28-JAN-2015 :  * Patterns generator adjusted to Numpy indexing. |br|
-    2.0    | 13-AUG-2015 :  * Objectified version (2.0) |br|
-    2.1    | 17-AUG-2015 :  * Observation matrices are gathered in list, not in 3D matrix |br|
-    2.1r1  | 18-AUG-2015 :  * Adjusted to RxCSObject v1.0 |br|
+    0.1    | 26-MAY-2014 :  *  Initial version. |br|
+    0.2    | 27-MAY-2014 :  *  Docstrings added. |br|
+    1.0    | 27-MAY-2014 :  *  Version 1.0 is ready. |br|
+    1.1    | 11-JUN-2014 :  *  Observation matrices added to the output. |br|
+    1.1r1  | 18-SEP-2014 :  *  Bug in checking time of patterns is fixed. |br|
+    1.1r2  | 28-JAN-2015 :  *  Patterns generator adjusted to Numpy indexing. |br|
+    2.0    | 13-AUG-2015 :  *  Objectified version (2.0) |br|
+    2.1    | 17-AUG-2015 :  *  Observation matrices are gathered in list, not in 3D matrix |br|
+    2.1r1  | 18-AUG-2015 :  *  Adjusted to RxCSObject v1.0 |br|
+    2.2    | 24-AUG-2015 :  *  **lObSig**, **lPatts**, **lPattsRep**, **lPattsT** added to the output |br|
 
 
 *License*:
@@ -376,14 +385,16 @@ class nonuniANGIE(rxcs._RxCSobject):
 
                 nSigs (number):       the number of input signals 
                 mPatts (matrix):      the sampling patterns (grid indices)
+                lPatts (list):        list with the sampling patterns (grid indices)
                 mPattsRep (matrix):   the sampling patterns (signal rep. sampling points)
+                lPattsRep (list):     list with the sampling patterns (signal rep. sampling points)
                 mPattsT (matrix):     the sampling patterns (time moments)
+                lPattsT (list):       list with the sampling patterns (time moments)
+                
         """
 
         # Make the matrix with signals 2 dim, if it is 1 dim
-        if self.mSig.ndim == 1:
-            self.mSig = self.mSig.copy()            
-            self.mSig.shape = (1, self.mSig.size)
+        self.mSig = self.makeArray2Dim(self.mSig)
         (nSigs, _) = self.mSig.shape          # The number of input signals
 
         # Allocate the matrix for all the sampling patterns
@@ -420,9 +431,15 @@ class nonuniANGIE(rxcs._RxCSobject):
         mPattsT = vTSig[mPattsRep]
 
         self.nSigs = nSigs
+        
         self.mPatts = mPatts
+        self.lPatts = self.array2D2list1D(self.mPatts, remnan=0)
+
         self.mPattsRep = mPattsRep
+        self.lPattsRep = self.array2D2list1D(self.mPattsRep, remnan=0)
+
         self.mPattsT = mPattsT
+        self.lPattsT = self.array2D2list1D(self.mPattsT, remnan=0)
         return
 
     # Sample the signals
@@ -441,6 +458,10 @@ class nonuniANGIE(rxcs._RxCSobject):
         """
 
         self.mObSig = (self.mSig[np.arange(self.nSigs), self.mPattsRep.T]).T
+        
+        # Store the observed signals in a list
+        self.lObSig = self.array2D2list1D(self.mObSig, remnan=0)
+
         return
 
     # Generate the observation matrices
