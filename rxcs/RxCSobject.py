@@ -9,7 +9,7 @@
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    18 August 2015
+                    24 August 2015
 
             Versions:
                 0.1     | 20-JUL-2015 : * Initial version. |br|
@@ -18,7 +18,8 @@
                 1.02    | 19-AUG-2015 : * Function 'makeArray2Dim' is added |br|
                 1.02r1  | 19-AUG-2015 : * Bug in checking the values of the Numpy arrays is fixed, |br|
                                           (devectorization of the arrays)
-                1.03    | 20--AUG-2015 : * Function 'isequal' is added |br|
+                1.03    | 20-AUG-2015 : * Function 'isequal' is added |br|
+                1.04    | 24-AUG-2015 : * Function 'array2D2list1D' is added |br|
 
 
             List of functions in the module:
@@ -83,7 +84,7 @@
                                   If so, it returns 1, otherwise 0
                                   
             makeArray2Dim       - make a 1Dimensional array a 2 dimensional
-            
+            array2D2list1D      - put rows of a 2D Numpy array into a list with 1D Numpy arrays
  
             Paramters printing:
             parametersPrint     - print parameters of a module
@@ -1042,6 +1043,46 @@ class _RxCSobject:
             mArr = mArr.copy()   
             mArr.shape = (1, mArr.size)
         return mArr
+
+
+    def array2D2list1D(self, mArr, remnan=1):
+        """
+            This function changes a 2D Numpy array into a list with 1D arrays.
+            If remnan == 1 than NaN elements are removed.
+
+            Arguments:
+                    mArr:  [Numpy array]  1- or 2-dimensional Numpy array
+                    remnan: [number]      1-remove NaN, 0-do not remove NaN            
+            
+            Output: 
+                    lRows:  [list]  the list with rows of the input matrices
+
+            Author:
+                    Jacek Pierzchlewski jap@es.aau.dk
+        """
+
+        if not isinstance(mArr, np.ndarray):
+            raise ValueError('Input matrix must be 2D or 1D Numpy array!')            
+        if mArr.ndim > 2:
+            raise ValueError('Input matrix must be 2D or 1D Numpy array!')
+        elif mArr.ndim == 1:
+            mArr = self.makeArray2Dim(mArr)
+        elif mArr.ndim < 1:
+            raise ValueError('Input matrix must be 2D or 1D Numpy array!')
+            
+        (nRows, _) = mArr.shape
+        lRows = []
+        
+        if remnan == 0:
+            for inxRow in range(nRows):
+                lRows.append(mArr[inxRow, :])
+        else:
+            for inxRow in range(nRows):
+                vRow = mArr[inxRow, :]
+                vRow = vRow[np.invert(np.isnan(vRow))]
+                lRows.append(vRow)
+        return lRows
+
 
     def parametersPrint(self):
         """
