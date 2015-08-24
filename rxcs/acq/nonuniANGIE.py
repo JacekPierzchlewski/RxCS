@@ -455,6 +455,7 @@ class nonuniANGIE(rxcs._RxCSobject):
 
                 List of variables added by function to the object:                
                 mObSig (matrix):  the observed signals
+                lObSig (list):    list with the observed signals
         """
 
         self.mObSig = (self.mSig[np.arange(self.nSigs), self.mPattsRep.T]).T
