@@ -22,7 +22,7 @@
     Take a look on '__parametersDefine' function for more info on the 
     parameters.
 
-    Parameters of the dictionary generator are attributes of the class which 
+    Parameters of the Theta generator are attributes of the class which 
     must/can be set before the generator is run.
 
     Required parameters:
