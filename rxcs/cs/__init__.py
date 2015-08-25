@@ -18,3 +18,8 @@ if cvxoptOK == 1:
 
 # Import irls L1 reconstruction
 import irlsL1
+
+
+# Import Theta matrix generator
+from makeTheta import makeTheta
+
