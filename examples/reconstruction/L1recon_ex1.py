@@ -2,21 +2,36 @@
 This script is an example of how to use the L1 optimization reconstruction
 module (regularized regression scheme). |br|
 
-In this example an IDFT dictionary is generated.
-Then, a 2 tone signal is generated using the dictionary. |br|
+Firstly, a multitone signal is generated. The signal model is as follows. 
+There are two random tones randomly distributed in the spectrum 
+from 11kHz to 20kHz and two random tones randomly distributed
+in the spectrum from 31kHz to 40kHz.
+
+                                                         o 
+                  o                                      |
+           o      |                                      |
+           |      |                              o       |
+           |      |                              |       |
+           |      |                              |       | 
+----11kHz<----------->20kHz------\\--------31kHz<----------->40kHz-->
+                                                                     f [kHz]
 
 The signal is nonuniformly sampled and reconstructed with L1 reconstrucion
 module from the RxCS toolbox. The module perfroms the regularized regression
 optimization scheme and uses the external 'cvxopt' toolbox. |br|
 
 After the signal generation and sampling, the original signal, the observed
-samples, and the reconstructed signal are plot in the time domain. |br|
+samples, and the reconstructed signal are plot in both the time domain and 
+the frequency domain |br|
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 11-JUN-2014 : * Version 1.0 released. |br|
+    1.0  | 18-SEP-2014 : * Version 1.0 released. |br|
+    2.0  | 25-AUG-2015 : * Adjusted to the version 2.0 of the L1 solver |br|
+    2.1  | 25-AUG-2015 : * New file name and improvements in header |br|
+
 
 *License*:
     BSD 2-Clause
@@ -25,7 +40,6 @@ samples, and the reconstructed signal are plot in the time domain. |br|
 from __future__ import division
 import numpy as np
 import rxcs
-from cvxopt import matrix
 import matplotlib.pyplot as plt
 
 
@@ -33,211 +47,216 @@ def _L1_recon_ex1():
 
     # ---------------------------------------------------------------------
     # Settings for the example
-    iT = 1          # Time of the signal [s]
-    iTSamp = 100    # The number of signal representation time samples
-    iTones = 20     # The number of tones
-    fSep = 1        # Tone separation [Hz]
+    # ---------------------------------------------------------------------
+
+    # General settings:
+    TIME = 1e-3     # time of the signal is 1 ms
+    FSMP = 2e6      # signal representation sampling frequency 2MHz
+
+    # Signals:
+    FDELTA = 1e3   # tone separation in both signals is 1kHz 
+
+    FMIN1 =  11e3  # spectrum #1: 11kHz <-> 20kHz    
+    FMAX1 =  20e3  # ^
+    NTNS1 =  2     # the number of tones is in the spectrum (11kHz <-> 20kHz)
+    FMIN2 =  31e3  # spectrum #2: 31kHz <-> 40kHz    
+    FMAX2 =  40e3  # ^
+    NTNS2 =  2     # the number of tones is 2 in the spectrum (31kHz <-> 40kHz)
+
+    POWER = 1   # Power of the signal is 1 W
+
+    # Sampler:
+    GRIDT = 1e-6   # sampling grid period is 1 us
+    FSAMP = 25e3   # the average sampling frequency is 25 kHz
+
+    # Things on the board:
+    gen1 = rxcs.sig.randMult()   # Signal generator #1 - for the 1st part of the spectrum
+    gen2 = rxcs.sig.randMult()   # Signal generator #2 - for the 2nd part of the spectrum
+
+    samp = rxcs.acq.nonuniANGIE()  # Sampler
+
+    IDFT = rxcs.cs.dict.IDFT()        # IDFT dictionary generator
+    makeTheta = rxcs.cs.makeTheta()   # Theta matrix generator 
+    L1recon = rxcs.cs.cvxoptL1()      # L1 reconstruction
+
+    analysisSNR = rxcs.ana.SNR()   # SNR analysis
 
     # ---------------------------------------------------------------------
-    # Generate the IDFT dictionary
+    # Generate the original signals
+    # ---------------------------------------------------------------------
 
-    # Start the IDFT dictionary configuration
-    dCSConf = {}
-    dCSConf['tS'] = iT           # Time of the dictionary
-    dCSConf['fR'] = iT * iTSamp  # The signal representation sampling freq.
-    dCSConf['fDelta'] = fSep     # The frequency separation between tones
-    dCSConf['nTones'] = iTones   # The number of tones in the dictionary
+    # Settings for the generator #1
+    gen1.tS = TIME         # time
+    gen1.fR = FSMP         # sig. representation sampling frequency
+    gen1.fRes = FDELTA     # tone separation
+    gen1.fMin = FMIN1      # Spectrum #1
+    gen1.fMax = FMAX1      # ^
+    gen1.nTones = NTNS1    # ^
+    gen1.iP = POWER/2      # power
 
-    # Generate the IDFT dictionary
-    (mDict, dDict) = rxcs.cs.dict.IDFToNoDC.main(dCSConf)
+    # Settings for the generator #2
+    gen2.tS = TIME         # time
+    gen2.fR = FSMP         # sig. representation sampling frequency
+    gen2.fRes = FDELTA     # tone separation
+    gen2.fMin = FMIN2      # Spectrum #1
+    gen2.fMax = FMAX2      # ^
+    gen2.nTones = NTNS2    # ^
+    gen2.iP = POWER/2      # power
 
-    # The dictionary contains separate tones in rows.
-    # The optimization modules requires the Theta matrix to be column-wise,
-    # so let's transpose the dictionary
-    mDict = mDict.T
 
-    # Get the signal time vector from the dictionary data
-    vTs = dDict['vT']
+    # ------------------------
+    gen1.run()                    # run the generators
+    gen2.run()                    # ^
+    mSig = gen1.mSig + gen2.mSig  # the original signal  is a sum of the two generated signals
 
     # ---------------------------------------------------------------------
-    # Generate the signal.
-    #
-    #
-    # Dictionary matrix is as follows:
-    #
-    # indices of columns
-    #  |
-    #  |
-    #  V
-    # [0] = 1Hz            [20] = - 20Hz
-    # [1] = 2Hz            [21] = - 19Hz
-    # [2] = 3Hz            [22] = - 18Hz
-    # [3] = 4Hz            [23] = - 17Hz
-    # [4] = 5Hz            [24] = - 16Hz
-    # [5] = 6Hz            [25] = - 15Hz
-    # [6] = 7Hz            [26] = - 14Hz
-    # [7] = 8Hz            [27] = - 13Hz
-    # [8] = 9Hz            [28] = - 12Hz
-    # [9] = 10Hz           [29] = - 11Hz
-    #
-    # [10] = 11Hz          [30] = - 10Hz
-    # [11] = 12Hz          [31] = - 9Hz
-    # [12] = 13Hz          [32] = - 8Hz
-    # [13] = 14Hz          [33] = - 7Hz
-    # [14] = 15Hz          [34] = - 6Hz
-    # [15] = 16Hz          [35] = - 5Hz
-    # [16] = 17Hz          [36] = - 4Hz
-    # [17] = 18Hz          [37] = - 3Hz
-    # [18] = 19Hz          [38] = - 2Hz
-    # [19] = 20Hz          [39] = - 1Hz
-    #
-
-    # Generate the signal using the IDFT dictionary
-    (iRows, iCols) = mDict.shape
-    vX = np.zeros((iCols, 1)) + 1j*np.zeros((iCols, 1))
-    # vX - vector with the signal coefficients
-
-    # 3Hz (-45 deg) - coeffients  (1-1j): +3Hz, (1+1j): (-3Hz)
-    vX[3] = 1-1j                          # 1-1j
-    vX[37] = 1+1j                         # 1+1j
-
-    # 7Hz (+45 deg) - coeffients  (1+1i): +3Hz, (1-1i): (-3Hz)
-    vX[6] = 1+1j                          # 1+1j
-    vX[33] = 1-1j                         # 1-1j
-
-    # Here we generate the signal using the vector with coefficients and
-    # the dictionary
-    vSig = np.dot(mDict, vX).real
-
+    # Sample the original signals
     # ---------------------------------------------------------------------
-    # Sample the signal (non uniform sampling)
+    
+    # Settings for the sampler
+    samp.tS = TIME        # time of the signal
+    samp.fR = FSMP        # the signal representation sampling freuqnecy
+    samp.Tg = GRIDT       # the sampling grid period
+    samp.fSamp = FSAMP    # the average sampling frequency
+    samp.tMin = 5e-6      # minimum time between sampling points
 
-    # The number of samples in the observation signal
-    nSamps = 20
+    # ------------------------
+    samp.mSig = mSig     # connect the original signal to the sampler 
+    samp.run()           # run the sampler
 
-    # Compute the oversampling ratio
-    tS = 1/fSep           # Signal time
-    fMax = fSep * iTones  # Maximum frequency in the dictionary
-    fNyq = 2 * fMax       # Nyquist of the dictionary
-    fS = nSamps / tS      # The average signal sampling
-    iOSR = fS / fNyq      # the oversampling ratio
-    print('The oversampling ratio is equal to  %.2f \n') % iOSR
+    # -----------------------------------------------------------------
+    # Reconstruct the signal
+    # -----------------------------------------------------------------
 
-    # Draw indices of signal representation samples which will sampled by ADC
-    vSampInx = np.random.permutation(iTSamp)
-    vSampInx = vSampInx[0:nSamps]
-    vSampInx.sort()
+    # Generate the IDFT dictionaries:
 
-    # Generate the observation matrix (nonuniform sampling)
-    inxRow = 0
-    mPhi = np.zeros((nSamps, iTSamp))
-    for inxCol in vSampInx:
-        mPhi[inxRow, inxCol] = 1
-        inxRow = inxRow + 1
+    # dictionary #1
+    IDFT.tS = TIME         # time of the dictionaries
+    IDFT.fR = FSMP         # representation sampling frequency
+    IDFT.fDelta = FDELTA   # the frequency separation between tones
+    IDFT.fFirst = FMIN1    # minimum frequency in the dictionary
+    IDFT.nTones = int((FMAX1 - FMIN1) / FDELTA)  # the number of tones
+    IDFT.run()
+    mDict1 = IDFT.mDict.copy()   # Take the dictionary matrix for the 1st part 
+                                 # of the spectrum
 
-    # Sample the signal using the generated observation matrix
-    vObSig = np.dot(mPhi, vSig)
+    # dictionary #2
+    IDFT.fFirst = FMIN2    # minimum frequency in the dictionary
+    IDFT.nTones = int((FMAX2 - FMIN2) / FDELTA)  # the number of tones
+    IDFT.run()
+    mDict2 = IDFT.mDict.copy()   # Take the dictionary matrix for the 2nd part 
+                                 # of the spectrum
 
-    # ---------------------------------------------------------------------
-    # Signal reconstruction
+    # Concatenate the dictionary matrices
+    (nRows, _) = mDict1.shape                     # Cut down the dictionary matrix #1
+    mDict1 = mDict1[np.arange(int(nRows/2)), :]   # ^   
+    (nRows, _) = mDict2.shape                     # Cut down the dictionary matrix #2
+    mDict2 = mDict2[np.arange(int(nRows/2)), :]   # ^
+    mDict = np.vstack((mDict1, mDict2))      
 
-    # Construct the theta matrix
-    #
-    # Theta matrix = observation matrix * dictionary matrix
-    #
-    mTheta = np.dot(mPhi, mDict)
-
-    # L1 minimization - find the signal coefficients
-    dCS = {}                  # Initialize the dictionary
-    dCS['m3Theta'] = mTheta   # Add the Theta matrix
-    dCS['iK'] = 0.1           # Add the 'k' parameter
-    dCS['mObSig'] = vObSig    # Add observed signal
-    dCS['bComplex'] = 1       # Add info that the problem contains complex
-                              # numbers
-
-    # INFO:
-    #
-    # The optimization scheme is:
-    #
-    #   min(  |Ax - y|_2^2  +  k * |x|_1  )
-    #                          ^
-    #                          |
-    #                          |
-    #                   the 'k' parameter
-    #
-    #
-    #
-    # THETA MATRICES:
-    # The optimization module 'rxcs.cs.cvxoptL1' is designed to work
-    # with multiple observed signals, so that many signals can be reconstructed
-    # with one module call.
-    #
-    # Therefore, by default the input matrix with Theta is a 3D matrix, so that
-    # many Theta matrices may be given to the module (one page of the
-    # 3D matrix = one Theta matrix).
-    #
-    # If there is a need to reconstruct only 1 signal, then the input
-    # Theta matrix may be 2D, the module will handle that.
-    #
-    #
-    # OBSERVATION SIGNALS:
-    # Similarly, the observed signals are given as a 2D matrix (one column -
-    # one observed signal). If there is a need to reconstruct only 1 signal
-    # then the field 'mObSig' in the input dictionary may be a simple vector
-    # with the observed signal, as it is in the example.
-    #
-    #
-    # Always the number of columns in the mObSig matrix must equal the number
-    # of pages in the m3Theta matrix.
-    #
-    #
-    # COMPLEX OPTIMIZATION FLAG:
-    # If the 'bComplex' is set, then the module converts the complex
-    # optimization problem into a real problem. This flag may not exists in
-    # the dictionary, by default it is cleared.
-    #
-    # Warning: the module does not support reconstruction of complex signals!
-    #          Therefore the conversion to real problem is done with assumption
-    #          that the complex part of the reconstructed signal is 0.
-    #
-    #
+    # Compute the Theta matrix    
+    makeTheta.lPhi = samp.lPhi    # # Add the observation matrix
+    makeTheta.lDict = [mDict.T]   # Add the dictionary  
+    makeTheta.run()
 
     # Run the L1 minimization - generate signal coefficients
-    mCoeff = rxcs.cs.cvxoptL1.main(dCS)
+    vObSig = samp.mObSig[0, :]            # the observed signal
+    L1recon.lTheta = makeTheta.lTheta     # add the Theta matrix
+    L1recon.lObserved = [vObSig]          # add the observed signals
+    L1recon.iK = 0.1                      # add the 'k' parameter
+    L1recon.bComplex = 1                  # add info that the problem contains complex
+                                          # numbers
+    L1recon.run()  # Run the reconstruction
 
-    # The module is designed to perform optimization for many signals with
-    # one module call, so the output is a matrix with found coefficients
-    # (one column - one vector with coefficients).
-    #
-    # If there was only one signal given to be reconstructed (as in the
-    # example), then the reconstructed coefficients are in the first column
-    # of the output matrix.
-    #
-    vCoeff = mCoeff[:, 0]
-
-    # Reconstruct the signal using the found signal coefficients and the
-    # dictionary
-    vSigRecon = np.dot(mDict, vCoeff)
-
-    # Due to numerical inaccuracies and reconstruction inaccuracies
-    # the reconstructed signal may contain trace amounts of complex
-    # values. Let's cut these values out.
+    # Reconstruct the signal using the found signal coefficients and the dictionary
+    vCoeff = L1recon.lCoeff[0]
+    vSigRecon = np.dot(mDict.T, vCoeff)
     vSigRecon = vSigRecon.real
+
+
+    # -----------------------------------------------------------------
+    # Measure the SNR of the reconstruction
+    # -----------------------------------------------------------------
+    mSigNN = gen1.mSigNN + gen2.mSigNN  # the original reference (unnoisy signal)    
+    analysisSNR.mSigRef = mSigNN        # nonnoisy signal from the generator is a a reference signal
+    analysisSNR.mSig = vSigRecon        # reconstructed signal is a signal under test
+    analysisSNR.run()                   # run the reconstruction
+
+    # ---------------------------------------------------------------------
+    plot(gen1, gen2, mSig, samp, vSigRecon)
+    plt.show(block=True)
+    
+
+def plot(gen1, gen2, mSig, samp, vSigRecon):
+    """
+    This function takes care of plotting the results.
+    """
 
     # ---------------------------------------------------------------------
     # Plot the original signal, reconstructed signal and signal samples
+    # in the time domain
+    # ---------------------------------------------------------------------
 
+    vSig = mSig[0, :]   # Get the original signal
+    vT = gen1.vTSig     # Get the signal time vector
+
+    vObSig = samp.mObSig[0, :]  # The observed signal
+    mPhi = samp.lPhi[0]         # Take the observation matrix from the sampler
+
+    # Plot the figure
     hFig1 = plt.figure(1)
     hSubPlot1 = hFig1.add_subplot(111)
-    hSubPlot1.plot(vTs, vSig, 'g-', label="original sig")
-    hSubPlot1.plot(vTs, vSigRecon, 'b--', label="reconstructed sig")
-    hSubPlot1.plot(np.dot(mPhi,vTs), vObSig,
-                   '*r', label="observed samps",markersize=10)
+    hSubPlot1.plot(vT, vSig, 'g-', label="original sig")
+    hSubPlot1.plot(vT, vSigRecon, 'b--', label="reconstructed sig")
+    hSubPlot1.plot(np.dot(mPhi,vT), vObSig,
+                   '*r', label="observed samps", markersize=10)
     hSubPlot1.set_xlabel('time')
+    hSubPlot1.set_title('Time domain')    
     hSubPlot1.grid(True)
     hSubPlot1.legend(loc="best")
-    plt.show(block=True)
 
+    # ---------------------------------------------------------------------
+    # Plot the original signal, reconstructed signal in the frequency domain
+    # ---------------------------------------------------------------------
+
+    # ---------------------------------------------------------------------
+
+    # Original signal
+    vFFT = np.fft.fft(vSig)   # Analyze the spectrum of the orignal signal
+    iS = vFFT.size            # Get the size of the spectrum
+    vFFTa = 2 * np.abs(vFFT[np.arange(iS / 2).astype(int)]) / iS  # Get the amps
+
+    # Reconstructed signal
+    vFFTR = np.fft.fft(vSigRecon)   # Analyze the spectrum of the reconstructed signal
+    iS = vFFT.size                  # Get the size of the spectrum
+    vFFTRa = 2 * np.abs(vFFTR[np.arange(iS / 2).astype(int)]) / iS  # Get the amps
+
+    # Create a vector with frequencies of the signal spectrum
+    fFFTR = gen1.fFFTR           # Signal FFT frequency resolution
+    vF = fFFTR * np.arange(iS / 2)
+
+    # ---------------------------------------------------------------------
+
+    # Plot half of the spectrum - original signal
+    hFig2 = plt.figure(2)
+    hSubPlot2 = hFig2.add_subplot(111)
+
+    # Original signal
+    (mo, so, _) = hSubPlot2.stem(vF, vFFTa,  markerfmt='o', basefmt='g-', label="original signal")
+    plt.setp(so, color='g', linewidth=2.0)
+    plt.setp(mo, color='g', markersize=10.0)
+ 
+    # Reconstructed signal
+    (mr, sr, _) = hSubPlot2.stem(vF, vFFTRa, markerfmt='x', basefmt='b-', label="reconstructed signal")
+    plt.setp(sr, color='b', linewidth=2.0)
+    plt.setp(mr, color='b', markersize=10.0)
+
+    hSubPlot2.grid(True)
+    hSubPlot2.set_xlabel('Frequency [Hz]')
+    hSubPlot2.set_xlim(-1*1e3, 51*1e3)
+    hSubPlot2.set_ylim(-0.1, 3.1)
+    hSubPlot2.set_title('Frequency domain')
+    hSubPlot2.legend(loc="best")
 
 # =====================================================================
 # Trigger when start as a script
