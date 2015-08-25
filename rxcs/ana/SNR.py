@@ -1,18 +1,59 @@
 """
 This module contains SNR evaluation function of the reconstructed signals. |br|
 
+*Examples*:
+    Please go to the *examples/analysis* directory for examples 
+    on how to use the SNR analysis modules. |br|
+
+*Settings*:
+    Parameters of the SNR analysis are described below.
+
+    Take a look on '__inputSignals' function for more info on the 
+    parameters.
+
+    Parameters of the SNR analysis are attributes of the class which 
+    must/can be set before the analysis is run.
+
+    Required parameters:
+
+    - a. **mSig** (*2D Numpy array*): list with signals to be tested
+
+    - b. **mSigRef** (*2D Numpy array*): list with reference signals
+
+    Optional parameters:
+
+    - c. **iSNRSuccess** (*float*):   success threshold. SNR over this 
+                                      threshold is treated as a successful 
+                                      reconstruction [default = not given]
+
+    - d. **bMute** (*int*):    mute the console output from the sampler [default = 0]
+
+*Output*:
+    Description of the SNR analysis output is below.
+    This is the list of attributes of the class which are available after
+    calling the 'run' method:
+
+    - a. **iSNR** (*float*):  the average SNR 
+
+    - b. **vSNR** (*float*):  SNR for every signal
+
+    - a. **iSR** (*float*):  average success ratio
+
+    - c. **vSuccessBits** (*float*):  list with success flags for every signal
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    0.1  | 20-MAY-2014 : * Initial version. |br|
-    0.2  | 21-MAY-2014 : * Success Ratio computation is added. |br|
-    0.3  | 21-MAY-2014 : * Docstrings added. |br|
-    0.4  | 21-MAY-2014 : * Configuration with a dictionary |br|
-    0.5  | 21-MAY-2014 : * Progress and results printing |br|
-    1.0  | 21-MAY-2014 : * Version 1.0 released. |br|
-    2,0  | 21-AUG-2015 : * Version 2,0 (objectified version) is released. |br|
+    0.1    | 20-MAY-2014 : * Initial version. |br|
+    0.2    | 21-MAY-2014 : * Success Ratio computation is added. |br|
+    0.3    | 21-MAY-2014 : * Docstrings added. |br|
+    0.4    | 21-MAY-2014 : * Configuration with a dictionary |br|
+    0.5    | 21-MAY-2014 : * Progress and results printing |br|
+    1.0    | 21-MAY-2014 : * Version 1.0 released. |br|
+    2,0    | 21-AUG-2015 : * Version 2,0 (objectified version) is released. |br|
+    2.0r1  | 25-AUG-2015 : * Improvements in headers |br|
+
 
 *License*:
     BSD 2-Clause
