@@ -17,28 +17,24 @@ The optimization module 'rxcs.cs.cvxoptL1' is designed to work with
 multiple observed signals, so that many signals can be reconstructed
 with one module call.
 
-Therefore, by default the input matrix with Theta matrices is a 3D matrix,
-so that many Theta matrices may be given to the module (one page of the
-'m3Theta' matrix = one Theta matrix).
+Therefore, the Theta matrices should be grouped in a list, 
+so that many Theta matrices may be given to the module (one element of the
+'lTheta' list = one Theta matrix).
 
-If there is a need to reconstruct only 1 signal, then the input
-Theta matrix may be 2D.
 
 
 OBSERVATION SIGNALS:
-Similarly, the observed signals are given as a 2D matrix (one column -
-one observed signal). If there is a need to reconstruct only 1 signal
-then the field 'mObSig' in the input dictionary may be a simple vector
-with the observed signal.
+Similarly, the observed signals are given as a list with 1D Numpy arrays
+(one list element  - one observed signal). 
 
-Always the number of columns in the mObSig matrix must equal the number
-of pages in the m3Theta matrix.
+Always the number of elements in the list with observed signals must equal 
+the number Theta matrices.
 
 
 COMPLEX OPTIMIZATION FLAG:
 If the 'bComplex' is set, then the module converts the complex
-optimization problem into a real problem. This flag may not exists in
-the dictionary, by default it is cleared.
+optimization problem into a real problem. This flag may not be given, 
+by default it is cleared.
 
 Warning: the module does not support reconstruction of complex signals!
          Therefore the conversion to real problem is done with assumption
@@ -46,12 +42,53 @@ Warning: the module does not support reconstruction of complex signals!
 
 
 OUTPUT MATRIX WITH SIGNAL COEFFICIENS:
-The found signal coefficients are given as a 2D matrix, where one column
-corresponds to a one vector with found signal coefficients.
+The found signal coefficients are given as a list with 1D Numpy arrays,
+where one element of a list corresponds to a one array with found 
+signal coefficients.
 
-The number of columns in the output matrix equalts the number of columns
-in the input matrix with observed signals.
+The number of elements in the output list equals the number of elements 
+in the input list with observed signals.
 
+------------------------------------------------------------------------------
+
+*Examples*:
+    Please go to the *examples/reconstruction* directory for examples on how to 
+    use the L1 reconstruction module. |br|
+
+*Settings*:
+    Parameters of the L1 reconstruction module are described below.
+
+    Take a look on '__parametersDefine' function for more info on the 
+    parameters.
+
+    Parameters of the L1 reconstruction module are attributes of the class  
+    which must/can be set before the generator is run.
+
+    Required parameters:
+
+    - a. **lObserved** (*list*): list with the observed signals
+
+    - b. **lTheta** (*list*): list with Theta matrices
+
+    - c. **iK** (*float*): the 'k' parameter from  the equation above
+
+
+    Optional parameters:
+
+    - d, **bComplex** (*float*):   'complex' problem flag, should be switched 
+                                   if Theta matrices are complex [default = 0]
+
+    - e. **bMute** (*int*):    mute the console output from the sampler [default = 0]
+
+
+*Output*:
+    Description of the L1 reconstruction module output is below. 
+    This is the list of attributes of the class which are available 
+    after calling the 'run' method:
+
+    - a. **lCoeff** (*list*):  list with the reconstructed signal coefficients,
+                               one element of the list is a 1D Numpy array with 
+                               coefficients for one signal
 
 *License*:
     GNU GPL v3
@@ -85,10 +122,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     http://cvxopt.org/examples/book/basispursuit.html
 
 *Version*:
-    0.1  | 11-JUN-2014 : * Initial version. |br|
-    0.2  | 12-JUN-2014 : * Docstrings added. |br|
-    1.0  | 12-JUN-2014 : * Version 1.0 released. |br|
-    2.0  | 21-AUG-2015 : * Version 2,0 (objectified version) released. |br|
+    0.1    | 11-JUN-2014 : * Initial version. |br|
+    0.2    | 12-JUN-2014 : * Docstrings added. |br|
+    1.0    | 12-JUN-2014 : * Version 1.0 released. |br|
+    2.0    | 21-AUG-2015 : * Version 2,0 (objectified version) released. |br|
+    2.0r1  | 25-AUG-2015 : * Improvements in code comments and in headers |br|
+    
 """
 from __future__ import division
 import rxcs
@@ -223,7 +262,14 @@ class cvxoptL1(rxcs._RxCSobject):
 
     # Reconstruct a single signal
     def _recon1sig(self, inxSig):
-
+        """
+        Args:
+            inxSig (list):  Index of the signal from the list with observed signals
+    
+        Returns:
+            vCoef (Numpy array 1D):  reconstructed signal coefficients
+    
+        """
         # Get the current Theta matrix and make it a cvxopt matrix
         mmTheta = matrix(self.lTheta[inxSig])
 
@@ -300,10 +346,10 @@ class cvxoptL1(rxcs._RxCSobject):
         is complex and was transformed to a real problem.
     
         Args:
-            mCoeff (matrix): The real matrix with found signal coefficients
+            lCoeff (list): List with found real signal coefficients
     
         Returns:
-            mCoeffC (matrix): The complex matrix with found signal coefficients
+            lCoeffC (list): List with found complex signal coefficients
         """
     
         # Get the size of the list with coefficients
