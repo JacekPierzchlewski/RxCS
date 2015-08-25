@@ -21,6 +21,59 @@ Frequencies represented by the rows of the generated IDHT matrix:
 
 where N is the number of tones in the dictionary.
            
+           
+*Examples*:
+    Please go to the *examples/dictionaries* directory for examples on how to 
+    use the dictionary generator. |br|
+
+*Settings*:
+    Parameters of the generator are described below.
+
+    Take a look on '__parametersDefine' function for more info on the 
+    parameters.
+
+    Parameters of the dictionary generator are attributes of the class which 
+    must/can be set before the generator is run.
+
+    Required parameters:
+
+    - a. **tS** (*float*): time of input signals
+
+    - b. **fR** (*float*): input signals' representation sampling frequency
+
+    - c. **fDelta** (*float*): the frequency separation between tones 
+
+    - d. **nTones** (*float*): the number of tones in the dictionary
+
+
+    Optional parameters:
+
+    - e. **tStart** (*float*):  the time shift of starting time point [default = 0]
+
+    - f, **fFirst** (*float*):  the first frequency in the spectrum  [default = fDelta]
+
+    - g. **bMute** (*int*):    mute the console output from the sampler [default = 0]
+
+
+*Output*:
+    Description of the dictionary generator output is below. 
+    This is the list of attributes of the generator class which are available 
+    after calling the 'run' method:
+
+    - a. **mDict** (*Numpy array 2D*):  the generated dictionary, one tone in a row
+ 
+    - b. **vT** (*Numpy array 1D*):  time vector for the dictionary
+
+    - c. **vF** (*Numpy array 1D*):  frequency vector for the dictionary    
+
+ 
+    Additional parameters of the generated dictionary:
+
+    - d. **Tg**  (*float*):  dictionary time representation period
+    
+    - e. **nSamp** (*int*):  the number of time representation samples
+
+
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
@@ -28,6 +81,7 @@ where N is the number of tones in the dictionary.
     1.0    | 13-JAN-2015 : * Initial version. |br|
     1.0r1  | 15-JAN-2015 : * Improvements in code comments |br|
     2,0    | 20-AUG-2015 : * Version 2.0 released |br|
+    2.0r1  | 25-AUG-2015 : * Improvements in code comments and in headers |br|
 
 *License*:
     BSD 2-Clause
@@ -123,6 +177,7 @@ class IDHT(rxcs._RxCSobject):
     # Check configuration
     def _checkConf(self):
         """
+        This function checks if the configuration for the generator is correct
         """
 
         # Check if the first frequency in the spectrum is compatible with the 
@@ -160,10 +215,22 @@ class IDHT(rxcs._RxCSobject):
         # -----------------------------------------------------------------
         return
         
-    # Compute time parameters of dictionaries
+    # Compute time parameters of dictionary
     def _computeParamT(self, tS, fR, tStart):
         """
+        This function computes additional time parameters of the dictionary.
+        
+        Args:
+            tS (float):         time of input signals
+            fR (float):         input signals' representation sampling frequency
+            tStart (float):     the time shift of starting time point
+    
+        Returns:
+            Tg (float):         dictionary time representation period
+            nSamp (int):        the number of time representation samples 
+            tEnd (float):       dictionary representation time end
         """
+        
         # The signal representation period
         Tg = 1/fR
 
@@ -178,7 +245,18 @@ class IDHT(rxcs._RxCSobject):
     # Compute frequency parameters of dictionaries
     def _computeParamF(self, fDelta, nTones, fFirst):
         """
+        This function computes additional frequency parameters of the dictionary.
+        
+        Args:
+            fDelta (float):   the frequency separation between tones       
+            nTones (int):     the number of tones in the dictionary     
+            fFirst (float):   the first frequency in the spectrum
+
+        Returns:
+            fFirstHigh (float):   the positive low frequency limit of the dictionary        
+            fHigh (float):        the positive high frequency limit of the dictionary
         """
+        
         # The positive low frequency limit of the dictionary
         fFirstHigh = np.floor(fFirst/fDelta) * fDelta
 
@@ -189,8 +267,6 @@ class IDHT(rxcs._RxCSobject):
 
     # Print some additional time parameters of the dictionary
     def _printExtraParam(self):
-        """
-        """
         rxcs.console.bullet_param('The last time moment represented by the dictionary',
                                    self.tEnd, '-', 'seconds')
 
@@ -205,7 +281,18 @@ class IDHT(rxcs._RxCSobject):
 
     # Generate the frequency vector
     def _generateFVector(self, fFirstHigh, fDelta, nTones):
+        """
+        This function generates the frequency vector of the dictionary.
 
+        Args:
+            fFirstHigh (float):   the positive low frequency limit of the dictionary                
+            fDelta (float):   the frequency separation between tones       
+            nTones (int):     the number of tones in the dictionary     
+
+        Returns:
+            vF  (Numpy array 1D): frequency vector for the dictionary          
+        """
+        
         # -----------------------------------------------------------------
         # Generate the frequency vector
         vF = np.arange(fFirstHigh, fFirstHigh + (fDelta * nTones), fDelta)
@@ -214,6 +301,17 @@ class IDHT(rxcs._RxCSobject):
 
     # Generate the time vector
     def _generateTVector(self, Tg, nSamp, tStart):
+        """
+        This function generates the time vector of the dictionary.
+
+        Args:
+            Tg (float):      dictionary time representation period
+            nSamp (float):   the number of time representation samples
+            tStart (int):    the time shift of starting time point
+
+        Returns:
+            vT  (Numpy array 1D): time vector for the dictionary          
+        """
 
         # -----------------------------------------------------------------
         # Generate the time vector
@@ -223,6 +321,16 @@ class IDHT(rxcs._RxCSobject):
 
     # Generate the IDHT dictionary
     def _generateIDHT(self, vT, vF):
+        """
+        This function generates the IDHT dictionary.
+
+        Args:
+            vT  (Numpy array 1D): time vector for the dictionary          
+            vF  (Numpy array 1D): frequency vector for the dictionary          
+ 
+        Returns:
+            mDict (Numpy array 2D):  the generated dictionary         
+        """
         
         # Change shape of the vectors, so that they can be multiplies        
         vT.shape = (1, vT.size)
