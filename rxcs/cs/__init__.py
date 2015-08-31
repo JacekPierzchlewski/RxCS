@@ -17,7 +17,7 @@ if cvxoptOK == 1:
 
 
 # Import irls L1 reconstruction
-import irlsL1
+from irlsL1 import irlsL1
 
 
 # Import Theta matrix generator
