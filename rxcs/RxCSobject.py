@@ -3153,13 +3153,13 @@ class _RxCSobject:
                 pass
             else:
                 strErrNote = '> %s < is an unknown code of a dimension!' % dimension
-                ValueError(strErrNote)
+                raise ValueError(strErrNote)
 
         # If dimension is an integer, it must be higher than 0
         else:
             if (dimension < 0):
                 strErrNote = 'Dimension index must be higher than 0!'
-                ValueError(strErrNote)
+                raise ValueError(strErrNote)
 
         # If dimension is a string, decode it
         if isinstance(dimension, str):
@@ -3187,6 +3187,9 @@ class _RxCSobject:
                 elif dimension == 'pages':
                     iDim = parVal.ndim - 3
                     dimension == ' (pages) '
+                else:
+                    strErrNote = '> %s < is an unknown code of a dimension!' % dimension
+                    raise ValueError(strErrNote)
 
                 # All dimensions lower than 0 are -1
                 if (iDim < 0):
