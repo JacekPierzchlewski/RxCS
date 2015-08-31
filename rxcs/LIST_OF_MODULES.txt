@@ -30,13 +30,15 @@ Acquistions modules (2):
 Compresed Sensing modules (3):
 
     # Dictionaries:
-    3.1. IDFToNoDC.py    - module generates inverse discrete fourier transform (IDHT) matrix
+    3.1. IDFT.py    - module generates inverse discrete fourier transform (IDHT) matrix
     3.2. IDHT.py         - module generates inverse discrete hartley transform (IDFT) matrix
 
     # L1 reconstructions:
     3.3. cvxoptL1.py    - module with L1-based signal reconstruction (regularized regression), the optimization uses cvxopt software
     3.4. irlsL1.py      - module with L1-based signal reconstruction (basis pursuit), the optimization uses IRLS algorithm
 
+    # CS auxiliary:
+    3.5. makeTheta.py   - module generates Theta matrices from dictionary matrices and observation matrices.
 
 System analysis modules (4):
 
@@ -45,7 +47,6 @@ System analysis modules (4):
 
 Auxiliary modules (5):
 
-    5.1. L2Solv_aldkrls.py       - L2 solver which uses KRLS algorithm
-    5.2. irls.py                 - module with iterative reweighted least squares (IRLS) algorithms
+    5.1. aldkrlsL2.py           - L2 solver which uses KRLS algorithm
     5.3. aldkrls.py              - kernel recursive least squares (KRLS) algorithm with approximate linear dependency (ALD) criterion
     5.4. kernel.py               - implementation of kernels used by kernel recursive least squares (KRLS) algorithms
