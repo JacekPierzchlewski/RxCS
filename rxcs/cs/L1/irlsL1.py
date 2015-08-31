@@ -129,6 +129,9 @@ class irlsL1(rxcs._RxCSobject):
 
         self.__inputSignals()      # Define the input signals
         self.__parametersDefine()  # Define the parameters
+        
+        # Start L2 solver object
+        self.L2solv = rxcs.auxiliary.aldkrlsL2()
 
 
     # Define parameters
@@ -349,7 +352,11 @@ class irlsL1(rxcs._RxCSobject):
         mX = np.zeros((nCols, iMaxIter+1))    # Allocate a matrix for storing the found vectors from every iteration
 
         # Compute the initial solution and store it in mX
-        vX = rxcs.auxiliary.L2solv_aldkrls.main(mA, vY)   # Find the initial vector X
+        self.L2solv.mA = mA
+        self.L2solv.vY = vY
+        self.L2solv.bMute = 1
+        self.L2solv.run()   # Find the initial vector X
+        vX = self.L2solv.vX.copy()        
         mX[:, 0] = vX
           
         # Loop over all iterations      
@@ -362,7 +369,12 @@ class irlsL1(rxcs._RxCSobject):
             vX_prev = vX.copy() # Store the previous solution
 
             # Compute the current x vector
-            vX_temp = rxcs.auxiliary.L2solv_aldkrls.main(np.dot(mAWeightedX, mA.T), vY)
+
+            self.L2solv.mA = np.dot(mAWeightedX, mA.T)
+            self.L2solv.vY = vY
+            self.L2solv.run()                 # Find the current vector X
+            vX_temp = self.L2solv.vX.copy()        
+            
             vX = np.dot(mAWeightedX.T, vX_temp.T).T
             
             # Stopre the found x vector in the 'mX' matrix

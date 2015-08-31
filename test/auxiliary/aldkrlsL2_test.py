@@ -11,7 +11,7 @@ This script tests if the found vector x is correct with a given tolerance. |br|
 
 To start the test run this module directly as a script:
 
-    :bash:`$ python _L2solv_aldkrls_test.py`
+    :bash:`$ python aldkrlsL2_test.py`
 
 when in *rxcs/test* directory. The results are then printed to the console.
 |br|
@@ -20,7 +20,9 @@ when in *rxcs/test* directory. The results are then printed to the console.
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 2-DEC-2014 : * Initial version. |br|
+    1.0  |  2-DEC-2014 : * Initial version. |br|
+    2.0  | 31-AUG-2015 : * Adjusted to v2.0 of the aldkrlsL2 solver. |br|
+
 
 *License*:
     BSD 2-Clause
@@ -28,10 +30,9 @@ when in *rxcs/test* directory. The results are then printed to the console.
 from __future__ import division
 import numpy as np
 import rxcs
-import rxcs.auxiliary.L2solv_aldkrls as L2solv_aldkrls
 
 
-def _L2solv_aldkrls_test():
+def _aldkrlsL2_test():
 
     # Print out the header of the signal generator test
     print('')
@@ -95,17 +96,25 @@ def _testCase3():
 # =====================================================================
 def _testEngine(iM, iN, nTests):
 
+    # Allocate the unit under test
+    aldkrlsL2 = rxcs.auxiliary.aldkrlsL2()
+
     for inxTest in np.arange(nTests):
 
         if (iM < iN):
-            print('The system cannot be underestimated')
+            raise Exception('The system cannot be underdefined')
 
         # Construct the vectors
         mA = np.random.randint(-10, 10, (iM, iN))
         vX = np.random.randint(-10,10,(iN, 1))
         vY = mA.dot(vX)
+        vY.shape = (vY.size, )
 
-        vX_KRLS = L2solv_aldkrls.main(mA, vY)             # Find the vector X using KRLS with linear kernel
+        aldkrlsL2.mA = mA
+        aldkrlsL2.vY = vY
+        aldkrlsL2.bMute = 1
+        aldkrlsL2.run()              # Find the vector X using KRLS with linear kernel
+        vX_KRLS = aldkrlsL2.vX_KRLS
 
         iErr = np.linalg.norm(np.abs(vX_KRLS - vX.T),2)   # Find the error
         if (iErr > 1e-1):
@@ -122,4 +131,4 @@ def _testEngine(iM, iN, nTests):
 # Trigger when start as a script
 # =====================================================================
 if __name__ == '__main__':
-    _L2solv_aldkrls_test()
+    _aldkrlsL2_test()

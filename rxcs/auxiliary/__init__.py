@@ -3,4 +3,4 @@
 import krls
 
 # Import L2 solver which uses KRLS method
-import L2solv_aldkrls
+from aldkrlsL2 import aldkrlsL2
