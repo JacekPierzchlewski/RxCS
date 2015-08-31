@@ -1,9 +1,9 @@
 """
-This script is an example of how to use the L1 optimization reconstruction
-module (iterative reweighted least squares). |br|
+This script is an example of how to use the L1 IRLS optimization 
+reconstruction module (iterative reweighted least squares). |br|
 
 In this example an IDFT dictionary is generated.
-Then, a 2 tone signal is generated using the dictionary. |br|
+Then, a 3 tone signal is generated using the dictionary. |br|
 
 The signal is nonuniformly sampled and reconstructed with L1 reconstrucion
 module (IRLS) from the RxCS toolbox. The module performs l1 optimization using
@@ -17,6 +17,8 @@ samples, and the reconstructed signal are plot in the time domain. |br|
 
 *Version*:
     1.0  | 23-JAN-2015 : * Version 1.0 released. |br|
+    2.0  | 31-AUG-2015 : * Adjusted to the version 2.0 of the L1 IRLS solver |br|
+
 
 *License*:
     BSD 2-Clause
@@ -33,102 +35,104 @@ def _IRLS_recon_ex0():
     # ---------------------------------------------------------------------
     # Settings for the example
     # ---------------------------------------------------------------------
-    iT = 200e-6     # Time of the signal [s]
-    fD = 5e3        # Tone separation [Hz]
-    Nt = 20         # The number of tones in the signal spectrum
-    fRS = 2e6       # Signal representation sampling frequency
+    TIME = 200e-6     # Time of the signal is 200 us
+    FSMP = 2e6        # Signal representation sampling frequency 2MHz
+
+    DELTA = 5e3    # Tone separation is 5KHz
+    FMAX = 100e3   # The highest possible frequency in the spectrum is 100 kHz
+
+    # Things on the board:
+    gen = rxcs.sig.randMult()      # Signal generator
+    samp = rxcs.acq.nonuniANGIE()  # Sampler
+      
+    IDFT = rxcs.cs.dict.IDFT()        # IDFT dictionary generator
+    makeTheta = rxcs.cs.makeTheta()   # Theta matrix generator 
+    irlsL1 = rxcs.cs.irlsL1()        # L1 IRLS reconstruction
+
+    analysisSNR = rxcs.ana.SNR()   # SNR analysis
+
+    # ---------------------------------------------------------------------
+    # Generate the signal and sample it
+    # ---------------------------------------------------------------------
+
+    # Settings for the generator
+    gen.tS = TIME    # Time of the signal
+    gen.fR = FSMP    # The signal representation sampling frequency
+    gen.fMax = FMAX    # Max frequency
+    gen.fRes = DELTA   # The tone separation in the signals 
+
+    gen.nTones = 3    # The number of random tones in the signals
+
+    # Settings for the sampler
+    samp.tS = TIME       # Time of the signal
+    samp.fR = FSMP       # The signal representation sampling freuqnecy
+    samp.Tg = 1e-6       # The sampling grid period
+    samp.fSamp = 100e3   # The average sampling frequency
 
     # -----------------------------------------------------------------
-    # Generate the signal
-    # -----------------------------------------------------------------
-    dSigConf = {}
-    dSigConf['tS'] = iT        # Time of the signal
-    dSigConf['fR'] = fRS       # The signal representation sampling frequency
-    dSigConf['fMax'] = fD*Nt   # The highest possible frequency in the signal
-    dSigConf['fRes'] = fD      # The signal spectrum resolution is 1 kHz
-    dSigConf['nTones'] = 2     # The number of tones in the signal
-    dSigConf['nSigPack'] = 1   # The number of signals to be generated
-    dSig = rxcs.sig.sigRandMult.main(dSigConf)
-
-    # -----------------------------------------------------------------
-    # Sample the signal
-    # -----------------------------------------------------------------
-
-    # Generate settings for the sampler
-    dAcqConf = {}
-    dAcqConf['Tg'] = 1e-6       # The sampling grid period
-    dAcqConf['fSamp'] = 100e3   # The average sampling frequency
-    dObSig = rxcs.acq.nonuniANGIE.main(dAcqConf, dSig)
-
-    # Take the observed signal and the observation matrix
-    vObSig = dObSig['mObSig'][0,:]
-    mPhi = dObSig['m3Phi'][0,:,:]
+    gen.run()               # Run the generator    
+    samp.mSig = gen.mSig    # Connect the signal from the generator to the sampler 
+    samp.run()              # Run the sampler
     
     # -----------------------------------------------------------------
     # Reconstruct the signal
     # -----------------------------------------------------------------
 
     # Generate the IDFT dictionary
-    dCSConf = {}
-    dCSConf['tS'] = iT            # Time of the dictionary
-    dCSConf['fR'] = fRS           # The signal representation sampling freq.
-    dCSConf['fDelta'] = fD        # The frequency separation between tones
-    dCSConf['nTones'] = Nt        # The number of tones in the dictionary
-    (mDict, _) = rxcs.cs.dict.IDFToNoDC.main(dCSConf)
-    
-    # Cut down the dictionary matrix - take only first 20 rows
-    mDict = mDict[np.arange(int(Nt)),:]    
-    
-    # Compute the Theta matrix
-    mTheta = np.dot(mPhi, mDict.T)
+    IDFT.tS = TIME    # Time of the dictionary is 1 ms
+    IDFT.fR = FSMP    # Representation sampling frequency is 40 kHz
+    IDFT.fDelta = DELTA   # The frequency separation between tones
+    IDFT.nTones = int(FMAX / DELTA)  # The number of tones in the dictionary
+    IDFT.run()
+    mDict = IDFT.mDict       # Take the dictionary matrix
+    (nRows, _) = mDict.shape                   # Cut down the dictionary matrix - 
+    mDict = mDict[np.arange(int(nRows/2)), :]  # take only first 20 rows 
+
+    # Compute the Theta matrix    
+    makeTheta.lPhi = samp.lPhi    # Add the observation matrix
+    makeTheta.lDict = [mDict.T]   # Add the dictionary  
+    makeTheta.run()
 
     # Run the L1 minimization - generate signal coefficients
-    dCS = {}                  # Initialize the dictionary
-    dCS['m3Theta'] = mTheta   # Add the Theta matrix
-    dCS['iK'] = 0.01          # Add the 'k' parameter
-    dCS['mObSig'] = vObSig    # Add observed signal
-    dCS['bComplex'] = 1       # Add info that the problem contains complex
-                              # numbers
-    mCoeff = rxcs.cs.irlsL1.main(dCS)
-    vCoeff = mCoeff[:, 0]
-
+    vObSig = samp.mObSig[0, :]            # The observed signal
+    irlsL1.lTheta = makeTheta.lTheta     # Add the Theta matrix
+    irlsL1.lObserved = [vObSig]          # Add the observed signals
+    irlsL1.bComplex = 1                  # Add info that the problem contains complex
+                                          # numbers
+    irlsL1.run()  # Run the reconstruction
+    
     # Reconstruct the signal using the found signal coefficients and the
     # dictionary
+    vCoeff = irlsL1.lCoeff[0]    
     vSigRecon = np.dot(mDict.T, vCoeff)
     vSigRecon = vSigRecon.real
 
     # -----------------------------------------------------------------
     # Measure the SNR of the reconstruction
     # -----------------------------------------------------------------
-     
-    # Put the reconstructed signal into a 2D matrix, and put the matrix into
-    # a dictionary
-    vSigRecon.shape = (vSigRecon.size, 1)
-    dSigRecon = {}
-    dSigRecon['mSig'] = vSigRecon.T 
-     
-    # Create a dictionary with configuration for the system analysis
-    dAnaConf = {}
-    dAnaConf['iSNRSuccess'] = 15  # SNR of the recon > 15dB == success
-    rxcs.ana.SNR.main(dSig, dSigRecon, {}, dAnaConf)
-
+    analysisSNR.mSigRef = gen.mSigNN    # Nonnoisy signal from the generator is a a reference signal
+    analysisSNR.mSig = vSigRecon        # Reconstructed signal is a signal under test
+    analysisSNR.run()                   # Run the reconstruction
+    
     # ---------------------------------------------------------------------
     # Plot the original signal, reconstructed signal and signal samples
     # ---------------------------------------------------------------------
 
     # Get the generated signal
-    mSig = dSig['mSig']
-    vSig = mSig[0, :]
+    vSig = gen.mSig[0, :]
 
     # Get the signal time vector from the dictionary data
-    vTs = dSig['vTSig']
+    vT = gen.vT
+
+    # Get the observation matrix
+    mPhi = samp.lPhi[0]
 
     # Plot the figure
     hFig1 = plt.figure(1)
     hSubPlot1 = hFig1.add_subplot(111)
-    hSubPlot1.plot(vTs, vSig, 'g-', label="original sig")
-    hSubPlot1.plot(vTs, vSigRecon, 'b--', label="reconstructed sig")
-    hSubPlot1.plot(np.dot(mPhi,vTs), vObSig,
+    hSubPlot1.plot(vT, vSig, 'g-', label="original sig")
+    hSubPlot1.plot(vT, vSigRecon, 'b--', label="reconstructed sig")
+    hSubPlot1.plot(np.dot(mPhi, vT), vObSig,
                    '*r', label="observed samps",markersize=10)
     hSubPlot1.set_xlabel('time')
     hSubPlot1.grid(True)
