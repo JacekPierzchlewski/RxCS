@@ -1,8 +1,44 @@
 """
-Module contains a solver which finds x which minimizes ||y - Ax||_2 for a given A and y.
+Module contains a solver which finds x which minimizes:
+
+
+                                  ||y - Ax||_2     (equation 1)
+                                  
+for a given A and y.
 The solver uses Kernel Recurive Least Squares algorithm with linear kenrel. |br|
 
-Take a look on  'aldkrlsL2_ex0.py' in 'examples/auxiliary' directory for examples of using the module.
+Take a look on  'aldkrlsL2_ex0.py' in 'examples/auxiliary' directory for examples 
+of using the module.
+
+------------------------------------------------------------------------------
+
+*Examples*:
+    Please go to the *examples/reconstruction* directory for examples on how to 
+    use the L1 reconstruction module. |br|
+
+*Settings*:
+    Parameters of the L1 reconstruction module are described below.
+
+    Take a look on '__parametersDefine' function for more info on the 
+    parameters.
+
+    Parameters of the L1 reconstruction module are attributes of the class  
+    which must/can be set before the generator is run.
+
+    Required parameters:
+
+    - a. **mA** (*2D Numpy array*): matrix A in the equation 1
+
+    - b. **vY** (*1D Numpy array*): vector Y in the equation 1
+
+
+*Output*:
+    Description of the L2 solver output is below. 
+    This is the list of attributes of the class which are available 
+    after calling the 'run' method:
+
+    - a. **vX** (*1D Numpy array*):  vector which solver the equation
+
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
