@@ -11,8 +11,6 @@ contents:
     4. __init__.py              - module initialization file
 
 
-    5. L2Solv_aldkrls.py        - L2 solver which uses KRLS algorithm
+    5. aldkrlsL2.py        - L2 solver which uses KRLS algorithm
 
-    6. @L2Solv_aldkrls_test.py  - link to a module with tests for the L2 solver which uses kernel recursive least squares (KRLS) method
-
-    7. irls.py                  - module with iterative reweighted least squares (IRLS) algorithms
+    6. @aldkrlsL2_test.py  - link to a module with tests for the L2 solver which uses kernel recursive least squares (KRLS) method

@@ -9,6 +9,6 @@ contents:
     3. __init__.py    - module initialization file
 
 
-    4. IDFToNoDC.py    - module generates inverse discrete fourier transform (IDFT) matrix
+    4. IDFT.py         - module generates inverse discrete fourier transform (IDFT) matrix
 
     5. IDHT.py         - module generates inverse discrete hartley transform (IDHT) matrix

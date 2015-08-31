@@ -18,3 +18,7 @@ contents:
 
     7. @irlsL1.py     - link to module with L1-based signal reconstruction (basis pursuit),
                         the optimization uses IRLS algorithm
+
+    8. makeTheta       - module which prepares Theta matrices based on observation and 
+                         dictionary matrix
+

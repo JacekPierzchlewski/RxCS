@@ -20,6 +20,7 @@ contents:
 
     9. __init__.py            - module initialization file
 
+   10. @rxcs                  - link to the main rxcs directory  
 
    10. RxCSobject.py          - main base class for all modules of RxCS
 
