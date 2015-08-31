@@ -15,6 +15,8 @@ where Y is \in R^(iM x 1) and A is \in R^(iM x iN)
 
 *Version*:
     1.0  | 4-DEC-2014 : * Version 1.0 released. |br|
+    2.0  | 31-AUG-2015 : * Example adjusted to v2.0 of the L2 solver. |br|
+
 
 *License*:
     BSD 2-Clause
@@ -36,9 +38,14 @@ def _L2solv_aldkrls_ex0():
     mA = np.random.randint(-10, 10, (iM, iN))
     vX = np.random.randint(-10,10,(iN, 1))
     vY = mA.dot(vX)
+    vY.shape = (vY.size, )
 
     # Solve the L2 problem
-    vX_solv = rxcs.auxiliary.L2solv_aldkrls.main(mA, vY)             # Find the vector X using KRLS with linear kernel
+    aldkrlsL2 = rxcs.auxiliary.aldkrlsL2()  # Allocate the object solver
+    aldkrlsL2.mA = mA
+    aldkrlsL2.vY = vY
+    aldkrlsL2.run()            # Run the solver
+    vX_solv = aldkrlsL2.vX 
     vX_solv.shape = (iN, )
 
     # Plot
