@@ -9,7 +9,7 @@
                     Jacek Pierzchlewski jap@es.aau.dk
 
             Last modification:
-                    24 August 2015
+                    02 September 2015
 
             Versions:
                 0.1     | 20-JUL-2015 : * Initial version. |br|
@@ -20,6 +20,9 @@
                                           (devectorization of the arrays)
                 1.03    | 20-AUG-2015 : * Function 'isequal' is added |br|
                 1.04    | 24-AUG-2015 : * Function 'array2D2list1D' is added |br|
+                1.05    | 02-SEP-2015 : * Mull and add parameters are added to default reference 
+                                          of an optional parameter |br|
+                1.05r1  | 02-SEP-2015 : * Bug in type check is fixed |br|
 
 
             List of functions in the module:
@@ -255,7 +258,7 @@ class _RxCSobject:
 
         self.iParam = self.iParam + 1  # Increase the number of parameters
 
-    def paramAddOpt(self, strName, strDesc, unit='', noprint=0, unitprefix='-', default=np.nan):
+    def paramAddOpt(self, strName, strDesc, unit='', noprint=0, unitprefix='-', default=np.nan, mul=1.0, add=0):
         """
             Add an optional parameter to the object.
 
@@ -273,6 +276,9 @@ class _RxCSobject:
 
                     default             default value
                                         (optional, by default it is np.nan)
+
+                    mul                 multiplication parameter for the default value
+                    add                 'add' parameter for the default value
 
             Output:
                     none
@@ -312,6 +318,8 @@ class _RxCSobject:
         dParameter['strDesc'] = strDesc             # Description
         dParameter['bOptional'] = 1                 # Mandatory/Optional flag
         dParameter['defaultValue'] = default        # Default value
+        dParameter['defaultValueMul'] = mul         # Multiplication for the default value
+        dParameter['defaultValueAdd'] = add         # 'add' parameter for the default value
         dParameter['strUnit'] = unit                # Unit
         dParameter['strUnitPrefix'] = unitprefix    # Unit prefix
         dParameter['bNoPrint'] = noprint            # NoPrint flag
@@ -1674,8 +1682,10 @@ class _RxCSobject:
                     % (strRefName, strParName)
                 raise NameError(strError)
             
-            # Propagate the value
-            self.__dict__[strParName] = self.__dict__[strRefName]                        
+            # Get the mul and add parameters and propagate the value
+            iMul = dParam['defaultValueMul']
+            iAdd = dParam['defaultValueAdd']
+            self.__dict__[strParName] = iMul * self.__dict__[strRefName] + iAdd                        
         return
 
     def __parametersCheckType(self):
@@ -1710,7 +1720,7 @@ class _RxCSobject:
             # If this is an optional parameter, and it has a NaN value, do nothng with it
             if bOptional:
                 if not self.wasParamGiven(strParName):
-                    return
+                    continue
 
             # Check the type
             if not (isinstance(parameter, tuple(lTypes))):
@@ -1796,7 +1806,7 @@ class _RxCSobject:
 
         # Loop over all restrictions
         for inxRes in range(len(dParam['lRes'])):
-            
+
             # Get the restriction dictionary
             dRes = dParam['lRes'][inxRes]     # Restriction dictionary
             strResCode = dRes['strName']      # Restriction code
