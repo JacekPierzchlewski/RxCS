@@ -11,7 +11,9 @@ and ploted.
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
 
 *Version*:
-    1.0  | 15-JUL-2015 : * Version 1.0 released. |br|
+    1.0    | 15-JUL-2015  : * Version 1.0 released. |br|
+    1,0r1  | 02-SEP-2015  : * Bug in rep. sampling frequency of the generator
+                              is fixed |br|  
 
 *License*:
     BSD 2-Clause
