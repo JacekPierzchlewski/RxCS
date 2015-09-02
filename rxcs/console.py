@@ -600,7 +600,10 @@ def _param(strName, iVal, strForm, strUnit):
     iVal_recal = iVal / iCoef
 
     # Create a string with value
-    if iCoef == 1:  # <- there is no need to recalculate the value
+    if iVal == 0: # <- the value is zero
+        strVal = '0'
+
+    elif iCoef == 1:  # <- there is no need to recalculate the value
 
         # Put the number as it is, but pay attention if it is float or int
         if isinstance(iVal, int):
