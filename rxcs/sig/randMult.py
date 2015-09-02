@@ -23,12 +23,12 @@ given by a user. |br|
 
     - b. **fR** (*float*): signals' representation sampling frequency
 
-    - c. **fMax** (*float*): maximum frequency present in signals
-
-    - d. **fRes** (*float*): tones frequency resolution
+    - c. **fRes** (*float*): tones frequency resolution
 
 
     Optional parameters:
+
+    - d. **fMax** (*float*): maximum frequency present in signals [default = 0.4 * fR]
 
     - e. **fMin** (*float*): minimum allowed frequency present in the spectrum  [default = fRes]
 
@@ -111,7 +111,8 @@ given by a user. |br|
     1.0r5  | 27-MAY-2014 : * Error in the vector with signal time is fixed. |br|
     2.0    | 21-JUL-2015 : * Objectified version (2.0) |br|
     2.0r1  | 18-AUG-2015 : * Adjusted to RxCSobject v1.0 |br|
-
+    2.1    | 02-SEP-2015 : * Max frequency in the spectrum is an optional parameter
+                             printing improvements. |br|
 
 *License*:
     BSD 2-Clause
@@ -148,7 +149,7 @@ class randMult(rxcs._RxCSobject):
         self.paramL('fR', np.inf)
  
         # The highest possible frequency in the signal [Hz]
-        self.paramAddMan('fMax', 'The highest possible frequency in the signal', unit='Hz')
+        self.paramAddOpt('fMax', 'The highest possible frequency in the signal', unit='Hz', default='$$fR', mul=0.4)
         self.paramType('fMax', (int, float))
         self.paramH('fMax', 0)
         self.paramL('fMax', 'fR', mul=0.5)  # Nyquist principle
@@ -221,35 +222,35 @@ class randMult(rxcs._RxCSobject):
         self.paramHE('nTones', 0)
 
         # The boundaries for amplitudes: amplitude min value
-        self.paramAddOpt('iMinAmp', 'Minimum value of random amplitudes', default=0.1)
+        self.paramAddOpt('iMinAmp', 'Minimum value of random amplitudes', default=0.1, unitprefix=' ')
         self.paramType('iMinAmp', (int, float))
         self.paramH('iMinAmp', 0)
         self.paramLE('iMinAmp','iMaxAmp')
  
         # The boundaries for amplitudes: amplitude gradation
-        self.paramAddOpt('iGraAmp', 'Gradation of value of random amplitudes', default=0.1)
+        self.paramAddOpt('iGraAmp', 'Gradation of value of random amplitudes', default=0.1, unitprefix=' ')
         self.paramType('iGraAmp', (int, float))
         self.paramH('iGraAmp', 0)
         
         # The boundaries for amplitudes: amplitude max value
-        self.paramAddOpt('iMaxAmp', 'Maximum value of random amplitudes', default=1.0)
+        self.paramAddOpt('iMaxAmp', 'Maximum value of random amplitudes', default=1.0, unitprefix=' ')
         self.paramType('iMaxAmp', (int, float))
         self.paramH('iMaxAmp', 0)
 
         # The boundaries for amplitudes: phase min value
-        self.paramAddOpt('iMinPhs', 'Minimum value of random phase', default=-179)
+        self.paramAddOpt('iMinPhs', 'Minimum value of random phase', default=-179, unitprefix=' ')
         self.paramType('iMinPhs', (int, float))
         self.paramH('iMinPhs',-180)
         self.paramLE('iMinPhs',180)
         self.paramLE('iMinPhs','iMaxPhs')
         
         # The boundaries for amplitudes: phase gradation
-        self.paramAddOpt('iGraPhs', 'Gradation of value of random phase', default=1)
+        self.paramAddOpt('iGraPhs', 'Gradation of value of random phase', default=1, unitprefix=' ')
         self.paramType('iGraPhs', (int, float))
         self.paramH('iGraPhs', 0)
 
         # The boundaries for amplitudes: phase max value
-        self.paramAddOpt('iMaxPhs', 'Maximum value of random phase', default=180)
+        self.paramAddOpt('iMaxPhs', 'Maximum value of random phase', default=180, unitprefix=' ')
         self.paramType('iMaxPhs', (int, float))
         self.paramH('iMaxPhs',-180)
         self.paramLE('iMaxPhs',180)
