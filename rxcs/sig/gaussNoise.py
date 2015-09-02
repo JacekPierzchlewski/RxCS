@@ -73,6 +73,7 @@ The generator is able to generate N random signals with a given bandwidth. |br|
     1.0    | 15-JUL-2014 : * Version 1.0 released. |br|
     1.0r1  | 18-AUG-2015 : * Adjusted to RxCSobject v1.0 |br|
     1.0r2  | 19-AUG-2015 : * Bug in bandwith regulation is fixed |br|
+    1,0r3  | 2-SEP-2015  : * Bug in rep. sampling frequency check is fixed |br|  
 
 *License*:
     BSD 2-Clause
@@ -102,9 +103,9 @@ class gaussNoise(rxcs._RxCSobject):
 
         # Representation sampling frequency
         self.paramAddMan('fR', 'Representation sampling frequency', unit='Hz')
-        self.paramType('fs', (int, float))
-        self.paramH('fs', 0)                  # Rep. samp. freq. must be higher than zero
-        self.paramL('fs', np.inf)             # ...and lower than infinity
+        self.paramType('fR', (int, float))
+        self.paramH('fR', 0)                  # Rep. samp. freq. must be higher than zero
+        self.paramL('fR', np.inf)             # ...and lower than infinity
 
         # Time of signal
         self.paramAddMan('tS', 'Signal time', unit='s')
@@ -117,7 +118,7 @@ class gaussNoise(rxcs._RxCSobject):
         self.paramType('fB', (float, int))
         self.paramHE('fB', 0)                           # Signal baseband must be higher or equal to zero
                                                         # (if it is equal to zero, the baseband is defined by fs)
-        self.paramLE('fB', 'fs', mul=0.5)               # Signal baseband must be lower or equal to half the rep. sampling
+        self.paramLE('fB', 'fR', mul=0.5)               # Signal baseband must be lower or equal to half the rep. sampling
                                                         # frequency
         # Power of a signal
         self.paramAddOpt('iP', 'Signal power', unit='W', default=1)

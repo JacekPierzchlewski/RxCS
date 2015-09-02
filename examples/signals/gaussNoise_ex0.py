@@ -37,7 +37,7 @@ def _gaussNoise_ex0():
 
     # -----------------------------------------------------------------
     # Analyze the signal and plot it
-    (vFxx, vPxx) = scsig.welch(vSig, fs=gaussNoise.fs, nperseg=1024, noverlap=512)
+    (vFxx, vPxx) = scsig.welch(vSig, fs=gaussNoise.fR, nperseg=1024, noverlap=512)
     hFig1 = plt.figure(1)
     hSubPlot1 = hFig1.add_subplot(111)
     hSubPlot1.grid(True)
