@@ -54,7 +54,7 @@ def _LNA_ex0():
     hSubPlot1 = hFig1.add_subplot(111)
     hSubPlot1.grid(True)
     hSubPlot1.set_title('Signal in the time domain')
-    hSubPlot1.set_xlabel('Frequency [Hz]')
+    hSubPlot1.set_xlabel('Time [Seconds]')
     hSubPlot1.plot(vTSig, vOrgSig, 'b-', label='original')
     hSubPlot1.plot(vTSig, vLNASig, 'k-', label='after the LNA')
     hSubPlot1.legend()    
