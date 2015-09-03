@@ -11,3 +11,5 @@ from gaussNoise import gaussNoise
 # Import nonlinear low-noise amplifier
 from LNA import LNA
 
+# Import radio modules
+import radio
