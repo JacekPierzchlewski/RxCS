@@ -1,7 +1,8 @@
 """
 This is a random gaussian noise generator module. |br|
 
-The generator is able to generate N random signals with a given bandwidth. |br|
+The generator is able to generate N random signals with a given min and max
+frequency components. |br|
 
 *Examples*:
     Please go to the *examples/signals* directory for examples on how to use 
@@ -25,33 +26,36 @@ The generator is able to generate N random signals with a given bandwidth. |br|
 
     Optional parameters:
 
-    - c. **fB** (*float*): signals' baseband   
-                           [default = baseband not regulated]
-  
-    - d. **iP** (*float*): signals' power  [default = 1W]
+    - c. **fMin** (*float*): minimum frequency component in the signal   
+                             [default = not regulated]
 
-    - e. **nSigs** (*int*):  the number of signals to be generated  
+    - d. **fMax** (*float*): maximum frequency component in the signal   
+                             [default = not regulated]
+
+    - e. **iP** (*float*): signals' power  [default = 1W]
+
+    - f. **nSigs** (*int*):  the number of signals to be generated  
                              [default = 1]
 
      Parameters given below are optional filter parameters.
-     There parameters describe the filter which limits the signals' baseband.
-     The filter is applied only if **fB** (the signal bandwidth) is given by user.
+     There parameters describe the filter which limits the signals' frequency components.
+     The filter is applied only if **fMin** or **fMax** is given by user.
 
-     - f. **strFilt**  (*string*):  filter type. The allowed values are:
+     - g. **strFilt**  (*string*):  filter type. The allowed values are:
                                     'butter', 'cheby1', 'cheby2', 'ellip', 'bessel'.
                                     [default = 'butter']
 
-     - g. **nFiltOrd** (*int*):  the fitler order  [default = 10]
+     - h. **nFiltOrd** (*int*):  the fitler order  [default = 10]
      
-     - h. **iRp** (*float*):  max ripple in the filter's pass band.
+     - i. **iRp** (*float*):  max ripple in the filter's pass band.
                               Applicable to Chebyshev and elliptic filt. only.
                               [default = 0.1]
      
-     - i. **iRs** (*float*):  min attenuation in the filter's stopband
+     - j. **iRs** (*float*):  min attenuation in the filter's stopband
                               Applicable to Chebyshev and elliptic filt. only.
                               [default = 60]
 
-     - j. **bMute** (*int*):  mute the console output from the generator
+     - k. **bMute** (*int*):  mute the console output from the generator
                               [default = 0]
 
 
@@ -73,7 +77,9 @@ The generator is able to generate N random signals with a given bandwidth. |br|
     1.0    | 15-JUL-2014 : * Version 1.0 released. |br|
     1.0r1  | 18-AUG-2015 : * Adjusted to RxCSobject v1.0 |br|
     1.0r2  | 19-AUG-2015 : * Bug in bandwith regulation is fixed |br|
-    1,0r3  | 2-SEP-2015  : * Bug in rep. sampling frequency check is fixed |br|  
+    1,0r3  | 02-SEP-2015 : * Bug in rep. sampling frequency check is fixed |br|  
+    1,1    | 03-SEP-2015 : * Minimum frequency component and maximum frequency   
+                             component regulation is added |br|
 
 *License*:
     BSD 2-Clause
@@ -113,13 +119,18 @@ class gaussNoise(rxcs._RxCSobject):
         self.paramH('tS', 0)            # Time must be higher than zero
         self.paramL('tS', np.inf)       # ...and lower than infinity
 
-        # Baseband
-        self.paramAddOpt('fB', 'Baseband', unit='Hz')
-        self.paramType('fB', (float, int))
-        self.paramHE('fB', 0)                           # Signal baseband must be higher or equal to zero
-                                                        # (if it is equal to zero, the baseband is defined by fs)
-        self.paramLE('fB', 'fR', mul=0.5)               # Signal baseband must be lower or equal to half the rep. sampling
-                                                        # frequency
+        # Minimum frequency of the signal
+        self.paramAddOpt('fMin', 'Minimum frequency component in the signal', unit='Hz') 
+        self.paramType('fMin', (float, int))
+        self.paramHE('fMin', 0)
+        self.paramL('fMin', 'fMax')
+
+        # Maximum frequency of the signal
+        self.paramAddOpt('fMax', 'Maximum frequency component in the signal', unit='Hz')
+        self.paramType('fMax', (float, int))
+        self.paramH('fMax', 0)
+        self.paramLE('fMax', 'fR', mul=0.5)
+
         # Power of a signal
         self.paramAddOpt('iP', 'Signal power', unit='W', default=1)
         self.paramType('iP',(float, int))
@@ -190,12 +201,37 @@ class gaussNoise(rxcs._RxCSobject):
 
         # ---------------------------------------------------------------------
         # Filter the signal with a low pass filter, if it is needed
-        if self.wasParamGiven('fB'):
+        if self.wasParamGiven('fMax') and self.wasParamGiven('fMin'):
 
             # Design a iir low pass filter
-            iCFP = self.fB/(0.5*self.fR)   # Compute the filter parameter
-            (vN, vD) = scsig.iirfilter(self.nFiltOrd, iCFP, btype='lowpass', ftype=self.strFilt,
+            iCFP_l = self.fMin/(0.5*self.fR)   # Compute the filter parameter for the low cutoff frequency 
+            iCFP_h = self.fMax/(0.5*self.fR)   # Compute the filter parameter for the high cutoff frequency 
+
+            (vN, vD) = scsig.iirfilter(self.nFiltOrd, [iCFP_l, iCFP_h], btype='bandpass', ftype=self.strFilt,
                                        rs=self.iRs, rp=self.iRp)
+
             # Apply the filter
             self.mSig = scsig.lfilter(vN, vD, self.mSig)
+            
+        elif self.wasParamGiven('fMax'):
+
+            # Design a iir low pass filter
+            iCFP = self.fMax/(0.5*self.fR)   # Compute the filter parameter for the cutoff frequency 
+            (vN, vD) = scsig.iirfilter(self.nFiltOrd, iCFP, btype='lowpass', ftype=self.strFilt,
+                                       rs=self.iRs, rp=self.iRp)
+
+            # Apply the filter
+            self.mSig = scsig.lfilter(vN, vD, self.mSig)
+
+        elif self.wasParamGiven('fMin'):
+
+            # Design a iir low pass filter
+            iCFP = self.fMin/(0.5*self.fR)   # Compute the filter parameter for the cutoff frequency 
+            (vN, vD) = scsig.iirfilter(self.nFiltOrd, iCFP, btype='highpass', ftype=self.strFilt,
+                                       rs=self.iRs, rp=self.iRp)
+
+            # Apply the filter
+            self.mSig = scsig.lfilter(vN, vD, self.mSig)
+
+        # ---------------------------------------------------------------------
         return
