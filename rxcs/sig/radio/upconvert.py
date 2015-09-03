@@ -62,7 +62,7 @@ class upconvert(rxcs._RxCSobject):
         rxcs._RxCSobject.__init__(self)    # Make it a RxCS object 
         
         self.strRxCSgroup = 'Signal generator'    # Name of group of RxCS modules
-        self.strModuleName = 'Upconversion'       # Module name
+        self.strModuleName = 'Upconverter'        # Module name
 
         self.__inputDefine()           # Define the input signals
         self.__parametersDefine()      # Define the parameters
@@ -98,6 +98,7 @@ class upconvert(rxcs._RxCSobject):
         self.paramType('fC', (float, int))
         self.paramH('fC', 0)
         self.paramL('fC', np.inf)
+        self.paramL('fC', 'fR', mul=0.5)
 
         # 'Mute the output' flag
         self.paramAddOpt('bMute', 'Mute the output', noprint=1, default=0)  
