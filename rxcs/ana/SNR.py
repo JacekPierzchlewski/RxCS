@@ -1,4 +1,4 @@
-"""
+"""|
 This module contains SNR evaluation function of the reconstructed signals. |br|
 
 *Examples*:
@@ -22,11 +22,15 @@ This module contains SNR evaluation function of the reconstructed signals. |br|
 
     Optional parameters:
 
-    - c. **iSNRSuccess** (*float*):   success threshold. SNR over this 
+    - c. **strComment** (*string*):   an optional comment to the name of 
+                                      the SNR analysis module
+
+    - d. **iSNRSuccess** (*float*):   success threshold. SNR over this 
                                       threshold is treated as a successful 
                                       reconstruction [default = not given]
 
-    - d. **bMute** (*int*):    mute the console output from the sampler [default = 0]
+    - e. **bMute** (*int*):    mute the console output from the sampler [default = 0]
+
 
 *Output*:
     Description of the SNR analysis output is below.
@@ -37,9 +41,9 @@ This module contains SNR evaluation function of the reconstructed signals. |br|
 
     - b. **vSNR** (*float*):  SNR for every signal
 
-    - a. **iSR** (*float*):  average success ratio
+    - c. **iSR** (*float*):  average success ratio
 
-    - c. **vSuccessBits** (*float*):  list with success flags for every signal
+    - d. **vSuccessBits** (*float*):  list with success flags for every signal
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
@@ -53,6 +57,7 @@ This module contains SNR evaluation function of the reconstructed signals. |br|
     1.0    | 21-MAY-2014 : * Version 1.0 released. |br|
     2,0    | 21-AUG-2015 : * Version 2,0 (objectified version) is released. |br|
     2.0r1  | 25-AUG-2015 : * Improvements in headers |br|
+    2,1    | 09-SEP-2015 : * Optional comment to the name was added |br|
 
 
 *License*:
@@ -101,6 +106,10 @@ class SNR(rxcs._RxCSobject):
         self.paramH('iSNRSuccess', -np.inf)
         self.paramL('iSNRSuccess', np.inf)
 
+        # Additional comment in printing
+        self.paramAddOpt('strComment', 'Additional comment in printing', noprint=1, default='')
+        self.paramType('strComment', (str))   # Must be a Numpy array
+
         # 'Mute the output' flag
         self.paramAddOpt('bMute', 'Mute the output', noprint=1, default=0)
         self.paramType('bMute', int)           # Must be of int type
@@ -108,14 +117,26 @@ class SNR(rxcs._RxCSobject):
 
     # Run
     def run(self):
+        
         self.parametersCheck()    # Check if all the needed partameters are in place and are correct
-        self.parametersPrint()         # Print the values of parameters
+        self.addComment2Name()    # Add a comment to the name of the SNR analysis, if needed
+
+        self.parametersPrint()    # Print the values of parameters
 
         self.engineStartsInfo()  # Info that the engine starts
         self.__engine()          # Run the engine
         self.engineStopsInfo()   # Info that the engine ends
         return self.__dict__     # Return dictionary with the parameters
 
+    # Add a comment to the name of the module, if needed
+    def addComment2Name(self):
+        if not (self.strComment == ''):
+            if not 'strModuleName_' in self.__dict__:
+                self.strModuleName_ = self.strModuleName
+            self.strModuleName = self.strModuleName_ + ' [' + self.strComment + ']'       
+            self.strComment = ''
+        return
+        
     # Engine - compute the noise and the success rate
     def __engine(self):
 
