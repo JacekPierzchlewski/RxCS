@@ -944,7 +944,7 @@ def _colors(strKey):
     dColors['RED'] = '\033[91m'
     dColors['BLACK'] = '\033[30m'
     dColors['DARK_MAGENTA'] = '\033[35m'
-    dColors['AUQA'] = '\033[96m'
+    dColors['AQUA'] = '\033[96m'
     dColors['BLUE_BG'] = '\033[44m'
     dColors['DARK_BLUE'] = '\033[34m'
     dColors['DARK_GREEN'] = '\033[32m'
@@ -957,7 +957,7 @@ def _colors(strKey):
     dColors['BULLET_INFO'] = dColors['BLUE']
     dColors['BULLET'] = dColors['DARK_MAGENTA']
     dColors['WARN'] = dColors['RED']
-    dColors['PARAM'] = dColors['BLUE']
+    dColors['PARAM'] = dColors['AQUA']
     dColors['OK'] = dColors['DARK_GREEN']
     dColors['ENDC'] = '\033[0m'
 
