@@ -128,7 +128,7 @@ class randMult(rxcs._RxCSobject):
     def __init__(self, *args):
         rxcs._RxCSobject.__init__(self)    # Make it a RxCS object 
         
-        self.strRxCSgroup = 'Dictionary generator'  # Name of group of RxCS modules
+        self.strRxCSgroup = 'Signal generator'  # Name of group of RxCS modules
         self.strModuleName = 'Random multitone'     # Module name        
 
         self.__parametersDefine()      # Define the parameters
