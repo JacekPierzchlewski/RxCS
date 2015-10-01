@@ -45,6 +45,8 @@ This is a model of a single branch upconverter. |br|
 
 *Version*:
     1.0    | 04-SEP-2015 : * Version 1.0 released. |br|
+    1.0r1  | 01-OCT-2015 : * Bug fix. |br|
+
 
 *License*:
     BSD 2-Clause
@@ -119,15 +121,20 @@ class upconvert(rxcs._RxCSobject):
     # Engine of the function
     def __engine(self):
 
+        # Get the number of signals
+        (nSigs, _) = self.mSig.shape
+
         # Generate the carrier
         genC = rxcs.sig.randMult()
 
         genC.tS = self.tS        # Time of the signal
         genC.fR = self.fR        # The signal rep. sampling frequency
-        genC.fRes = self.fC      # The signal spectrum resolution
+        genC.fRes = self.fC      # The signal spectrum resolution and the maximum freq.
+        genC.fMax = self.fC      # equals the carrier frequency 
         genC.vFrqs = np.array([self.fC]) 
         genC.vAmps = np.array([1])
         genC.vPhs = np.array([0])
+        genC.nSigs = nSigs 
         genC.bMute = 1
         genC.run()
         self.vCarrier = genC.mSig[0, :]
