@@ -68,7 +68,10 @@ frequency components. |br|
                                       one signal p. row
 
     - b. **nSmp** (*int*): The number of samples in the signals
- 
+
+    - c. **vP** (*Numpy array 1D*): Vector with the power of signals
+
+
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
@@ -80,6 +83,7 @@ frequency components. |br|
     1,0r3  | 02-SEP-2015 : * Bug in rep. sampling frequency check is fixed |br|  
     1,1    | 03-SEP-2015 : * Minimum frequency component and maximum frequency   
                              component regulation is added |br|
+    1.2    | 01-OCT-2015 : * Power adjsutment is added
 
 *License*:
     BSD 2-Clause
@@ -234,4 +238,45 @@ class gaussNoise(rxcs._RxCSobject):
             self.mSig = scsig.lfilter(vN, vD, self.mSig)
 
         # ---------------------------------------------------------------------
+
+        # Adjust the signal power
+        (self.mSig, self.vP) = self._adjPower(self.mSig, self.iP)
+        
         return
+
+
+    def _adjPower(self, mSig, iP):
+        """
+        This function adjustes powers of the generated signals.
+        If the requested power of the signals is equal to NaN or inf, then
+        the signals are not adjusted.
+    
+        Args:
+            mSig (matrix):   matrix with signals (one row - one signal)
+            iP (float):      requested power of the signals
+    
+        Returns:
+            mSig (matrix):   matrix with noisy signals
+            vP (vector):     vector with powers of noisy signals
+        """
+    
+        # Get the number of signals and the size of signals (the number of samples)
+        (nSigs, nSmp) = mSig.shape
+    
+        # Measure the power of the signals
+        vP = (np.sum(mSig * mSig, axis=1) / nSmp).reshape(nSigs, 1)
+    
+        # Adjust the signal power, if needed
+        if not np.isnan(iP) or np.isinf(iP):
+    
+            # Compute power adjustments coefficients for the noise signals
+            vPCoef = np.sqrt(iP / vP)
+
+            # Adjust the signal power
+            mPCoef = np.tile(vPCoef, (1, nSmp))
+            mSig = mSig * mPCoef
+        
+            # Measure the power of the adjusted signals
+            vP = np.sum(mSig*mSig, axis=1) / nSmp
+    
+        return (mSig, vP)
