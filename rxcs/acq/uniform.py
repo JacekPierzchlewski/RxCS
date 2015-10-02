@@ -82,6 +82,7 @@ The modules samples the given signals uniformly. |br|
     2.0    | 14-AUG-2015 :  * Objectified version (2.0) |br|
     2.1    | 17-AUG-2015 :  * Observation matrices are gathered in list, not in 3D matrix |br|
     2.1r1  | 18-AUG-2015 :  * Adjusted to RxCSObject v1.0 |br|
+    2.1r2  | 03-OCT-2015 :  * Secured against floating-point precision errors |br|
 
 
 *License*:
@@ -275,7 +276,7 @@ class uniform(rxcs._RxCSobject):
         # -----------------------------------------------------------------
         # Check if the signal representation sampling frequency is compatible
         # with the sampling period
-        if np.round(self.Tg * self.fR) != (self.Tg * self.fR):
+        if np.abs(np.round(self.Tg * self.fR) - (self.Tg * self.fR)) > 1e-6:
             strError = ('The chosen sampling grid period is incompatible with ')
             strError = strError + ('the signals representation sampling ')
             strError = strError + ('frequency')
