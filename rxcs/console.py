@@ -12,6 +12,7 @@ from this module.
     0.21 | 15-MAY-2014 : * New colors ('PARAM' + 'OK') added to the dictionary
     0.22 | 14-AUG-2015 : * New function (progress_doneNL) is added 
     0.23 | 20-AUG-2015 : * New function (newline) is added 
+    0.24 | 30-NOV-2015 : * Progress bar is added 
 
 
 *License*:
@@ -214,6 +215,208 @@ def progress_doneNL(tStart):
     sys.stdout.flush()
 
     return
+
+
+# =====================================================================
+# Start a progress bar
+# =====================================================================
+def progress_bar_start(strInfo, iPrintIter, iMilestone, iLineBreak,
+                       bPrintSteps=1, bIteration0=0, bPrintTime=0):
+    """
+    Function starts a progress bar
+    The start is preceded by a tabulator and a module progress sign ('>>>'). |br|
+
+    Additionally, the function starts a time counter. |br|
+
+    The function takes care of the proper coloring of the console output. |br|
+
+    The function returns a progress bar dictionary. |br|
+
+    >>> console.progress_bar_start('The module X:')
+
+    gives an output:
+
+    :bash:`|        > The module X:`
+
+    Args:
+        strInfo (string): info to be printed
+        iPrintIter (integer):   print a step after 'iPrintIter' iterations
+        iMilestone (integer):   print X after 'iMilestone' iterations
+        iLineBreak (integer):   break the line after 'iLineBreak' iterations
+
+        bPrintSteps (integer):  0 - do not print the number of iterations at the end 
+                                1 - print the number of iterations at the end
+
+        bIteration0 (integer):  0 - iteration #0 is not allowed
+                                1 - iteration #0 is allowed
+                
+        bPrintTime (integer):   0 - do not print time at all
+                                1 - print time and average time for the last 
+                                    iteration (excluding iteration 0)
+                                    
+    Returns:
+        dBar (dictionary): data with the progress bar
+    """
+
+    # Correct the input arguments
+    iPrintIter = int(round(iPrintIter))
+    iMilestone = int(round(iMilestone))
+    iLineBreak = int(round(iLineBreak))
+
+    # Check if the settings are correct
+    if iMilestone % iPrintIter != 0:
+        strError = '\'iMilestone\' must be a multiplication of \'iPrintIter\'! (%d is not a multiplication of %d)!' \
+            % (iMilestone, iPrintIter)  
+        raise ValueError(strError)
+    if iLineBreak % iMilestone != 0:
+        strError = '\'iLineBreak\' must be a multiplication of \'iMilestone\'! (%d is not a multiplication of %d)!' \
+            % (iLineBreak, iMilestone)
+        raise ValueError(strError)
+    #----------------------------------
+
+    # Construct the output dictionary
+    dBar = dict()
+    dBar['bActive'] = 1
+    dBar['iInfoLen'] = len(strInfo)   # Length of the info string
+    dBar['iPrintIter'] = iPrintIter
+    dBar['iMilestone'] = iMilestone
+    dBar['iLineBreak'] = iLineBreak
+    dBar['bPrintSteps'] = bPrintSteps
+    dBar['bIteration0'] = bIteration0
+    dBar['bPrintTime'] = bPrintTime
+
+    # Start iterations
+    if bIteration0 == 0:
+        dBar['iLastIter'] = 0
+    else:
+        dBar['iLastIter'] = -1
+
+    # Construct a new line tabulator    
+    if bIteration0 == 0:
+        dBar['strNewLine'] = '\n              ' + (' ' * dBar['iInfoLen'])
+    else:
+        dBar['strNewLine'] = '\n              ' + (' ' * (dBar['iInfoLen'] + 1))
+ 
+    #----------------------------------
+    # Begin a progress bar
+    sys.stdout.write(_colors('PROGRESS') + '\n        >>> ' + _colors('ENDC'))
+    sys.stdout.write(strInfo + ': ')
+    sys.stdout.flush()
+
+    # Start the timer, if needed
+    if bPrintTime == 1:
+        tStart = time.time()
+        dBar['tStart'] = tStart
+
+    return dBar
+
+
+def progress_bar(dBar, iIter):
+    """
+    Function prints printing bar
+    Args:
+        dBar (string): info to be printed
+        iPrintIter (integer):  print a step after 'iPrintIter' iterations
+
+    Returns:
+        dBar (dictionary): data with the progress bar
+        iIter (integer): the current iteration
+    """
+    # Is the bar still actve
+    if dBar['bActive'] == 0:
+       return dBar
+
+    # Make iterations a round integer, in any case
+    iIter = int(round(iIter))
+
+    # Is it the end of the story?
+    if iIter < 0:
+        dBar['bActive'] = 0
+        if dBar['bPrintSteps'] == 1:
+            strMessage = ' (%d) ' % (dBar['iLastIter'])
+            sys.stdout.write(strMessage)
+            sys.stdout.flush()
+        if dBar['bPrintTime'] == 1:
+            sys.stdout.write(dBar['strNewLine'])
+            tTime = time.time() - dBar['tStart']  # Measure the time
+            strMessage = progress_bar_time(tTime, dBar['iLastIter'])            
+            sys.stdout.write(strMessage)
+            sys.stdout.flush()
+        return dBar
+
+    # Was this iteration already given? 
+    if iIter <= dBar['iLastIter']:
+        return dBar
+
+    iPreviousLastIter = dBar['iLastIter']
+    dBar['iLastIter'] = iIter  # Mark the current iteration as the last iteration
+
+    # Loop over all the iterations
+    for iIter in range(iPreviousLastIter + 1, iIter + 1):
+
+        if iIter == 0:
+            if dBar['bIteration0'] == 1:
+                sys.stdout.write(_colors('PROGRESS') + '0' + _colors('ENDC'))
+            return dBar
+
+        elif (iIter % dBar['iMilestone']) == 0:
+            sys.stdout.write(_colors('PROGRESS') + 'X' + _colors('ENDC'))
+            sys.stdout.flush()
+        elif (iIter % dBar['iPrintIter']) == 0:
+            sys.stdout.write('.')
+            sys.stdout.flush()
+
+        # Break the line, if it is needed
+        if (iIter % dBar['iLineBreak']) == 0:
+            sys.stdout.write(dBar['strNewLine'])
+            sys.stdout.flush()
+    return dBar
+
+
+def progress_bar_time(tTime, iIter):
+    """
+    Time service for the progress bar. 
+    """
+    iHour = 3600
+    iMin = 60
+    strMessage = 'Total time = %.1f [s]' % (tTime)
+
+    # Hours
+    if tTime >=  1 * iHour:
+        nHours = np.floor(tTime / iHour)
+        tTimeSec = tTime - nHours * iHour
+        if nHours == 1:
+            strMessage = strMessage + ' (%d [hour]' % (nHours)
+        else:
+            strMessage = strMessage + ' (%d [hours]' % (nHours)
+
+        if tTimeSec >= 1 * iMin: 
+            nMins = np.floor(tTimeSec / iMin)
+            tTimeSec = tTimeSec - nMins * iMin
+            strMessage = strMessage + ' %d [mins]' % (nMins)
+        strMessage = strMessage + ' %.1f [sec])' % (tTimeSec)
+
+    # Minutes
+    elif tTime >=  10 * iMin:
+        nMins = np.floor(tTime / iMin)
+        tTimeSec = tTime - nMins * iMin        
+        strMessage = strMessage + ' (%d [mins]' % (nMins)
+        strMessage = strMessage + ' %.1f [sec])' % (tTimeSec)
+
+    # One iteration
+    tTimeIter = tTime / iIter
+    
+    # Microseconds    
+    if tTimeIter < 1e-3:
+        strMessage = strMessage + ' (%.1f [us] p. iteration)' % (tTimeIter * 1e6)
+
+    # Miliseconds
+    elif tTimeIter < 1: 
+        strMessage = strMessage + ' (%.3f [ms] p. iteration)' % (tTimeIter * 1e3)
+    
+    else:
+        strMessage = strMessage + ' (%.3f [s] p. iteration)' % (tTimeIter)
+    return strMessage
 
 
 # =====================================================================
