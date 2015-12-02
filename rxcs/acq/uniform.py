@@ -46,6 +46,9 @@ The modules samples the given signals uniformly. |br|
 
     Observed signals:
     - a. **mObSig** (*Numpy array 2D*): The observed sampled signals
+ 
+    - b. **lObSig** (list): list with the observed sampled signals
+    
     
     Sampling patterns:
     - b. **mPatts** (*Numpy array 2D*): Sampling patterns (as grid indices)
@@ -83,7 +86,7 @@ The modules samples the given signals uniformly. |br|
     2.1    | 17-AUG-2015 :  * Observation matrices are gathered in list, not in 3D matrix |br|
     2.1r1  | 18-AUG-2015 :  * Adjusted to RxCSObject v1.0 |br|
     2.1r2  | 03-OCT-2015 :  * Secured against floating-point precision errors |br|
-
+    2.2    | 13-OCT-2015 :  * List with observed signal is added |br|
 
 *License*:
     BSD 2-Clause
@@ -363,6 +366,12 @@ class uniform(rxcs._RxCSobject):
         """
 
         self.mObSig = (self.mSig[np.arange(self.nSigs), self.mPattsRep.T]).T   # Sample the signals
+
+        # Put the observed signals into a list
+        self.lObSig = []
+        for inxSig in range(self.nSigs):
+            self.lObSig.append(self.mObSig[inxSig, :])
+                
         return
 
     # Generate the observation matrices
