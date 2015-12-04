@@ -300,7 +300,7 @@ def progress_bar_start(strInfo, iPrintIter, iMilestone, iLineBreak,
     #----------------------------------
     # Begin a progress bar
     sys.stdout.write(_colors('PROGRESS') + '\n        >>> ' + _colors('ENDC'))
-    sys.stdout.write(strInfo + ': ')
+    sys.stdout.write(strInfo + ' ')
     sys.stdout.flush()
 
     # Start the timer, if needed
@@ -1157,7 +1157,7 @@ def _colors(strKey):
     # Define colors for communication
     dColors['PROGRESS'] = dColors['DARK_MAGENTA']
     dColors['INFO'] = dColors['DARK_GREEN']
-    dColors['BULLET_INFO'] = dColors['BLUE']
+    dColors['BULLET_INFO'] = dColors['AQUA']
     dColors['BULLET'] = dColors['DARK_MAGENTA']
     dColors['WARN'] = dColors['RED']
     dColors['PARAM'] = dColors['AQUA']
