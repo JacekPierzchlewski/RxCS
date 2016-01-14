@@ -25,6 +25,36 @@ Frequencies represented by the rows of the generated IDFT matrix:
 
 where N is the number of tones in the dictionary.
 
+
+OR: 
+if the **bFreqSym** [frequency symmetrical] flag is cleared, then 
+the frequencies are organized like this:
+
+
+  freq.
+    ^        /.
+    |       / .
+    |      /  .  
+    |     /   .
+    |    /    .
+    |   /     .
+    |  /      .
+    | /       . N+1
+    |/        . .     
+    |1-------N---------2N---->  indices of columns
+    |           \      .
+    |            \     .
+    |             \    .
+    |              \   .
+    |               \  .
+    |                \ .
+    |                 \.
+
+where N is the number of tones in the dictionary.
+
+(the **bFreqSym** flag was added in v2.1, 14 January 2016).         
+
+
 *Examples*:
     Please go to the *examples/dictionaries* directory for examples on how to 
     use the dictionary generator. |br|
@@ -76,6 +106,8 @@ where N is the number of tones in the dictionary.
     
     - e. **nSamp** (*int*):  the number of time representation samples
 
+    - f. **bFreqSym** (*int*):  symmetrical/non-symmetrical frequency distribution flag
+
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
@@ -85,8 +117,10 @@ where N is the number of tones in the dictionary.
     1.0r1  | 15-JAN-2015 : * Improvements in code comments |br|
     1.0r2  | 20-AUG-2015 : * File name changed |br|
     2,0    | 20-AUG-2015 : * Version 2.0 released |br|
-    2.0r1  | 25-AUG-2015 : * Improvements in code comments and in headers |br|
+    2.0r1  | 25-AUG-2015 : * Improvements in code comments and in headers |br| 
     2.0r2  | 03-OCT-2015 : * Bug fixed in silent mode |br|
+    2.1    | 14-JAN-2016 : * Frequencies of tones may be organized non-symetrical |br|
+
 
 *License*:
     BSD 2-Clause
@@ -145,6 +179,11 @@ class IDFT(rxcs._RxCSobject):
         self.paramH('fFirst', 0)
         self.paramL('fFirst', np.inf)
 
+        # The 'symmetrical frequency distribution' flag
+        self.paramAddOpt('bFreqSym', 'Symmetrical frequency distribution', default=0)
+        self.paramType('bFreqSym', (int))
+        self.paramAllowed('bFreqSym',[0, 1])      # It can be either 1 or 0
+
         # 'Mute the output' flag
         self.paramAddOpt('bMute', 'Mute the output', noprint=1, default=0)
         self.paramType('bMute', int)           # Must be of int type
@@ -175,7 +214,7 @@ class IDFT(rxcs._RxCSobject):
         self.engineStartsInfo()      # Info that the engine starts
         self.vF = self._generateFVector(self.fFirstHigh, self.fDelta, self.fHigh)   # Frequency vector
         self.vT = self._generateTVector(self.Tg, self.nSamp, self.tStart)           # Time vector
-        self.mDict = self._generateIDFT(self.vT, self.vF)   # The dicionary matrix
+        self.mDict = self._generateIDFT(self.vT, self.vF)                           # The dicionary matrix        
         self.engineStopsInfo()       # Info that the engine ends
         return
 
@@ -349,6 +388,14 @@ class IDFT(rxcs._RxCSobject):
         # Generate the Dictionary matrix
         d = (1j * 2 * np.pi)   # d coefficient
         mDict = 0.5 * np.e**np.dot(vF, (d * vT))
+        if self.bFreqSym == 0:
+            mDict = mDict.T
+            (_, nCols) = mDict.shape
+            mDict_ = mDict.copy()
+            mDict_[:, np.arange(int(nCols/2))] = mDict[:, np.arange(int(nCols/2),nCols)]    
+            mDict_[:, np.arange(int(nCols/2),nCols)] = mDict[:, np.arange(int(nCols/2))]    
+            mDict = mDict_
+            mDict = mDict.T
 
         # -----------------------------------------------------------------
         vT.shape = (vT.size, )

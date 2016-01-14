@@ -20,7 +20,28 @@ Frequencies represented by the rows of the generated IDHT matrix:
 
 
 where N is the number of tones in the dictionary.
-           
+  
+OR: 
+if the **bFreqSym** [frequency symmetrical] flag is set, then the frequencies
+are organized like this:
+
+
+  freq.     (cos)      (sin) 
+    ^        /. \          
+    |       / .  \         
+    |      /  .   \        
+    |     /   .    \       
+    |    /    .     \      
+    |   /     .      \     
+    |  /      .       \    
+    | /       .        \   
+    |/        .         \  
+    |1-------N----------2N--->  indices of columns
+                .
+              N + 1
+              
+(the **bFreqSym** flag was added in v2.1, 14 January 2016).         
+              
            
 *Examples*:
     Please go to the *examples/dictionaries* directory for examples on how to 
@@ -73,6 +94,8 @@ where N is the number of tones in the dictionary.
     
     - e. **nSamp** (*int*):  the number of time representation samples
 
+    - f. **bFreqSym** (*int*):  symmetrical/non-symmetrical frequency distribution flag
+
 
 *Author*:
     Jacek Pierzchlewski, Aalborg University, Denmark. <jap@es.aau.dk>
@@ -82,6 +105,7 @@ where N is the number of tones in the dictionary.
     1.0r1  | 15-JAN-2015 : * Improvements in code comments |br|
     2,0    | 20-AUG-2015 : * Version 2.0 released |br|
     2.0r1  | 25-AUG-2015 : * Improvements in code comments and in headers |br|
+    2.1    | 14-JAN-2016 : * Frequencies of tones may be organized symetrical |br|
 
 *License*:
     BSD 2-Clause
@@ -140,6 +164,11 @@ class IDHT(rxcs._RxCSobject):
         self.paramH('fFirst', 0)
         self.paramL('fFirst', np.inf)
 
+        # The 'symmetrical frequency distribution' flag
+        self.paramAddOpt('bFreqSym', 'Symmetrical frequency distribution', default=0)
+        self.paramType('bFreqSym', (int))
+        self.paramAllowed('bFreqSym',[0, 1])      # It can be either 1 or 0
+
         # 'Mute the output' flag
         self.paramAddOpt('bMute', 'Mute the output', noprint=1, default=0)
         self.paramType('bMute', int)           # Must be of int type
@@ -170,7 +199,7 @@ class IDHT(rxcs._RxCSobject):
         self.engineStartsInfo()      # Info that the engine starts
         self.vF = self._generateFVector(self.fFirstHigh, self.fDelta, self.nTones)   # Frequency vector
         self.vT = self._generateTVector(self.Tg, self.nSamp, self.tStart)            # Time vector
-        self.mDict = self._generateIDHT(self.vT, self.vF)   # The dicionary matrix
+        self.mDict = self._generateIDHT(self.vT, self.vF)                            # The dicionary matrix                        
         self.engineStopsInfo()       # Info that the engine ends
         return
 
@@ -332,7 +361,7 @@ class IDHT(rxcs._RxCSobject):
             mDict (Numpy array 2D):  the generated dictionary         
         """
         
-        # Change shape of the vectors, so that they can be multiplies        
+        # Change shape of the vectors, so that they can be multiplied  
         vT.shape = (1, vT.size)
         vF = vF[0: vF.size / 2]  # Take only half of the frequency vector 
         vF.shape = (vF.size, 1)
@@ -345,6 +374,18 @@ class IDHT(rxcs._RxCSobject):
         mSin = np.sin(mFT)                # Sinus part of the matrrix
         mDict = np.vstack((mCos,mSin))    # IDHT matrix
 
+        # -----------------------------------------------------------------
+        # Reorganise the columns of the dictionary matrix, 
+        # if the flag 'bFreqSym' is switched on
+        if self.bFreqSym == 1:
+            mDict = mDict.T
+            (_, nCols) = mDict.shape
+            mDict_ = mDict.copy()
+            mDict_[:, np.arange(int(nCols/2))] = mDict[:, np.arange(int(nCols/2),nCols)]    
+            mDict_[:, np.arange(int(nCols/2),nCols)] = mDict[:, np.arange(int(nCols/2))]    
+            mDict = mDict_
+            mDict = mDict.T
+        
         # -----------------------------------------------------------------
         vT.shape = (vT.size, )   # Restore shape of the time vector
         return (mDict)
