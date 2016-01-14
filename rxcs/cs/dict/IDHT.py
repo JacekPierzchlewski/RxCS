@@ -199,7 +199,7 @@ class IDHT(rxcs._RxCSobject):
         self.engineStartsInfo()      # Info that the engine starts
         self.vF = self._generateFVector(self.fFirstHigh, self.fDelta, self.nTones)   # Frequency vector
         self.vT = self._generateTVector(self.Tg, self.nSamp, self.tStart)            # Time vector
-        self.mDict = self._generateIDHT(self.vT, self.vF)                            # The dicionary matrix                        
+        (self.mDict, self.vF) = self._generateIDHT(self.vT, self.vF)                            # The dicionary matrix                        
         self.engineStopsInfo()       # Info that the engine ends
         return
 
@@ -358,34 +358,31 @@ class IDHT(rxcs._RxCSobject):
             vF  (Numpy array 1D): frequency vector for the dictionary          
  
         Returns:
-            mDict (Numpy array 2D):  the generated dictionary         
+            mDict (Numpy array 2D): the generated dictionary         
+            vF  (Numpy array 1D):   frequency vector for the dictionary
         """
         
         # Change shape of the vectors, so that they can be multiplied  
         vT.shape = (1, vT.size)
-        vF = vF[0: vF.size / 2]  # Take only half of the frequency vector 
-        vF.shape = (vF.size, 1)
+        vF_ = vF[0: vF.size / 2]  # Take only half of the frequency vector 
+        vF_.shape = (vF_.size, 1)
 
         # -----------------------------------------------------------------
         # Generate the Dictionary matrix
-        mFT = np.dot(vF, vT)              # Frequency / time matrix
+        mFT = np.dot(vF_, vT)              # Frequency / time matrix
         mFT = 2*np.pi*mFT                 # ^
         mCos = np.cos(mFT)                # Cosine part of the matrix
         mSin = np.sin(mFT)                # Sinus part of the matrrix
-        mDict = np.vstack((mCos,mSin))    # IDHT matrix
+        mDict = np.vstack((mCos, mSin))   # IDHT matrix
 
         # -----------------------------------------------------------------
         # Reorganise the columns of the dictionary matrix, 
         # if the flag 'bFreqSym' is switched on
         if self.bFreqSym == 1:
-            mDict = mDict.T
-            (_, nCols) = mDict.shape
-            mDict_ = mDict.copy()
-            mDict_[:, np.arange(int(nCols/2))] = mDict[:, np.arange(int(nCols/2),nCols)]    
-            mDict_[:, np.arange(int(nCols/2),nCols)] = mDict[:, np.arange(int(nCols/2))]    
-            mDict = mDict_
-            mDict = mDict.T
+            (nRows, _) = mDict.shape
+            mDict[np.arange(int(nRows/2), nRows), :] = mDict[np.arange(int(nRows) - 1, int(nRows/2) - 1, -1), :]
+            vF[np.arange(int(nRows/2), int(nRows))] = vF[np.arange(int(nRows) - 1, int(nRows/2) - 1, -1)]
         
         # -----------------------------------------------------------------
         vT.shape = (vT.size, )   # Restore shape of the time vector
-        return (mDict)
+        return (mDict, vF)

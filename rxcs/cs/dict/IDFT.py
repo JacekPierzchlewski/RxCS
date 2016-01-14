@@ -214,7 +214,7 @@ class IDFT(rxcs._RxCSobject):
         self.engineStartsInfo()      # Info that the engine starts
         self.vF = self._generateFVector(self.fFirstHigh, self.fDelta, self.fHigh)   # Frequency vector
         self.vT = self._generateTVector(self.Tg, self.nSamp, self.tStart)           # Time vector
-        self.mDict = self._generateIDFT(self.vT, self.vF)                           # The dicionary matrix        
+        (self.mDict, self.vF) = self._generateIDFT(self.vT, self.vF)                           # The dicionary matrix        
         self.engineStopsInfo()       # Info that the engine ends
         return
 
@@ -389,15 +389,11 @@ class IDFT(rxcs._RxCSobject):
         d = (1j * 2 * np.pi)   # d coefficient
         mDict = 0.5 * np.e**np.dot(vF, (d * vT))
         if self.bFreqSym == 0:
-            mDict = mDict.T
-            (_, nCols) = mDict.shape
-            mDict_ = mDict.copy()
-            mDict_[:, np.arange(int(nCols/2))] = mDict[:, np.arange(int(nCols/2),nCols)]    
-            mDict_[:, np.arange(int(nCols/2),nCols)] = mDict[:, np.arange(int(nCols/2))]    
-            mDict = mDict_
-            mDict = mDict.T
+            (nRows, _) = mDict.shape
+            mDict[np.arange(int(nRows/2), nRows), :] = mDict[np.arange(int(nRows) - 1, int(nRows/2) - 1, -1), :]
+            vF[np.arange(int(nRows/2), nRows)] = vF[np.arange(int(nRows) - 1, int(nRows/2) - 1, -1)]
 
         # -----------------------------------------------------------------
         vT.shape = (vT.size, )
         vF.shape = (vF.size, )
-        return (mDict)
+        return (mDict, vF)
