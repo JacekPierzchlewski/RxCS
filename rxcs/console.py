@@ -13,6 +13,7 @@ from this module.
     0.22 | 14-AUG-2015 : * New function (progress_doneNL) is added 
     0.23 | 20-AUG-2015 : * New function (newline) is added 
     0.24 | 30-NOV-2015 : * Progress bar is added 
+    0.26 | 15-JAN-2016 : * Note, warning and info starts with a new line 
 
 
 *License*:
@@ -525,7 +526,7 @@ def warning(strWarn):
     """
 
     # Add a tabulator to the warning message
-    strWarn = ('          %s') % (strWarn)
+    strWarn = ('\n          %s') % (strWarn)
 
     # Write the warning
     sys.stdout.write(_colors('WARN'))
@@ -557,7 +558,7 @@ def info(strInfo):
     """
 
     # Add a tabulator to the info message
-    strInfo = ('          %s') % (strInfo)
+    strInfo = ('\n          %s') % (strInfo)
 
     # Write the info
     sys.stdout.write(_colors('INFO'))
@@ -629,7 +630,7 @@ def note(strNote):
     """
 
     # Add a tabulator to the info message
-    strNote = ('          %s') % (strNote)
+    strNote = ('\n          %s') % (strNote)
 
     # Write the info
     sys.stdout.write(strNote)
