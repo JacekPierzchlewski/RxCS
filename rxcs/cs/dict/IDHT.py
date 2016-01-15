@@ -106,7 +106,8 @@ are organized like this:
     2,0    | 20-AUG-2015 : * Version 2.0 released |br|
     2.0r1  | 25-AUG-2015 : * Improvements in code comments and in headers |br|
     2.1    | 14-JAN-2016 : * Frequencies of tones may be organized symetrical |br|
-
+    2.1r1  | 15-JAN-2016 : * Bug in entering the silend mode is repaired |br|
+    
 *License*:
     BSD 2-Clause
 
@@ -296,16 +297,18 @@ class IDHT(rxcs._RxCSobject):
 
     # Print some additional time parameters of the dictionary
     def _printExtraParam(self):
-        rxcs.console.bullet_param('The last time moment represented by the dictionary',
-                                   self.tEnd, '-', 'seconds')
-
-        rxcs.console.bullet_param('The signal representation sampling period',
-                                  self.Tg, '-', 'seconds')
-
-        rxcs.console.param('The number of signal samples', self.nSamp, '-', 'samples')
-
-        rxcs.console.bullet_param('The maximum frequency represented by the dictionary',
-                                  self.fHigh, '-', 'Hz')
+        
+        if not self.bMute == 1:
+            rxcs.console.bullet_param('The last time moment represented by the dictionary',
+                                       self.tEnd, '-', 'seconds')
+    
+            rxcs.console.bullet_param('The signal representation sampling period',
+                                      self.Tg, '-', 'seconds')
+    
+            rxcs.console.param('The number of signal samples', self.nSamp, '-', 'samples')
+    
+            rxcs.console.bullet_param('The maximum frequency represented by the dictionary',
+                                      self.fHigh, '-', 'Hz')
         return
 
     # Generate the frequency vector
