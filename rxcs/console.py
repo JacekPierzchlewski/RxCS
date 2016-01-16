@@ -294,9 +294,9 @@ def progress_bar_start(strInfo, iPrintIter, iMilestone, iLineBreak,
 
     # Construct a new line tabulator    
     if bIteration0 == 0:
-        dBar['strNewLine'] = '\n              ' + (' ' * dBar['iInfoLen'])
+        dBar['strNewLine'] = '\n             ' + (' ' * dBar['iInfoLen'])
     else:
-        dBar['strNewLine'] = '\n              ' + (' ' * (dBar['iInfoLen'] + 1))
+        dBar['strNewLine'] = '\n             ' + (' ' * (dBar['iInfoLen'] + 1))
  
     #----------------------------------
     # Begin a progress bar
