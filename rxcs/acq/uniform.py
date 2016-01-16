@@ -87,6 +87,7 @@ The modules samples the given signals uniformly. |br|
     2.1r1  | 18-AUG-2015 :  * Adjusted to RxCSObject v1.0 |br|
     2.1r2  | 03-OCT-2015 :  * Secured against floating-point precision errors |br|
     2.2    | 13-OCT-2015 :  * List with observed signal is added |br|
+    2.2r1  | 16-JAN-2016 :  * Fix in calculation of the expected average sampling period [round instead of ceil] |br|
 
 *License*:
     BSD 2-Clause
@@ -218,7 +219,7 @@ class uniform(rxcs._RxCSobject):
     
         # Calculate the expected average sampling period and recalculate it to
         # the grid
-        nT = int(math.ceil(1 / (f_s * self.Tg)))
+        nT = int(round(1 / (f_s * self.Tg)))
 
         self.nK_g = nK_g              # the number of grid points in the sampling pattern
         self.tTau_real = tTau_real    # the real time of sampling patterns
