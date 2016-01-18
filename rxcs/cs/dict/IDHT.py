@@ -106,7 +106,9 @@ are organized like this:
     2,0    | 20-AUG-2015 : * Version 2.0 released |br|
     2.0r1  | 25-AUG-2015 : * Improvements in code comments and in headers |br|
     2.1    | 14-JAN-2016 : * Frequencies of tones may be organized symetrical |br|
-    2.1r1  | 15-JAN-2016 : * Bug in entering the silend mode is repaired |br|
+    2.1r1  | 15-JAN-2016 : * Bug in entering the silent mode is repaired |br|
+    2.2    | 18-JAN-2016 : * Function 'freqRange' which gives indices of columns corresponding to a given frequency
+                             range is added |br|
     
 *License*:
     BSD 2-Clause
@@ -372,7 +374,7 @@ class IDHT(rxcs._RxCSobject):
 
         # -----------------------------------------------------------------
         # Generate the Dictionary matrix
-        mFT = np.dot(vF_, vT)              # Frequency / time matrix
+        mFT = np.dot(vF_, vT)             # Frequency / time matrix
         mFT = 2*np.pi*mFT                 # ^
         mCos = np.cos(mFT)                # Cosine part of the matrix
         mSin = np.sin(mFT)                # Sinus part of the matrrix
@@ -389,3 +391,25 @@ class IDHT(rxcs._RxCSobject):
         # -----------------------------------------------------------------
         vT.shape = (vT.size, )   # Restore shape of the time vector
         return (mDict, vF)
+
+
+    def freqRange(self, iFMin, iFMax):
+        """
+        Find indices of cols of the dictionary which correspond to a frequency range <iFMin, iFMax>
+        """
+        if not 'vF' in self.__dict__:
+            raise RuntimeError('Dictionary generator did not generate a dictionary yet!')
+        if iFMin > iFMax:
+            raise RuntimeError('Low frequency defining the frequency range can not be higher than the high frequency!')
+        if (iFMin < 0) or (iFMax < 0):
+            raise RuntimeError('Frequencies which define the frequency range can not be lower than zero!')
+        if (iFMin > self.fHigh):
+            raise RuntimeError('Requested frequency range is not in the dictionary!')
+                                 
+        iNf = self.vF.size          # The number of frequencies in the dictionary
+        vInx = np.arange(iNf)       # All the indices of frequencies in the dictionary
+        vFiltInx_p = vInx[np.multiply(self.vF >= iFMin, self.vF <= iFMax)]
+        vFiltInx_n = vInx[np.multiply(self.vF <= -iFMin, self.vF >= -iFMax)]
+        vFiltInx = np.hstack((vFiltInx_n, vFiltInx_p))
+        return vFiltInx
+
