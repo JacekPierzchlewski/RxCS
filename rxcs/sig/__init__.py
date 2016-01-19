@@ -13,3 +13,6 @@ from LNA import LNA
 
 # Import radio modules
 import radio
+
+# Import oversampler
+from oversampler import oversampler
