@@ -30,10 +30,10 @@ def _gaussNoise2_ex1():
     gaussNoise = rxcs.sig.gaussNoise2()  # Gaussian noise generator
 
     # Configure the generator...
-    gaussNoise.fR = 100e6      # Representation sampling frequency [100 MHz]
-    gaussNoise.tS = 1        # Time [1 sec]
-    gaussNoise.fMin = 100e3  # Minimum frequency component [100 kHz]
-    gaussNoise.fMax = 200e3  # Maximum frequency component [200 kHz]
+    gaussNoise.fR = 100e6     # Representation sampling frequency [100 MHz]
+    gaussNoise.tS = 1         # Time [1 sec]
+    gaussNoise.fMin = 100e3   # Minimum frequency component [100 kHz]
+    gaussNoise.fMax = 200e3   # Maximum frequency component [200 kHz]
 
     gaussNoise.run()              # ... and run it!
     vSig = gaussNoise.mSig[0, :]  # take the generated signal
