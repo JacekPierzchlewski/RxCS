@@ -114,7 +114,8 @@ available in arXiv: http://arxiv.org/abs/1409.1002
     2.1    | 17-AUG-2015 :  *  Observation matrices are gathered in list, not in 3D matrix |br|
     2.1r1  | 18-AUG-2015 :  *  Adjusted to RxCSObject v1.0 |br|
     2.2    | 24-AUG-2015 :  *  **lObSig**, **lPatts**, **lPattsRep**, **lPattsT** added to the output |br|
-
+    2.2r1  | 20-JAN-2016 :  *  Grid / representation sampling frequency compatibility check is secured against 
+                               floating-point inaccuracy issues |br|
 
 *License*:
     BSD 2-Clause 
@@ -361,11 +362,11 @@ class nonuniANGIE(rxcs._RxCSobject):
         # -----------------------------------------------------------------
         # Check if the signal representation sampling frequency is compatible
         # with the sampling period
-        if np.round(self.Tg * self.fR) != (self.Tg * self.fR):
+        if np.abs(np.round(self.Tg * self.fR) - (self.Tg * self.fR)) > 1e-6:
             strError = ('The chosen sampling grid period is incompatible with ')
             strError = strError + ('the signals representation sampling ')
             strError = strError + ('frequency')
-            raise ValueError(strError)
+            raise ValueError(strError)            
     
         # -----------------------------------------------------------------
         return
