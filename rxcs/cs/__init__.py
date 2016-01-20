@@ -23,3 +23,6 @@ from irlsL1 import irlsL1
 # Import Theta matrix generator
 from makeTheta import makeTheta
 
+# Import final reconstruction
+from finalRecon import finalRecon
+
