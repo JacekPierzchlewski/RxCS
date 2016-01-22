@@ -67,7 +67,7 @@ the saturated sampling points are removed.
     available after calling the 'run' method:
 
     Observed signals:
-    - a. **mSig** (*Numpy array 2D*): observed saturated signals
+    - a. **mObSig** (*Numpy array 2D*): observed saturated signals
 
     - b. **mSaturMark** (*Numpy array 2D*): saturation markers   
 
@@ -226,6 +226,10 @@ class satur(rxcs._RxCSobject):
         
         # Print results of saturation
         self._printResults(self.mSig, self.nSatMin, self.nSatMax)
+        
+        # Store the total number of saturated samples abd the average percentage of saturated samples in the signals
+        self.nSat = self.nSatMin + self.nSatMax 
+        self.nSatPerc = self.nSat/(self.nSamps*self.nSigs)*100
         return
 
     def _make2DSignals(self, mSig):
@@ -318,7 +322,7 @@ class satur(rxcs._RxCSobject):
             # Generate the clean observation matrix for the current pattern
             mPhiClean = np.zeros((nNSSamp, nCols))   # Allocate the current observation matrix
             inxRowClean = 0                           # Reset the index of the row in the clean observation matrix            
-            for inxRow in np.range(nRows):            # Loop over all rows in the original observation matrix
+            for inxRow in np.arange(nRows):            # Loop over all rows in the original observation matrix
                 if vSaturMark[inxRow] == 0:                       
                     # Propagate a row from the observation matrix into the clean observation matrix,
                     # if the sample which correspond to this row was not saturated
@@ -346,19 +350,22 @@ class satur(rxcs._RxCSobject):
         """
 
         (nSigs, nSamps) = mSig.shape  # Get the number of signals and the number of samples in one signal
- 
-        print('')        
-        rxcs.console.bullet_param('The total number of signals is', nSigs, '-', '')
-        rxcs.console.param('The number of samples in one signal is', nSamps, '-', 'samples')
-        rxcs.console.param('The total number of samples is', nSamps*nSigs, '-', 'samples')
-    
-        rxcs.console.bullet_param('The total number of saturated samples', nSatMin+nSatMax, '-', 'samples')
-        rxcs.console.param('which is',(nSatMin+nSatMax)/(nSamps*nSigs)*100, ' ', '%')
-    
-        rxcs.console.param('The total number of saturated samples because of too low value', nSatMin, '-', 'samples')
-        rxcs.console.param('which is',nSatMin/(nSamps*nSigs)*100, ' ', '%')
-    
-        rxcs.console.param('The total number of saturated samples because of too high value', nSatMax, '-', 'samples')
-        rxcs.console.param('which is',nSatMax/(nSamps*nSigs)*100, ' ', '%')
+        self.nSigs = nSigs    # Store the number of signals
+        self.nSamps = nSamps  # Store the number of samples in a signal     
+        
+        if self.bMute == 0:
+            print('')        
+            rxcs.console.bullet_param('The total number of signals is', nSigs, '-', '')
+            rxcs.console.param('The number of samples in one signal is', nSamps, '-', 'samples')
+            rxcs.console.param('The total number of samples is', nSamps*nSigs, '-', 'samples')
+        
+            rxcs.console.bullet_param('The total number of saturated samples', nSatMin+nSatMax, '-', 'samples')
+            rxcs.console.param('which is',(nSatMin+nSatMax)/(nSamps*nSigs)*100, ' ', '%')
+        
+            rxcs.console.param('The total number of saturated samples because of too low value', nSatMin, '-', 'samples')
+            rxcs.console.param('which is',nSatMin/(nSamps*nSigs)*100, ' ', '%')
+        
+            rxcs.console.param('The total number of saturated samples because of too high value', nSatMax, '-', 'samples')
+            rxcs.console.param('which is',nSatMax/(nSamps*nSigs)*100, ' ', '%')
         return
 
