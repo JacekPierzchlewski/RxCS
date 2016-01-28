@@ -4,6 +4,7 @@
 
 *Version*:
     1.0    | 20-JAN-2016 : * Version 1.0 released |br|
+    1.0r1  | 28-JAN-2016 : * Only real part of reconstructed signals is preserved
 
 *License*:
     BSD 2-Clause
@@ -103,21 +104,19 @@ class finalRecon(rxcs._RxCSobject):
 
         # Loop over all the signal coefficients
         if self.wasParamGiven('vInx'):
-            
             # Take only a part of the dictionary which should be used to reconstruct the signal
             self.mDict_ = self.mDict[self.vInx, :]
-            
             for inxSig in np.arange(nSigCoeff):
                 vCoeff = self.lCoeff[inxSig][self.vInx]  # 
                 vSig = vCoeff.dot(self.mDict_)           # Generate a signal
-                self.lSig.append(vSig)                  # Add the signal to the lst
-                self.mSig[inxSig, :] = vSig             # Add the signal to the matrix with signals
+                self.lSig.append(vSig)                   # Add the signal to the lst
+                self.mSig[inxSig, :] = vSig.real         # Add the signal to the matrix with signals
 
         else:
             for inxSig in np.arange(nSigCoeff):        
                 vSig = self.lCoeff[inxSig].dot(self.mDict)   # Generate a signal
                 self.lSig.append(vSig)
-                self.mSig[inxSig, :] = vSig             # Add the signal to the matrix with signals
+                self.mSig[inxSig, :] = vSig.real             # Add the signal to the matrix with signals
 
         return
 
