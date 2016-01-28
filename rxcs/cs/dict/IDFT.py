@@ -120,6 +120,8 @@ where N is the number of tones in the dictionary.
     2.0r1  | 25-AUG-2015 : * Improvements in code comments and in headers |br| 
     2.0r2  | 03-OCT-2015 : * Bug fixed in silent mode |br|
     2.1    | 14-JAN-2016 : * Frequencies of tones may be organized non-symetrical |br|
+    2.2    | 28-JAN-2016 : * Function 'freqRange' which gives indices of columns corresponding to a given frequency
+                             range is added |br|    
 
 
 *License*:
@@ -397,3 +399,24 @@ class IDFT(rxcs._RxCSobject):
         vT.shape = (vT.size, )
         vF.shape = (vF.size, )
         return (mDict, vF)
+
+
+    def freqRange(self, iFMin, iFMax):
+        """
+        Find indices of cols of the dictionary which correspond to a frequency range <iFMin, iFMax>
+        """
+        if not 'vF' in self.__dict__:
+            raise RuntimeError('Dictionary generator did not generate a dictionary yet!')
+        if iFMin > iFMax:
+            raise RuntimeError('Low frequency defining the frequency range can not be higher than the high frequency!')
+        if (iFMin < 0) or (iFMax < 0):
+            raise RuntimeError('Frequencies which define the frequency range can not be lower than zero!')
+        if (iFMin > self.fHigh):
+            raise RuntimeError('Requested frequency range is not in the dictionary!')
+                                 
+        iNf = self.vF.size          # The number of frequencies in the dictionary
+        vInx = np.arange(iNf)       # All the indices of frequencies in the dictionary
+        vFiltInx_p = vInx[np.multiply(self.vF >= iFMin, self.vF <= iFMax)]
+        vFiltInx_n = vInx[np.multiply(self.vF <= -iFMin, self.vF >= -iFMax)]
+        vFiltInx = np.hstack((vFiltInx_n, vFiltInx_p))
+        return vFiltInx
