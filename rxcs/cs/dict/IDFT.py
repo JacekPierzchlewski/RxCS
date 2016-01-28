@@ -95,18 +95,20 @@ where N is the number of tones in the dictionary.
 
     - a. **mDict** (*Numpy array 2D*):  the generated dictionary, one tone in a row
  
-    - b. **vT** (*Numpy array 1D*):  time vector for the dictionary
+    - b. **mDictR** (*Numpy array 2D*):  the generated dictionary, real only values, one tone in a row 
+ 
+    - c. **vT** (*Numpy array 1D*):  time vector for the dictionary
 
-    - c. **vF** (*Numpy array 1D*):  frequency vector for the dictionary    
+    - d. **vF** (*Numpy array 1D*):  frequency vector for the dictionary    
 
  
     Additional parameters of the generated dictionary:
 
-    - d. **Tg**  (*float*):  dictionary time representation period
+    - e. **Tg**  (*float*):  dictionary time representation period
     
-    - e. **nSamp** (*int*):  the number of time representation samples
+    - f. **nSamp** (*int*):  the number of time representation samples
 
-    - f. **bFreqSym** (*int*):  symmetrical/non-symmetrical frequency distribution flag
+    - g. **bFreqSym** (*int*):  symmetrical/non-symmetrical frequency distribution flag
 
 
 *Author*:
@@ -122,6 +124,7 @@ where N is the number of tones in the dictionary.
     2.1    | 14-JAN-2016 : * Frequencies of tones may be organized non-symetrical |br|
     2.2    | 28-JAN-2016 : * Function 'freqRange' which gives indices of columns corresponding to a given frequency
                              range is added |br|    
+    2.3    | 28-JAN-2016 : * Additional, real-valued only version of IDFT dictionary is returned
 
 
 *License*:
@@ -214,9 +217,9 @@ class IDFT(rxcs._RxCSobject):
         self._printExtraParam()
 
         self.engineStartsInfo()      # Info that the engine starts
-        self.vF = self._generateFVector(self.fFirstHigh, self.fDelta, self.fHigh)   # Frequency vector
-        self.vT = self._generateTVector(self.Tg, self.nSamp, self.tStart)           # Time vector
-        (self.mDict, self.vF) = self._generateIDFT(self.vT, self.vF)                           # The dicionary matrix        
+        self.vF = self._generateFVector(self.fFirstHigh, self.fDelta, self.fHigh)            # Frequency vector
+        self.vT = self._generateTVector(self.Tg, self.nSamp, self.tStart)                    # Time vector
+        (self.mDict, self.mDictR, self.vF, self.vFr) = self._generateIDFT(self.vT, self.vF)  # The dicionary matrices
         self.engineStopsInfo()       # Info that the engine ends
         return
 
@@ -379,7 +382,9 @@ class IDFT(rxcs._RxCSobject):
             vF  (Numpy array 1D): frequency vector for the dictionary          
  
         Returns:
-            mDict (Numpy array 2D):  the generated dictionary         
+            mDict   (Numpy array 2D):  the generated dictionary         
+            mDictR  (Numpy array 2D):  the generated dictionary, real values only
+            vF (Numpy array 1D): frequencies vector
         """
         
         # Change shape of the vectors, so that they can be multiplies
@@ -396,9 +401,17 @@ class IDFT(rxcs._RxCSobject):
             vF[np.arange(int(nRows/2), nRows)] = vF[np.arange(int(nRows) - 1, int(nRows/2) - 1, -1)]
 
         # -----------------------------------------------------------------
+        (nRows, nCols ) = mDict.shape                 # Get the number of rows/cols in the dictionary
+        mDictR = np.zeros((2*nRows, nCols))           # Construct a new empty real-only dictionary matrix
+        mDictR[np.arange(int(nRows/2)), :] = mDict.real[np.arange(int(nRows/2)) , :]   
+        mDictR[np.arange(int(nRows/2) , nRows), :] = -1 * mDict.real[np.arange(int(nRows/2), nRows), :]
+        mDictR[np.arange(nRows, 2*nRows), :] = mDict.imag
+
         vT.shape = (vT.size, )
         vF.shape = (vF.size, )
-        return (mDict, vF)
+        vFr = np.hstack((vF, vF))
+
+        return (mDict, mDictR, vF, vFr)
 
 
     def freqRange(self, iFMin, iFMax):
@@ -420,3 +433,27 @@ class IDFT(rxcs._RxCSobject):
         vFiltInx_n = vInx[np.multiply(self.vF <= -iFMin, self.vF >= -iFMax)]
         vFiltInx = np.hstack((vFiltInx_n, vFiltInx_p))
         return vFiltInx
+        
+        
+        
+    def freqRangeR(self, iFMin, iFMax):
+        """
+        Find indices of cols of the dictionary which correspond to a frequency range <iFMin, iFMax>  
+        (dictionary with only real values)
+        """
+        if not 'vFr' in self.__dict__:
+            raise RuntimeError('Dictionary generator did not generate a dictionary yet!')
+        if iFMin > iFMax:
+            raise RuntimeError('Low frequency defining the frequency range can not be higher than the high frequency!')
+        if (iFMin < 0) or (iFMax < 0):
+            raise RuntimeError('Frequencies which define the frequency range can not be lower than zero!')
+        if (iFMin > self.fHigh):
+            raise RuntimeError('Requested frequency range is not in the dictionary!')
+                                 
+        iNf = self.vFr.size          # The number of frequencies in the dictionary
+        vInx = np.arange(iNf)       # All the indices of frequencies in the dictionary
+        vFiltInx_p = vInx[np.multiply(self.vFr >= iFMin, self.vFr <= iFMax)]
+        vFiltInx_n = vInx[np.multiply(self.vFr <= -iFMin, self.vFr >= -iFMax)]
+        vFiltInx = np.hstack((vFiltInx_n, vFiltInx_p))
+        return vFiltInx        
+        
