@@ -11,6 +11,9 @@ from gaussNoise import gaussNoise
 # Import Gaussian noise (type 2)
 from gaussNoise2 import gaussNoise2
 
+# Import Gaussigna noise (type 3)
+from gaussNoise3 import gaussNoise3
+
 # Import nonlinear low-noise amplifier
 from LNA import LNA
 
