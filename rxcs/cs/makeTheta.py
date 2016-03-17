@@ -33,7 +33,9 @@
 
     Optional parameters:
 
-    - c. **bMute** (*int*):    mute the console output from the sampler [default = 0]
+    - c  **bNonuniform**  (*int*):   observation matrix comes from nonuniform sampling
+    
+    - d. **bMute** (*int*):    mute the console output from the sampler [default = 0]
 
 *Output*:
     Description of the Theta matrix generator output is below.
@@ -48,6 +50,7 @@
 
 *Version*:
     1,0    | 25-AUG-2015 : * Version 1.0 released |br|
+    1.1    | 17-MAR-2016 : Flag 'bNonuniform' is added |br|
 
 *License*:
     BSD 2-Clause
@@ -87,11 +90,15 @@ class makeTheta(rxcs._RxCSobject):
         self.paramTypeEl('lPhi' ,np.ndarray)  # with Numpy arrays
         self.paramSizH('lPhi', 0)             # The list can not be empty
 
+        # Observation matrix comes from nonuniform sampling
+        self.paramAddOpt('bNonuniform', 'Nonuniform sampling observation matrix', default=0)
+        self.paramType('bNonuniform', int)           # Must be of int type
+        self.paramAllowed('bNonuniform', [0, 1])     # It can be either 1 or 0
+
         # 'Mute the output' flag
         self.paramAddOpt('bMute', 'Mute the output', noprint=1, default=0)
         self.paramType('bMute', int)           # Must be of int type
         self.paramAllowed('bMute', [0, 1])     # It can be either 1 or 0
-
 
     # Run
     def run(self):
@@ -125,8 +132,26 @@ class makeTheta(rxcs._RxCSobject):
         for inxPhi in np.arange(nPhi):
             mPhi = self.lPhi[inxPhi]
             mDict = self.lDict[inxPhi]
-            mTheta = np.dot(mPhi, mDict)
+            if self.bNonuniform == 1:
+                mTheta = self._makeTheteNonuniform(mPhi, mDict)
+            else:
+                mTheta = np.dot(mPhi, mDict)
             self.lTheta.append(mTheta)
+
+
+    # Make Theta from nonuniform observation matrix
+    def _makeTheteNonuniform(self, mPhi, mDict):
+        """
+        This function creates Theta matrix from nonuniform observation matrix
+        """
+
+        # Find indices of rows of dictionary to be taken
+        vSumPhi = np.sum(mPhi, axis=0)        
+        vInxRows = np.arange(vSumPhi.size)
+        vInxRows = vInxRows[vSumPhi == 1]
+        mTheta = mDict[vInxRows, :]        
+        return mTheta        
+
 
     # Count and check the number of dictionaries and observation matrices
     def _processDictPhi(self, lDict, lPhi):
@@ -143,9 +168,9 @@ class makeTheta(rxcs._RxCSobject):
             nDict (int):    the number of dictionaries        
             nPhi  (int):    the number of observation matrices
         """
-        
+
         # Count the number of given dictionaries and observation matrices
-        nDict = len(lDict)            
+        nDict = len(lDict)
         nPhi = len(lPhi)
 
         # Check the sizes of lists
