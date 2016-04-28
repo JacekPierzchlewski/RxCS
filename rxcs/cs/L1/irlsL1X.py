@@ -332,7 +332,7 @@ class irlsL1X(rxcs._RxCSobject):
         # -------------------------------------------------------------------------
 
         # COMPUTATIONS START HERE:
-        vX = self.solverL2(mA, vY)           # Iteration zero
+        vX = self.solverL2(mA, vY)
 
         # Loop over all iterations
         strStopCond = 'Max iterations'
@@ -411,7 +411,7 @@ class irlsL1X(rxcs._RxCSobject):
         dAuxDict['vSNR'] = vSNR
         dAuxDict['vSNRL2'] = vSNRL2
 
-        return (vXfinal.T, mX, iIter, dAuxDict)
+        return (vXfinal.T, mX, iIter-1, dAuxDict)
 
 
     def _postprocessing(self):
@@ -584,14 +584,14 @@ class irlsL1X(rxcs._RxCSobject):
 
         # Perform an L2 check
         if bL2 == 1:
-            mADamaged = mA[:, vInxPreserved]
+            mADamaged = mA[:, vInxPreserved]            
             vXL2_ = self.solverL2(mADamaged, vY)
             (_, nCols) = mA.shape     # Take the number of rows and columns in Theta
             vXL2 = np.zeros(nCols)
             vXL2[vInxPreserved] = vXL2_
         else:
             vXL2 = np.nan
-        return bL2, vXL2
+        return (bL2, vXL2)
 
 
     def _startL2(self, iLeft, vY, mA, vInxPreserved, vX, mX, iIter):
@@ -631,79 +631,15 @@ class irlsL1X(rxcs._RxCSobject):
 
         return (bStop, strStopCond)
 
-
+    
     # =====================================================================
     # Solver L2
     # =====================================================================
     def solverL2(self, mA, vY):
-
-        iALDth=1e-4
-        iMaxDict=1e3
-
-        # Get the number of rows in the matrix A
-        (iR, _) = mA.shape
-
-        # Initialize training:
-        vRowA = mA[1, :]
-
-        iSample = vY[1]
-
-        iKtt = np.dot(vRowA, vRowA.T)
-        mKinv = np.array([[1/iKtt]])
-        vAlpha = np.array([iSample/iKtt])
-        mP = np.array([[1]])
-        mDict = np.array([vRowA])
-
-        #-------------------------------------------------------------------------
-        # Training loop (loop over all rows in the matrix A)
-        for i in np.arange(1, iR):
-            vRowA = mA[i, :]
-            if vRowA.ndim == 1:             # Change the shape of the input vector, if needed
-                vRowA = np.array([vRowA])
-
-            iSample = vY[i]
-
-            vK = np.dot(np.vstack((mDict, vRowA)), vRowA.T)
-            vKt = vK[np.arange(0, vK.size-1)]
-            iKtt = float(vK[vK.size-1])
-
-            vAT = np.dot(mKinv, vKt)                   # AT vector
-
-            iDelta = iKtt - float(np.dot(vKt.T, vAT))     # Delta value (integer)
-
-            (iRowsDict, _) = mDict.shape                  # The number of rows in the dictionary
-
-            if ((iDelta > iALDth) and (iRowsDict < iMaxDict)):  # expand, if delta is higher than
-                                                                # ALD threshold, and there is a
-                                                                # place in the dictionary
-
-                mDict = np.vstack((mDict, vRowA))
-                mKinv = iDelta * mKinv + np.dot(vAT, vAT.T)
-                mKinv = np.hstack((mKinv, -vAT))
-                mKinv = np.vstack((mKinv,
-                                   np.hstack((-vAT.T, np.array([[1]])))))
-                mKinv = (1/iDelta) * mKinv;
-
-                (iRowsP, _) = mP.shape
-                vZ = np.zeros((iRowsP, 1))
-
-                mP = np.vstack((np.hstack((mP, vZ)), np.hstack((vZ.T, np.array([[1]])))))
-
-                iOde = 1/iDelta * (iSample - np.dot(vKt.T, vAlpha))
-                vAlpha = np.vstack(((vAlpha - np.dot(vAT, iOde)), iOde))
-
-            else: # only update alpha
-
-                vQ = np.dot(mP,vAT) / (1 + np.dot(np.dot(vAT.T,mP),vAT))
-                mP = mP - np.dot(vQ, (np.dot(vAT.T,mP)))
-                vAlpha = vAlpha + mKinv.dot(vQ).dot(iSample - (vKt.T).dot(vAlpha))
-        #-------------------------------------------------------------------------
-
-        (iRowsDict, _) = mDict.shape # Get the number of rows from the dictionary
-        if iRowsDict > 0:
-            vX = np.dot(vAlpha.T, mDict)
-        else:
-            vX = np.zeros((iRowsDict,1))
-
+                
+        self.L2solv.mA = mA
+        self.L2solv.vY = vY
+        self.L2solv.bMute = 1
+        self.L2solv.run()   # Find the initial vector X
+        vX = self.L2solv.vX.copy() 
         return vX
-
