@@ -11,14 +11,14 @@ except ImportError:
     print('RxCS Warning: no \'cvxopt\' software found! Some reconstruction methods will not work!')
     print('')
     cvxoptOK = 0
-    
+
 if cvxoptOK == 1:
     from cvxoptL1 import cvxoptL1
 
 
 # Import irls L1 reconstruction
 from irlsL1 import irlsL1
-
+from irlsL1X import irlsL1X
 
 # Import Theta matrix generator
 from makeTheta import makeTheta
