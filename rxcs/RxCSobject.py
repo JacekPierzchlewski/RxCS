@@ -23,7 +23,7 @@
                 1.05    | 02-SEP-2015 : * Mull and add parameters are added to default reference 
                                           of an optional parameter |br|
                 1.05r1  | 02-SEP-2015 : * Bug in type check is fixed |br|
-
+                1.05r2  | 28-APR-2016 : * Bug in elements type check is fixed |br|
 
             List of functions in the module:
 
@@ -1737,8 +1737,9 @@ class _RxCSobject:
                 if isinstance(parameter, np.ndarray):
                     if (parameter.size > 0):
                         original_shape = parameter.shape
-                        parameter.shape = (parameter.size, )
-                        if not (isinstance(parameter[0], tuple(lTypesEl))):
+                        parametercopy = parameter.copy()
+                        parametercopy.shape = (parameter.size, )
+                        if not (isinstance(parametercopy[0], tuple(lTypesEl))):
                             strError = ('Parameter > %s < contains elements of an illegal type (%s)!') \
                                 % (strParName, type(parameter[0]))
                             raise ElementTypeError(strError)
