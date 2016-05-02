@@ -1,6 +1,8 @@
 
 # Import RxCSobject 
 from RxCSobject import _RxCSobject
+from parExp import parExp
+
 
 # Errors from RxCSobject
 from RxCSobject import ParameterMissingError
