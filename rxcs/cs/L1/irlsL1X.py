@@ -1,7 +1,6 @@
 from __future__ import division
 import rxcs
 import numpy as np
-import sys
 
 
 # =================================================================
@@ -162,20 +161,22 @@ class irlsL1X(rxcs._RxCSobject):
 
         # -----------------------------------------------------------------
         # Loop over all the observed signals
-        self.lCoeff = []   # Start a list with signal coefficients
-        self.lmX = []      # List with matrix with vectors x found in every iteration
-        self.lIter = []    # The number of iterations
-        self.lAux = []     # Dictionaries with auxiliary data
+        self.lCoeff = []     # Start a list with signal coefficients
+        self.lmX = []        # List with matrix with vectors x found in every iteration
+        self.lIter = []      # The number of iterations
+        self.lAux = []       # Dictionaries with auxiliary data
+        self.lChildrenOut = []  # Lists with outputs form children IRLS
         for inxSig in np.arange(nObSig):
 
             # Run reconstruction of the current signal
-            (vCoef, mX, iIter, dAuxDict) = self._recon1sig(inxSig)
+            (vCoef, mX, iIter, dAuxDict, lChildrenResults) = self._recon1sig(inxSig)
 
             # Store the coefficients in the list with coefficients
             self.lCoeff.append(vCoef)
             self.lmX.append(mX)
             self.lIter.append(iIter)
             self.lAux.append(dAuxDict)
+            self.lChildrenOut.append(lChildrenResults)
 
         # -----------------------------------------------------------------
         # Construct the complex output coefficients vector (if needed)
@@ -263,7 +264,14 @@ class irlsL1X(rxcs._RxCSobject):
         (vCoef, mX, iIter, dAuxDict) = self._irlsXL1(mTheta, vObSig, inxSig)
         vCoef.shape = (vCoef.size,)
 
-        return (vCoef, mX, iIter, dAuxDict)
+        # Run the child irls computations 
+        lChildrenResults = []
+        for dChild in self.lChildren:
+          
+            dChildResult = self._irlsXL1child(mTheta, vObSig, inxSig, dChild, dAuxDict).copy()
+            lChildrenResults.append(dChildResult)
+
+        return (vCoef, mX, iIter, dAuxDict, lChildrenResults)
 
 
     # Make complex output vectors, if it is needed
@@ -308,6 +316,118 @@ class irlsL1X(rxcs._RxCSobject):
 
 
     # =====================================================================
+    # Reconstruction irls child
+    # =====================================================================
+    def _irlsXL1child(self, mTheta, vObSig, inxSig, dChild, dAuxDict):
+
+        # Start the output dictionary with all the data
+        dChildResult = dict()
+        dChildResult['bStarted'] = 1
+
+        # Take the start iteration of the child and the number of iterations performed in the main IRLS
+        iStartIt = dChild['iStartIt']
+        iIter = dAuxDict['iIter']
+
+        # If the start iteration is after the end of the main IRLS, return
+        if iStartIt > iIter:
+            dChildResult['bStarted'] = 0
+            return dChildResult
+
+        # Take the vectors found by the main irls until the starting iteration
+        #mX = dAuxDict['mX'][:, np.arange(iStartIt)]
+        vX = dAuxDict['mX'][:, iStartIt]
+
+        # ----------------------------------------------------
+        # Power cut
+        iPowerCut = dChild['iPowerCut']
+        iXPower = np.sum(np.abs(vX) * np.abs(vX))  # Total power of the vector
+        vXX = vX * vX              # The power of elements of the vector X
+        vXX.shape = (vXX.size, )   # ^
+
+        vInxCols = np.arange(vX.size)
+        vInxPreserved = vInxCols[vXX >= iPowerCut*iXPower]  # Indices of preserved columns
+        
+        # ----------------------------------------------------
+        # Cut the Theta dictionary
+        (_, nCols) = mTheta.shape
+        mThetaChild = mTheta[:, vInxPreserved]
+        (_, nColsChild) = mThetaChild.shape       # Take the number of rows and columns in Theta
+
+        # ----------------------------------------------------  
+        # Compute the max number of iterations
+        iMaxIter = iIter - iStartIt - 1
+
+        # -------------------------------------------------------------------------
+        # Allocate data for analysis purposes
+        mXchild = np.zeros((nColsChild, iMaxIter+1))    # Matrix with vectors found in every iteration
+        mX = np.zeros((nCols, iMaxIter+1))
+        
+        vL2found = np.zeros(iMaxIter+1)       # Vectors found in L2 computations
+
+        vXleft = np.zeros(iMaxIter+1)                          # The number of elements of the vector over the power threshold
+        mPreservedInd = np.nan*np.zeros((nColsChild, iMaxIter+1))   # Indices of preserved elements of the vector X
+        mRemovedInd = np.nan*np.zeros((nColsChild, iMaxIter+1))     # Indices of removed elements of the vector X
+
+        mXL2child = np.zeros((nColsChild, iMaxIter+1))         # Matrix with vectors found in L2 side check
+        mXL2 = np.zeros((nCols, iMaxIter+1))                   # Matrix with vectors found in L2 side check
+
+        # -------------------------------------------------------------------------
+
+        # Iteration 'zero' (starting + 1)
+        vXchild = self.solverL2(mThetaChild, vObSig)   # Iteration #0
+
+        # Loop over all iterations 
+        for iIter in np.arange(1, iMaxIter+1):
+
+            # Store the previous solution
+            vXchild_prev = vXchild.copy()
+
+            # Compute the next vX value
+            vXchild = self.irlscore(vXchild, mThetaChild, vObSig)
+            
+            # Store data from the current iteration
+            vXchild_1dim = vXchild.copy(); vXchild_1dim.shape = (nColsChild, ); mXchild[:, iIter] = vXchild_1dim   # The found x vector in the 'mX' matrix
+            #vX_ = vX.copy()
+            #vX_[vInxPreserved] = vXchild
+            mX[vInxPreserved, iIter] = vXchild_1dim
+            
+
+
+        # -------------------------------------------------------------------------
+
+        # Cut down the auxiliary matrices
+        mXchild = mXchild[:, np.arange(iIter+1)]
+        mX = mX[:, np.arange(iIter+1)]
+
+        vL2found = vL2found[np.arange(iIter+1)]
+        vXleft = vXleft[np.arange(iIter+1)]
+        mPreservedInd = mPreservedInd[:, np.arange(iIter+1)]
+        mRemovedInd = mRemovedInd[:, np.arange(iIter+1)]
+        mXL2 = mXL2[:, np.arange(iIter+1)]
+        mXL2child = mXL2child[:, np.arange(iIter+1)]
+
+        # -------------------------------------------------------------------------
+
+        # Generate iterations vector
+        vIter = np.arange(0, iIter+1)  # Iterations vector
+
+        # Compute SNR for all the iterations
+        (vSNR, vSNRL2) = self.SNRvsIter(vIter, mX, mXL2, self.lDict, self.lInxDict, self.mSigRef, inxSig)
+
+        # ----------------------------------------------------
+        dChildResult['mXchild'] = mXchild  
+        dChildResult['iIter'] = iIter
+        dChildResult['vIter'] = vIter + iStartIt
+        dChildResult['vInxPreserved'] = vInxPreserved
+        dChildResult['iXPower'] = iXPower
+        dChildResult['vSNR'] = vSNR
+        dChildResult['vSNRL2'] = vSNRL2
+        
+        return dChildResult
+
+
+
+    # =====================================================================
     # Reconstruction irls
     # =====================================================================
     def _irlsXL1(self, mA, vY, inxSig):
@@ -322,21 +442,27 @@ class irlsL1X(rxcs._RxCSobject):
         # ALLOCATE DATA FOR ANALYSIS PURPOSES:
         (_, nCols) = mA.shape     # Take the number of rows and columns in Theta
 
-        mX = np.zeros((nCols, iMaxIter))    # Matrix with vectors found in every iteration
-        vL2found = np.zeros(iMaxIter)       # Vectors found in L2 computations
+        mX = np.zeros((nCols, iMaxIter+1))    # Matrix with vectors found in every iteration
+        vL2found = np.zeros(iMaxIter+1)       # Vectors found in L2 computations
 
-        vXleft = np.zeros(iMaxIter)  # The number of elements of the vector over the power threshold
-        mPreservedInd = np.nan*np.zeros((nCols, iMaxIter))   # Indices of preserved elements of the vector X
+        vXleft = np.zeros(iMaxIter+1)  # The number of elements of the vector over the power threshold
+        mPreservedInd = np.nan*np.zeros((nCols, iMaxIter+1))   # Indices of preserved elements of the vector X
+        mRemovedInd = np.nan*np.zeros((nCols, iMaxIter+1))       # Indices of removed elements of the vector X
 
-        mXL2 = np.zeros((nCols, iMaxIter))  # Matrix with vectors found in L2 side check
+
+        mXL2 = np.zeros((nCols, iMaxIter+1))  # Matrix with vectors found in L2 side check
         # -------------------------------------------------------------------------
 
         # COMPUTATIONS START HERE:
-        vX = self.solverL2(mA, vY)
+        vX = self.solverL2(mA, vY)   # Iteration #0
+        vX_1dim = vX.copy(); vX_1dim.shape = (vX.size, ); mX[:, 0] = vX_1dim  # The found x vector
+        vL2found[0] = 0
+        vXleft[0] = vX_1dim.size
+        mPreservedInd[: ,0] = np.arange(nCols)
 
         # Loop over all iterations
         strStopCond = 'Max iterations'
-        for iIter in np.arange(iMaxIter):
+        for iIter in np.arange(1, iMaxIter+1):
 
             # Store the previous solution
             vX_prev = vX.copy()
@@ -345,7 +471,7 @@ class irlsL1X(rxcs._RxCSobject):
             vX = self.irlscore(vX, mA, vY)
 
             # Power cut
-            (vInxPreserved, iLeft) = self.powercut(vX, iPowerCut, nCols)
+            (vInxPreserved, vInxRemoved, iLeft) = self.powercut(vX, iPowerCut, nCols)
 
             # Perform the side L2 optimisation, if it makes sense
             (bL2, vXL2) = self.L2recon(iLeft, vY, mA, vInxPreserved, vX, mX, iIter)
@@ -357,11 +483,12 @@ class irlsL1X(rxcs._RxCSobject):
             # -----------------------------------------------------------------------------------------
             # Store data from the current iteration
             vX_1dim = vX.copy(); vX_1dim.shape = (nCols, ); mX[:, iIter] = vX_1dim  # The found x vector in
-                                                                                    # the 'mX' matrix
-
+                                                                                   # the 'mX' matrix
             # Store the number of preserved elements of a dictionary and indices of preserved elements
             vXleft[iIter] = iLeft
             mPreservedInd[np.arange(vInxPreserved.size), iIter] = vInxPreserved
+            mRemovedInd[np.arange(vInxRemoved.size), iIter] = vInxRemoved
+            
 
             # L2
             if bL2 == 1:
@@ -371,7 +498,6 @@ class irlsL1X(rxcs._RxCSobject):
             if bStop == 1:
                 break
             # -----------------------------------------------------------------------------------------
-
 
         # -------------------------------------------------
         # Take the correct output
@@ -387,10 +513,12 @@ class irlsL1X(rxcs._RxCSobject):
         vL2found = vL2found[np.arange(iIter+1)]
         vXleft = vXleft[np.arange(iIter+1)]
         mPreservedInd = mPreservedInd[:, np.arange(iIter+1)]
+        mRemovedInd = mRemovedInd[:, np.arange(iIter+1)]
         mXL2 = mXL2[:, np.arange(iIter+1)]
+        
 
         # Generate iterations vector
-        vIter = np.arange(1, iIter+2)  # Iterations vector
+        vIter = np.arange(0, iIter+1)  # Iterations vector
 
         # Compute SNR for all the iterations
         (vSNR, vSNRL2) = self.SNRvsIter(vIter, mX, mXL2, self.lDict, self.lInxDict, self.mSigRef, inxSig)
@@ -401,17 +529,17 @@ class irlsL1X(rxcs._RxCSobject):
         dAuxDict['vX'] = vX.T                      # Vector from the main iterations
         dAuxDict['vXleft'] = vXleft
         dAuxDict['mX'] = mX                        # Vectors from all the main iterations
-        dAuxDict['strStopCond'] = strStopCond      # Correct stop conditions
-        iIter = iIter + 1
+        dAuxDict['strStopCond'] = strStopCond      # Correct stop reason
         dAuxDict['iIter'] = iIter
         dAuxDict['vIter'] = vIter
         dAuxDict['mPreservedInd'] = mPreservedInd
+        dAuxDict['mRemovedInd'] = mRemovedInd
         dAuxDict['mXL2'] = mXL2
         dAuxDict['vL2found'] = vL2found
         dAuxDict['vSNR'] = vSNR
         dAuxDict['vSNRL2'] = vSNRL2
 
-        return (vXfinal.T, mX, iIter-1, dAuxDict)
+        return (vXfinal.T, mX, iIter, dAuxDict)
 
 
     def _postprocessing(self):
@@ -568,9 +696,11 @@ class irlsL1X(rxcs._RxCSobject):
         iRemoved = np.sum(vXX < iPowerCut*iXPower)
 
         vInxPreserved = vInxCols[vXX >= iPowerCut*iXPower]  # Indices of preserved columns
+        vInxRemoved = vInxCols[vXX < iPowerCut*iXPower]  # Indices of preserved columns
+        
         iLeft = nCols - iRemoved
 
-        return (vInxPreserved, iLeft)
+        return (vInxPreserved, vInxRemoved, iLeft)
 
 
     def L2recon(self, iLeft, vY, mA, vInxPreserved, vX, mX, iIter):
