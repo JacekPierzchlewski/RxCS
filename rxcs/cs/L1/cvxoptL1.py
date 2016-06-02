@@ -17,7 +17,7 @@ The optimization module 'rxcs.cs.cvxoptL1' is designed to work with
 multiple observed signals, so that many signals can be reconstructed
 with one module call.
 
-Therefore, the Theta matrices should be grouped in a list, 
+Therefore, the Theta matrices should be grouped in a list,
 so that many Theta matrices may be given to the module (one element of the
 'lTheta' list = one Theta matrix).
 
@@ -25,15 +25,15 @@ so that many Theta matrices may be given to the module (one element of the
 
 OBSERVATION SIGNALS:
 Similarly, the observed signals are given as a list with 1D Numpy arrays
-(one list element  - one observed signal). 
+(one list element  - one observed signal).
 
-Always the number of elements in the list with observed signals must equal 
+Always the number of elements in the list with observed signals must equal
 the number Theta matrices.
 
 
 COMPLEX OPTIMIZATION FLAG:
 If the 'bComplex' is set, then the module converts the complex
-optimization problem into a real problem. This flag may not be given, 
+optimization problem into a real problem. This flag may not be given,
 by default it is cleared.
 
 Warning: the module does not support reconstruction of complex signals!
@@ -43,25 +43,25 @@ Warning: the module does not support reconstruction of complex signals!
 
 OUTPUT MATRIX WITH SIGNAL COEFFICIENS:
 The found signal coefficients are given as a list with 1D Numpy arrays,
-where one element of a list corresponds to a one array with found 
+where one element of a list corresponds to a one array with found
 signal coefficients.
 
-The number of elements in the output list equals the number of elements 
+The number of elements in the output list equals the number of elements
 in the input list with observed signals.
 
 ------------------------------------------------------------------------------
 
 *Examples*:
-    Please go to the *examples/reconstruction* directory for examples on how to 
+    Please go to the *examples/reconstruction* directory for examples on how to
     use the L1 reconstruction module. |br|
 
 *Settings*:
     Parameters of the L1 reconstruction module are described below.
 
-    Take a look on '__parametersDefine' function for more info on the 
+    Take a look on '__parametersDefine' function for more info on the
     parameters.
 
-    Parameters of the L1 reconstruction module are attributes of the class  
+    Parameters of the L1 reconstruction module are attributes of the class
     which must/can be set before the generator is run.
 
     Required parameters:
@@ -75,19 +75,19 @@ in the input list with observed signals.
 
     Optional parameters:
 
-    - d, **bComplex** (*float*):   'complex' problem flag, should be switched 
+    - d, **bComplex** (*float*):   'complex' problem flag, should be switched
                                    if Theta matrices are complex [default = 0]
 
     - e. **bMute** (*int*):    mute the console output from the sampler [default = 0]
 
 
 *Output*:
-    Description of the L1 reconstruction module output is below. 
-    This is the list of attributes of the class which are available 
+    Description of the L1 reconstruction module output is below.
+    This is the list of attributes of the class which are available
     after calling the 'run' method:
 
     - a. **lCoeff** (*list*):  list with the reconstructed signal coefficients,
-                               one element of the list is a 1D Numpy array with 
+                               one element of the list is a 1D Numpy array with
                                coefficients for one signal
 
 *License*:
@@ -127,7 +127,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     1.0    | 12-JUN-2014 : * Version 1.0 released. |br|
     2.0    | 21-AUG-2015 : * Version 2,0 (objectified version) released. |br|
     2.0r1  | 25-AUG-2015 : * Improvements in code comments and in headers |br|
-    
+    2.0r2  | 03-JUN-2016 : * A bug in reconstruction of multisignals is fixed |br|
+
 """
 from __future__ import division
 import rxcs
@@ -142,10 +143,10 @@ from cvxopt import blas, lapack, solvers
 class cvxoptL1(rxcs._RxCSobject):
 
     def __init__(self, *args):
-        rxcs._RxCSobject.__init__(self)    # Make it a RxCS object 
-        
+        rxcs._RxCSobject.__init__(self)    # Make it a RxCS object
+
         # Name of group of RxCS modules and module name
-        self.strRxCSgroup = 'Reconstruction'  
+        self.strRxCSgroup = 'Reconstruction'
         self.strModuleName = 'L1 basis pursuit (regularized regression) [cvxopt]'
 
         self.__inputSignals()      # Define the input signals
@@ -163,7 +164,7 @@ class cvxoptL1(rxcs._RxCSobject):
         self.paramAddMan('lTheta', 'Theta matrices', noprint=1)
         self.paramType('lTheta', list)            # Must be a list
         self.paramTypeEl('lTheta', (np.ndarray))  # Elements must be np.ndarray
-        self.paramSizEq('lTheta', 'lObserved')    # The number of theta matrices 
+        self.paramSizEq('lTheta', 'lObserved')    # The number of theta matrices
                                                   # must equal the number of observed
                                                   # signals
     # Define parameters
@@ -173,7 +174,7 @@ class cvxoptL1(rxcs._RxCSobject):
         self.paramAddOpt('bComplex', '\'complex data\' flag')
         self.paramType('bComplex', (int, float))  # Must be a number  type
         self.paramAllowed('bComplex', [0, 1])     # It can be either 1 or 0
-        
+
          # k parameter
         self.paramAddMan('iK', 'k parameter')
         self.paramType('iK', (int, float))    # Must be of int type
@@ -189,8 +190,8 @@ class cvxoptL1(rxcs._RxCSobject):
     def run(self):
         self.parametersCheck()    # Check if all the needed partameters are in place and are correct
         self.parametersPrint()    # Print the values of parameters
-        
-        self.checktInputSig()     # Check if the observed signals and Theta 
+
+        self.checktInputSig()     # Check if the observed signals and Theta
                                   # matrices are correct
 
         self.engineStartsInfo()  # Info that the engine starts
@@ -203,37 +204,37 @@ class cvxoptL1(rxcs._RxCSobject):
 
         # Get the number of the observed signals
         nObSig = len(self.lObserved)
-        
+
         # Check if the observed signals are 1 dimensional
         for inxSig in np.arange(nObSig):
             nDim = self.lObserved[inxSig].ndim
             if not (nDim == 1):
                 strE = 'The observed signals must be 1-dimensional'
-                strE = strE + 'Observed signal #%d has %d dimensions' % (inxSig, nDim) 
+                strE = strE + 'Observed signal #%d has %d dimensions' % (inxSig, nDim)
                 raise ValueError(strE)
-            
+
         # Check if the Theta matrices are 2 dimensional and have the number
         # of rows equal to the size of corresponding observed signa;
         for inxTheta in np.arange(nObSig):
             nDim = self.lTheta[inxTheta].ndim
             if not (nDim == 2):
                 strE = 'The Theta matrices must be 2-dimensional! '
-                strE = strE + 'Theta matrix #%d has %d dimensions' % (inxTheta, nDim) 
+                strE = strE + 'Theta matrix #%d has %d dimensions' % (inxTheta, nDim)
                 raise ValueError(strE)
-            
+
             (nRows, _) = self.lTheta[inxTheta].shape
             (nSize) = self.lObserved[inxTheta].shape
             if (nRows == nSize):
                 strE = 'The Theta matrices must have the number of rows equal '
                 strE = strE + 'to the size of corresponding observed signal! '
-                strE = strE + 'Theta matrix #%d has incorrect shape!' % (inxTheta)                
+                strE = strE + 'Theta matrix #%d has incorrect shape!' % (inxTheta)
                 raise ValueError(strE)
-      
+
         return
 
     # Engine - reconstruct the signal coefficients
     def __engine(self):
-    
+
         # Get the number of the observed signals
         nObSig = len(self.lObserved)
 
@@ -248,7 +249,7 @@ class cvxoptL1(rxcs._RxCSobject):
 
             # Run reconstruction of the current signal
             vCoeff = self._recon1sig(inxSig)
-                        
+
             # Store the coefficients in the list with coefficients
             self.lCoeff.append(vCoeff)
 
@@ -257,7 +258,7 @@ class cvxoptL1(rxcs._RxCSobject):
         if self.bComplex == 1:
             self.lCoeff = self._makeComplexOutput(self.lCoeff)
 
-        # -----------------------------------------------------------------        
+        # -----------------------------------------------------------------
         return
 
     # Reconstruct a single signal
@@ -265,68 +266,68 @@ class cvxoptL1(rxcs._RxCSobject):
         """
         Args:
             inxSig (list):  Index of the signal from the list with observed signals
-    
+
         Returns:
             vCoef (Numpy array 1D):  reconstructed signal coefficients
-    
+
         """
         # Get the current Theta matrix and make it a cvxopt matrix
         mmTheta = matrix(self.lTheta[inxSig])
 
         # Get the current observed signal and make it a cxxopt matrix
-        vvObSig = matrix(self.lObserved[inxSig])
+        vvObSig = matrix(self.lObserved[inxSig].copy())
 
         # Run the engine: Reconstruct the signal coefficients
         vvCoef = _reconEngine(mmTheta, vvObSig, self.iK)
-        
-        # Make the vector with signal coefficients a Numpy array 
+
+        # Make the vector with signal coefficients a Numpy array
         vCoef = np.array(vvCoef)
         vCoef.shape = (vCoef.size)
-        
-        return vCoef        
+
+        return vCoef
 
     # Make real-only Theta matrices, if it is needed
     def _makeRealProblem(self, lTheta):
         """
         This function makes a real only Theta matrix from a complex
         Theta matrix.
-    
+
         The output matrix has twice as many columns as the input matrix.
-    
+
         This function is used only if the optimization problem
         is complex and must be transformed to a real problem.
-    
-    
+
+
         Let's assume that the input complex Theta matrix looks as follows:
-    
+
         |  r1c1    r1c2    r1c3  |
         |  r2c1    r2c2    r2c3  |
         |  r3c1    r3c2    r3c3  |
         |  r4c1    r4c2    r4c3  |
         |  r5c1    r5c2    r5c3  |
-    
+
         Then the real output matrix is:
-    
+
         |  re(r1c1)   re(r1c2)   re(r1c3)   im(r1c1)   im(r1c2)   im(r1c3)  |
         |  re(r2c1)   re(r2c2)   re(r2c3)   im(r2c1)   im(r2c2)   im(r2c3)  |
         |  re(r3c1)   re(r3c2)   re(r3c3)   im(r3c1)   im(r3c2)   im(r3c3)  |
         |  re(r4c1)   re(r4c2)   re(r4c3)   im(r4c1)   im(r4c2)   im(r4c3)  |
         |  re(r5c1)   re(r5c2)   re(r5c3)   im(r5c1)   im(r5c2)   im(r5c3)  |
-    
+
 
         Args:
             lTheta (list): The list with theta matrices with complex values
-    
+
         Returns:
             lThetaR (list): The list with theta matrices with real only values
         """
-    
+
         # Get the size of the 3d matrix with Theta matricess
         nTheta = len(lTheta)                # Get the number of Theta matrices
-    
+
         # Create the real-only Theta matrix
         lThetaR = []
-    
+
         for inxPage in np.arange(nTheta):
             (nRows, nCols) = lTheta[inxPage].shape    # Get the number of rows/cols in the current Theta matrix
             mThetaR = np.zeros((nRows, 2*nCols))      # Construct a new empty real-only Theta matrix
@@ -341,17 +342,17 @@ class cvxoptL1(rxcs._RxCSobject):
         """
         This function constructs a complex output vector with the found
         signal coefficients,
-    
+
         This function is used only if the optimization problem
         is complex and was transformed to a real problem.
-    
+
         Args:
             lCoeff (list): List with found real signal coefficients
-    
+
         Returns:
             lCoeffC (list): List with found complex signal coefficients
         """
-    
+
         # Get the size of the list with coefficients
         nSigs = len(lCoeff)
 
@@ -373,7 +374,7 @@ class cvxoptL1(rxcs._RxCSobject):
 
             # Store the current complex vector
             lCoeffC.append(vCoeffC)
-        
+
         return lCoeffC
 
 # =================================================================
