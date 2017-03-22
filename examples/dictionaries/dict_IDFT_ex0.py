@@ -12,8 +12,9 @@ After the generation, the signal is plotted in the time domain.
 *Version*:
     1.0      | 30-MAY-2014 : * Version 1.0 released. |br|
     1.0-r1   | 23-FEB-2015 : * Header is added. |br|
-    2.0      | 20-AUG-2015 : * Version 2.0 released 
+    2.0      | 20-AUG-2015 : * Version 2.0 released
                                (adjusted to v2.0 of the dictionary generator) |br|
+    2.1      | 23-MAR-2017 : * Symmetrical frequency distribution is set
 
 *License*:
     BSD 2-Clause
@@ -34,6 +35,7 @@ def _dict_IDFT_ex0():
     IDFT.fDelta = 1e3  # The frequency separation between tones
     IDFT.nTones = 10   # The number of tones in the dictionary
 
+    IDFT.bFreqSym = 1  # Symmetrical frequency distribution
     IDFT.run()   # Generate the dictionary
 
     # -----------------------------------------------------------------
@@ -43,9 +45,9 @@ def _dict_IDFT_ex0():
     vFcoef = np.zeros((1,20)).astype(complex)
     vFcoef[0, 0] = 1
     vFcoef[0, 19] = 1
-     
-    # Get the dictionary matrix 
-    mIDFT = IDFT.mDict   
+
+    # Get the dictionary matrix
+    mIDFT = IDFT.mDict
 
     # Generate a signal and change its shape to a single vector
     vSig = np.real(np.dot(vFcoef,mIDFT))
